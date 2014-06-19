@@ -1,0 +1,8 @@
+/**
+\page page_features Features
+
+\tableofcontents
+
+\section sec-001 Dummy Feature
+\verbinclude features/001-Dummy.feature
+*/

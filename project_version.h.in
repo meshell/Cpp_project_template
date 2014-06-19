@@ -1,0 +1,17 @@
+#ifndef PROJECT_VERSION_H
+#define PROJECT_VERSION_H
+
+#include <string>
+
+namespace CppTemplate
+{
+
+  // the configured options and settings for the Project
+  static const std::string version_major = "@Project_VERSION_MAJOR@";
+  static const std::string version_minor = "@Project_VERSION_MINOR@";
+  static const std::string version_patch = "@Project_VERSION_PATCH@";
+
+} // namespace CppTemplate
+
+#endif // PROJECT_VERSION_H
+

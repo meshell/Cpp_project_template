@@ -1,0 +1,27 @@
+/**
+\page page_introduction Introduction
+
+\section Motivation Motivation
+
+The idea of this project templates is to have a Walking Skeleton as starting point for a C++ project. The project template contains the following targets:
+<ul>
+<li>A Dummy [google test] (http://code.google.com/p/googletest/) unit test</li>
+<li>A Dummy BDD Style (Gherkin) feature test using [Cucumber] (http://cukes.info/) and [Cucumber-cpp] (https://github.com/cucumber/cucumber-cpp)</li>
+<li>A Dummy BDD Style (Context/Specification) component test using [CppSpec] (https://github.com/tpuronen/cppspec)</li>
+<li>A Dummy BDD Style test using [Igloo] (http://igloo-testing.org/) testing framework</li>
+<li>[SonarQube] (http://www.sonarqube.org/) project file</li>
+<li>[Doxygen](www.doxygen.org) generated documentation</li>
+<li>A packages target which generates a [NSIS] (http://nsis.sourceforge.net) based installer (Windows) or a [Debian package] (http://en.wikipedia.org/wiki/Deb_%28file_format%29 ) (Linux)</li>
+<li>Makefile to build, run tests and measure metrics under Linux</li>
+</ul>
+
+\note
+Note that my definition of a <a href="http://alistair.cockburn.us/Walking+skeleton" target="_blank">Walking Skeleton</a> is not as defined in the literature, since it doesn't cut through the final architecture. 
+However it is a Walking Skeleton in the sense that it includes everything a C++ project possibly needs.
+
+\section ProjectPage Project Page
+
+The project sources can be found at github: https://github.com/meshell/Cpp_CMake_project_template
+
+*/
+

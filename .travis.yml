@@ -1,0 +1,48 @@
+language: cpp
+compiler:
+  - gcc
+  - clang
+
+env:
+  - CONFIG=Debug COVERAGE=0 
+  - CONFIG=Debug COVERAGE=1 DOC=1
+  - CONFIG=Release COVERAGE=0
+
+matrix:
+  exclude:
+    - compiler: clang
+      env: CONFIG=Debug COVERAGE=1 DOC=1
+    - compiler: gcc
+      env: CONFIG=Debug COVERAGE=0  
+
+branches:
+  only:
+    - master
+notifications:
+  recipients:
+    - estermann.michel@gmail.com
+  email:
+    on_success: change
+    on_failure: always
+before_install:
+  - if test ${CC} = gcc ; then sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test ; fi
+  - sudo apt-get update -qq
+  - if test ${CC} = gcc ; then sudo apt-get install -qq g++-4.8 ; fi
+  - if test ${CC} = gcc ; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 40 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8 --slave /usr/bin/gcov gcov /usr/bin/gcov-4.8 ; fi
+  - if test ${CC} = gcc ; then sudo update-alternatives --set gcc /usr/bin/gcc-4.8 ; fi
+  - gem install cucumber
+  - if [ "${COVERAGE}" = '1' ] ; then sudo pip install cpp-coveralls --use-mirrors; fi
+  - if [ "${DOC}" = '1' ] ; then sudo apt-get install doxygen graphviz; fi
+before_script:
+  - ./configure.sh -DCMAKE_BUILD_TYPE=$CONFIG
+  - make prepare
+script:
+  - make unittests
+  - make specs
+  - make features
+  - make igloo-tests
+  - make main
+  - if [ "${COVERAGE}" = '1' ] ; then make coverage ; fi 
+  - if [ "${DOC}" = '1' ] ; then make doc ; fi
+after_success:
+  - if [ "${COVERAGE}" = '1' ] ; then coveralls --exclude externals/include --exclude /usr/include --exclude test ; fi
