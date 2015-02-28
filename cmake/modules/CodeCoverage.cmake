@@ -61,7 +61,7 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname
         ${_testrunner} ${ARGV3}
 
         # Running gcovr
-        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -e '${CMAKE_SOURCE_DIR}/tests/unit' -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
+        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
     )
@@ -72,8 +72,6 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname
         COMMENT "Cobertura code coverage report saved in ${_outputname}.xml."
     )
 ENDFUNCTION() # SETUP_TARGET_FOR_COVERAGE_COBERTURA
-
-
 
 # Param _targetname     The name of new the custom make target
 # Param _testrunner     The name of the target which runs the tests
@@ -98,7 +96,7 @@ FUNCTION(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrun
 
     ADD_CUSTOM_TARGET(${_targetname}
         # Running gcovr
-        ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -e '${CMAKE_SOURCE_DIR}/tests/feature' -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
+        ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
     )
@@ -134,7 +132,7 @@ FUNCTION(SETUP_TARGET_SPEC_FOR_COVERAGE_COBERTURA _targetname _testrunner _outpu
         ${_testrunner} ${ARGV3}
 
         # Running gcovr
-        COMMAND ${GCOVR_PATH} -d -x -r ${CMAKE_SOURCE_DIR} -e '${CMAKE_SOURCE_DIR}/tests/spec' -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
+        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
     )
@@ -166,7 +164,7 @@ FUNCTION(SETUP_TARGET_FOR_IGLOO_COVERAGE_COBERTURA _targetname _testrunner _outp
         ${_testrunner} ${ARGV3} > ${ARGV4}
 
         # Running gcovr
-        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -e '${CMAKE_SOURCE_DIR}/tests/igloo' -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
+        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
     )
