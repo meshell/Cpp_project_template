@@ -79,9 +79,9 @@ set(GMOCK_LIBRARY_DIRS ${INSTALL_DIR})
 ####################
 
 # Set boost minimal version in order to build cppspec and cucumber-cpp with the same library versions
-set(BOOST_MIN_VERSION 1.57)
+set(BOOST_MIN_VERSION 1.55)
 set(Boost_Version ${BOOST_MIN_VERSION}.0)
-set(Boost_MD5 1be49befbdd9a5ce9def2983ba3e7b76)
+set(Boost_MD5 d6eef4b4cacb2183f2bf265a5a03a354)
 
 # cucumber-cpp and CppSpec needs filesystem, date_time, chrono, thread, system, regex and program_options
 # TODO: add your boost libraries here if you need one
