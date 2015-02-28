@@ -54,13 +54,30 @@ enable_testing()
 # Generic Compiler Flags
 #
 
+# Check for clang compiler
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGCXX 1)
+endif()
+
+#
+# Generic Compiler Flags
+#
 # Visual Studio 2012 needs _VARIADIC_MAX preprocessor define set in order to build google test
 if (MSVC11)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_VARIADIC_MAX=10")
 endif(MSVC11)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+# Determine the gcc version
+  execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
+                          OUTPUT_VARIABLE GCC_VERSION)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror")
+elseif(CMAKE_COMPILER_IS_CLANGCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Werror -Wno-c++98-compat -Wno-documentation -Wno-padded -Wno-weak-vtables -Wno-implicit-fallthrough")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 if(UNIX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -fPIC")
 endif(UNIX)
 
 # Enable C++11 or C++0x features if possible
@@ -76,18 +93,6 @@ else(COMPILER_KNOWS_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
   endif(COMPILER_KNOWS_CXX0X)
 endif(COMPILER_KNOWS_CXX11)
-
-# Determine the gcc version
-if(CMAKE_COMPILER_IS_GNUCXX)
-  execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
-                          OUTPUT_VARIABLE GCC_VERSION)
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
-# boost issues a lot of warnings with unused-local-typedefs warning option enabled (gcc > 4.8), therefore disable it
-check_cxx_compiler_flag("-Wunused-local-typedefs" COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
-if(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
-endif(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
 
 # set the path to the additional cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)

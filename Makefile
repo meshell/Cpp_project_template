@@ -1,8 +1,6 @@
 OUTPUT_DIR=build
 REPORT_DIR=reports
 
-all: unittests specs features igloo-tests doc main
-
 $(OUTPUT_DIR)/Makefile:
 	@make prepare
 
@@ -28,11 +26,17 @@ endif
 CUCUMBER_FEATURES_PATH=tests/feature
 CUCUMBER=cd $(CUCUMBER_FEATURES_PATH) && cucumber
 
+all: unittests specs features igloo-tests doc main
+
+.PHONY: configure
+configure: 
+	$(CONFIGURE_CMD) -DCMAKE_BUILD_TYPE=$(CONFIG)
+
 $(OUTPUT_DIR)/CMakeFiles:
-	$(CONFIGURE) -DCMAKE_BUILD_TYPE=$(CONFIG)
+	@make configure
 
 $(REPORT_DIR):
-	$(CONFIGURE)
+	@make configure
 
 .PHONY: prepare
 prepare: $(OUTPUT_DIR)/CMakeFiles
@@ -49,6 +53,10 @@ main: $(OUTPUT_DIR)/CMakeFiles
 
 .PHONY: test
 test: $(OUTPUT_DIR)/CMakeFiles
+	@cmake --build $(OUTPUT_DIR) --target dummy_spec
+	@cmake --build $(OUTPUT_DIR) --target dummy_describe
+	@cmake --build $(OUTPUT_DIR) --target dummy_when_then
+	@cmake --build $(OUTPUT_DIR) --target specs
 	@cmake --build $(OUTPUT_DIR) --target dummy_test
 	@cmake --build $(OUTPUT_DIR) --target test
 
@@ -62,34 +70,34 @@ specs: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target specs
 	$(OUTPUT_DIR)/tests/spec/$(BINARY_DIR)/specs$(BINARY_SUFFIX) -m
 
-.PHONY: igloo-tests
-igloo-tests: $(OUTPUT_DIR)/CMakeFiles 
-	@cmake --build $(OUTPUT_DIR) --target igloo-tests
-	$(OUTPUT_DIR)/tests/igloo/$(BINARY_DIR)/igloo-tests$(BINARY_SUFFIX)
-
 .PHONY: specs-junit
 specs-junit: $(REPORT_DIR)
 	@cmake --build $(OUTPUT_DIR) --target specs
 	$(OUTPUT_DIR)/tests/spec/$(BINARY_DIR)/specs$(BINARY_SUFFIX) -m -o junit --report-dir '$(REPORT_DIR)/tests/'
 
+.PHONY: igloo-tests
+igloo-tests: $(OUTPUT_DIR)/CMakeFiles 
+	@cmake --build $(OUTPUT_DIR) --target igloo-tests
+	$(OUTPUT_DIR)/tests/igloo/$(BINARY_DIR)/igloo-tests$(BINARY_SUFFIX)
+
+.PHONY: features
+features: $(OUTPUT_DIR)/CMakeFiles
+	@cmake --build $(OUTPUT_DIR) --target run_feature_test
+
+.PHONY: wip-features
+wip-features: $(OUTPUT_DIR)/CMakeFiles
+	@cmake --build $(OUTPUT_DIR) --target run_wip_features
+
 .PHONY: build-features
 build-features: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target features
 
-.PHONY: launch-features
-launch-features: build-features
+.PHONY: launch-wireserver
+launch-wireserver: build-features
 	$(LAUNCH_PREFIX) $(OUTPUT_DIR)/tests/feature/$(BINARY_DIR)/features$(BINARY_SUFFIX) $(LAUNCH_SUFFIX)
-
-.PHONY: features
-features: launch-features
-	$(CUCUMBER) 
-
-.PHONY: wip-features
-wip-features: launch-features
-	$(CUCUMBER) --profile wip 
-
+	
 .PHONY: features-doc
-features-doc: launch-features
+features-doc: launch-wireserver
 	$(CUCUMBER) --profile html
 
 .PHONY: coverage-unittests 
@@ -114,7 +122,7 @@ coverage: $(REPORT_DIR) coverage-unittests coverage-features coverage-igloo cove
 .PHONY: memcheck
 memcheck: build-features
 	$(LAUNCH_PREFIX) $(MEMCHECK) $(OUTPUT_DIR)/tests/feature/$(BINARY_DIR)/features$(BINARY_SUFFIX) $(LAUNCH_SUFFIX)
-	sleep 10
+	sleep 5
 	$(CUCUMBER)
 
 .PHONY: cppcheck

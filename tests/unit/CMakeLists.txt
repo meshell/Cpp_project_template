@@ -1,19 +1,21 @@
 ###################################################
-# Create test executables for every testclass (no coverage measurement) 
+# Create test executables for every testclass
+# (no coverage measurement)
 ###################################################
 
+# Disable some warnings issued by the googletest macro expansions
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors -Wno-non-virtual-dtor")
+endif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
 
 find_package(GMock REQUIRED)
 find_package(GTest REQUIRED)
 
-set(${PROJECT_NAME}_UNITTEST_INCLUDE_DIRS
-  ${GTEST_INCLUDE_DIRS}
-  ${GMOCK_INCLUDE_DIRS}
-  ${@PROJECT_NAME@_INCLUDE_DIRS})
-
-
 if(GTEST_FOUND AND GMOCK_FOUND)
-  include_directories(${@PROJECT_NAME@_UNITTEST_INCLUDE_DIRS})
+  include_directories(SYSTEM
+                      ${GTEST_INCLUDE_DIRS}
+                      ${GMOCK_INCLUDE_DIRS}
+                      )
     
   function(register_test TEST_FILE)
       get_filename_component(TEST_NAME ${TEST_FILE} NAME)
@@ -48,7 +50,7 @@ if(GTEST_FOUND AND GMOCK_FOUND)
       ${@PROJECT_NAME@_UNITTEST_LIBRARIES} 
       ${CMAKE_THREAD_LIBS_INIT})
   endif(UNIX)  
-  include_directories(${@PROJECT_NAME@_UNITTEST_INCLUDE_DIRS})
+
   add_executable(${@PROJECT_NAME@_UNITTEST_NAME} ${@PROJECT_NAME@_UNITTEST_SOURCES})
   target_link_libraries(${@PROJECT_NAME@_UNITTEST_NAME} ${@PROJECT_NAME@_UNITTEST_LIBRARIES} )
 

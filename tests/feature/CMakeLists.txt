@@ -2,10 +2,14 @@
 # Create a single feature test executable
 #
 
-
 set(${PROJECT_NAME}_BDDTEST_NAME 
   features
 )
+
+# Disable some warnings issued by the cucumber-cpp macro expansions
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor -Wno-global-constructors")
+endif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
 
 #
 # Boost
@@ -17,7 +21,6 @@ if(USE_STATIC_BOOST)
 else(USE_STATIC_BOOST)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
 endif(USE_STATIC_BOOST)
-
 
 find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
 
@@ -57,17 +60,16 @@ endif(CUKE_FOUND)
 FILE(GLOB_RECURSE FEATURE_FILES features *.feature)
 
 if(STEP_SOURCES)
-  include_directories(
-    ${@PROJECT_NAME@_INCLUDE_DIRS} 
+  include_directories(SYSTEM 
     ${CUKE_INCLUDE_DIR} 
     ${Boost_INCLUDE_DIRS})
 
   if (CPPSPEC_FOUND)
-    include_directories(${CPPSPEC_INCLUDE_DIR})  
+    include_directories(SYSTEM ${CPPSPEC_INCLUDE_DIR})  
   endif(CPPSPEC_FOUND)
   
   if (GTEST_FOUND)
-    include_directories(${GTEST_INCLUDE_DIRS})  
+    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})  
   endif(GTEST_FOUND)
   
   

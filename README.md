@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/meshell/CMake_project_template.png)](https://travis-ci.org/meshell/CMake_project_template)
+[![Coverage Status](https://coveralls.io/repos/meshell/Cpp_CMake_project_template/badge.svg?branch=master)](https://coveralls.io/r/meshell/Cpp_CMake_project_template?branch=master)
 
 CMake_project_template
 ======================

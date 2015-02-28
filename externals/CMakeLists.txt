@@ -19,6 +19,11 @@ else(MSVC)
   set(SCRIPT_SUFFIX .sh)
 endif(MSVC)
 
+check_cxx_compiler_flag("-Wunused-local-typedefs" COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
+if(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
+  set(CXX_FLAGS "-Wno-unused-local-typedefs")
+endif(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
+
 ####################
 # Igloo
 ####################
@@ -51,7 +56,7 @@ ExternalProject_Add(
   UPDATE_COMMAND ""
   CMAKE_ARGS
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-    -DCMAKE_CXX_FLAGS='-Wno-unused-local-typedefs'
+    -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
     -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -Dgtest_force_shared_crt=${MSVC}
@@ -74,9 +79,9 @@ set(GMOCK_LIBRARY_DIRS ${INSTALL_DIR})
 ####################
 
 # Set boost minimal version in order to build cppspec and cucumber-cpp with the same library versions
-set(BOOST_MIN_VERSION 1.55)
+set(BOOST_MIN_VERSION 1.57)
 set(Boost_Version ${BOOST_MIN_VERSION}.0)
-set(Boost_MD5 d6eef4b4cacb2183f2bf265a5a03a354)
+set(Boost_MD5 1be49befbdd9a5ce9def2983ba3e7b76)
 
 # cucumber-cpp and CppSpec needs filesystem, date_time, chrono, thread, system, regex and program_options
 # TODO: add your boost libraries here if you need one
@@ -102,9 +107,10 @@ set(BOOST_TOOLSET_BUILD)
 if(CMAKE_COMPILER_IS_GNUCXX)
   set(BOOST_TOOLSET "gcc")
   set(BOOST_TOOLSET_BUILD "toolset=gcc-${GCC_VERSION}")
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif(CMAKE_CXX_COMPILER MATCHES ".*clang")
   set(BOOST_TOOLSET "clang")
   set(BOOST_TOOLSET_BUILD "toolset=clang")
+  set(BOOST_CXX_FLAGS "cxxflags='-Wno-c99-extensions'")
 elseif(MSVC)
   if (NOT BOOST_TOOLSET)
     set(BOOST_TOOLSET "msvc")
@@ -125,7 +131,7 @@ ExternalProject_Add(
                     link=shared,static
                     threading=${BOOST_THREADING}
                     --layout=${BOOST_LAYOUT}
-                    cxxflags="-Wno-unused-local-typedefs"
+                    ${BOOST_CXX_FLAGS}
                     ${BOOST_TOOLSET_BUILD}
   BUILD_IN_SOURCE 1
   INSTALL_COMMAND ""
@@ -236,7 +242,7 @@ ExternalProject_Add(
   DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
   CMAKE_ARGS
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    -DCMAKE_CXX_FLAGS='-Wno-unused-local-typedefs'
+    -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}

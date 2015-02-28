@@ -2,9 +2,14 @@
 # Create test executables for every testclass (no coverage measurement) #
 ###################################################
 
+# Disable some warnings issued by the Igloo macro expansions
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-global-constructors -Wno-unused-parameter -Wno-non-virtual-dtor")
+endif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+
 find_package(Igloo REQUIRED)
 
-include_directories(${IGLOO_INCLUDE_DIR} ${@PROJECT_NAME@_INCLUDE_DIRS} )
+include_directories(SYSTEM ${IGLOO_INCLUDE_DIR})
  
 set(IGLOO_DIR ${CMAKE_CURRENT_SOURCE_DIR})  
 function(register_iglootest TEST_FILE)
@@ -42,7 +47,6 @@ set(@PROJECT_NAME@_IGLOOTEST_SOURCES
 set(${PROJECT_NAME}_IGLOOTEST_LIBRARIES
      ${@PROJECT_NAME@_LIBRARIES})
 
-include_directories(${@PROJECT_NAME@_INCLUDE_DIRS})
 add_executable(${@PROJECT_NAME@_IGLOOTEST_NAME} ${@PROJECT_NAME@_IGLOOTEST_SOURCES})
 link_directories(${@PROJECT_NAME@_LIBRARY_DIRS})
 target_link_libraries(${@PROJECT_NAME@_IGLOOTEST_NAME} ${@PROJECT_NAME@_IGLOOTEST_LIBRARIES} )

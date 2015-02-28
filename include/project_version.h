@@ -7,9 +7,9 @@ namespace CppTemplate
 {
 
   // the configured options and settings for the Project
-  static const std::string version_major = "1";
-  static const std::string version_minor = "0";
-  static const std::string version_patch = "0000";
+  constexpr auto version_major = "1";
+  constexpr auto version_minor = "0";
+  constexpr auto version_patch = "0000";
 
 } // namespace CppTemplate
 

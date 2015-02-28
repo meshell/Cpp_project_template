@@ -3,6 +3,12 @@
 # With coverage measurement
 #
 
+
+# Disable some warnings issued by the cppspec macro expansions
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
+endif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+
 set(${PROJECT_NAME}_SPEC_NAME 
   specs
 )
@@ -41,7 +47,8 @@ if(CPPSPEC_FOUND)
     ${CPPSPEC_LIBRARIES}
     ${Boost_LIBRARIES}
     ${@PROJECT_NAME@_LIBRARIES})
-  include_directories(${CPPSPEC_INCLUDE_DIR} ${@PROJECT_NAME@_MANAGER_INCLUDE_DIRS} include)
+  include_directories(SYSTEM ${CPPSPEC_INCLUDE_DIR})
+  include_directories(include)
   add_executable(${@PROJECT_NAME@_SPEC_NAME} ${@PROJECT_NAME@_SPEC_SOURCES})
   target_link_libraries(${@PROJECT_NAME@_SPEC_NAME} ${@PROJECT_NAME@_SPEC_LIBRARIES} )
 

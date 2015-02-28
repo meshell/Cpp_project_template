@@ -18,12 +18,14 @@ matrix:
 branches:
   only:
     - master
+
 notifications:
   recipients:
     - estermann.michel@gmail.com
   email:
     on_success: change
     on_failure: always
+
 before_install:
   - if test ${CC} = gcc ; then sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test ; fi
   - sudo apt-get update -qq
@@ -33,9 +35,11 @@ before_install:
   - gem install cucumber
   - if [ "${COVERAGE}" = '1' ] ; then sudo pip install cpp-coveralls --use-mirrors; fi
   - if [ "${DOC}" = '1' ] ; then sudo apt-get install doxygen graphviz; fi
+
 before_script:
   - ./configure.sh -DCMAKE_BUILD_TYPE=$CONFIG
   - make prepare
+
 script:
   - make unittests
   - make specs
@@ -44,5 +48,6 @@ script:
   - make main
   - if [ "${COVERAGE}" = '1' ] ; then make coverage ; fi 
   - if [ "${DOC}" = '1' ] ; then make doc ; fi
+
 after_success:
-  - if [ "${COVERAGE}" = '1' ] ; then coveralls --exclude externals/include --exclude /usr/include --exclude test ; fi
+  - if [ "${COVERAGE}" = '1' ] ; then coveralls -E.*/externals/.* -E/usr/include/.* -E.*/tests/.* -E.*/CMakeFiles/.* ; fi

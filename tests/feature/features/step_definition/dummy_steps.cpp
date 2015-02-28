@@ -12,7 +12,8 @@ struct DummyCtx {
   DummyCtx ():
     dummies_(),
     say_hello_result_("")
-  {};
+  {}
+
   std::vector<CppTemplate::Dummy> dummies_;
   std::string say_hello_result_;
 };
@@ -46,7 +47,7 @@ WHEN("^I command the dummy to say hello$") {
 
 
 WHEN("^I command the dummy (\\d+) to say hello$") {
-  REGEX_PARAM(int, dummy_index);
+  REGEX_PARAM(size_t, dummy_index);
   ScenarioScope<DummyCtx> context;
   context->say_hello_result_ = context->dummies_.at(dummy_index).say_hello();
 }

@@ -7,10 +7,6 @@ set(${PROJECT_NAME}_SOURCES
   dummy.cpp
 )
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -pedantic")
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
 add_library(${@PROJECT_NAME@_LIBRARY}
   STATIC  
   ${@PROJECT_NAME@_SOURCES})
@@ -20,7 +16,7 @@ add_library(${@PROJECT_NAME@_LIBRARY}
 #
 
 #
-# Boost
+# with Boost
 #
 set(CORE_BOOST_LIBS program_options)
 
@@ -32,7 +28,7 @@ endif()
 
 find_package(Boost COMPONENTS ${CORE_BOOST_LIBS} REQUIRED)
 
-include_directories(${Boost_INCLUDE_DIRS})   
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})   
 
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} ${@PROJECT_NAME@_LIBRARY} ${Boost_LIBRARIES})
