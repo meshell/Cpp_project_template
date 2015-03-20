@@ -20,11 +20,12 @@ branches:
     - master
 
 notifications:
-  recipients:
-    - estermann.michel@gmail.com
   email:
+    recipients:
+      - estermann.michel@gmail.com
     on_success: change
     on_failure: always
+
 
 before_install:
   - if test ${CC} = gcc ; then sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test ; fi
