@@ -1,9 +1,6 @@
 OUTPUT_DIR=build
 REPORT_DIR=reports
 
-$(OUTPUT_DIR)/Makefile:
-	@make prepare
-
 ifeq ($(OS),Windows_NT)
   CONFIGURE=./configure.bat
   LAUNCH_PREFIX=start
@@ -27,6 +24,9 @@ CUCUMBER_FEATURES_PATH=tests/feature
 CUCUMBER=cd $(CUCUMBER_FEATURES_PATH) && cucumber
 
 all: unittests specs features igloo-tests doc main
+
+$(OUTPUT_DIR)/Makefile:
+	@make prepare
 
 .PHONY: configure
 configure: 

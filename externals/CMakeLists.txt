@@ -41,7 +41,8 @@ if(NOT DISABLE_IGLOO)
       -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
     BUILD_COMMAND cmake --build <BINARY_DIR> --target igloo-tests
     INSTALL_COMMAND
-      cp -rf <SOURCE_DIR>/igloo <INSTALL_DIR>/include  
+      ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/igloo &&
+      ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/igloo <INSTALL_DIR>/include/igloo
    )
 endif(NOT DISABLE_IGLOO)
 
@@ -62,12 +63,12 @@ ExternalProject_Add(
     -Dgtest_force_shared_crt=${MSVC}
     -DBUILD_SHARED_LIBS=OFF
   INSTALL_COMMAND
-    cp -rf <SOURCE_DIR>/gtest/include/gtest <INSTALL_DIR>/include &&
-    cp -rf <SOURCE_DIR>/include/gmock <INSTALL_DIR>/include &&
-    cp -f <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
-    cp -f <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
-    cp -f <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/  &&
-    cp -f <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
+    ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/gtest/include <INSTALL_DIR>/include &&
+    ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&
+    ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
+    ${CMAKE_COMMAND} -E copy <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/ &&
+    ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gmock_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/  &&
+    ${CMAKE_COMMAND} -E copy <BINARY_DIR>/gtest/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}gtest_main${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
   )
 
 # override GMock_LIBRARY_DIRS such that only the ones from external are used
@@ -141,7 +142,7 @@ if(MSVC)
   string( REPLACE "_0" "" Boost_Version_Shorten ${Boost_Version_Underscore} )
   ExternalProject_Add_Step(
     boost MoveHeaders
-    COMMAND mv ${CMAKE_SOURCE_DIR}/externals/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_SOURCE_DIR}/externals/include/boost
+    COMMAND move ${CMAKE_SOURCE_DIR}/externals/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_SOURCE_DIR}/externals/include/boost
     DEPENDEES install
   )
     
@@ -211,9 +212,9 @@ if(UNIX)
     BUILD_COMMAND cmake --build <BINARY_DIR> --target CppSpec
       UPDATE_COMMAND ""
       INSTALL_COMMAND
-        mkdir -p <INSTALL_DIR>/include/CppSpec &&
-        cp -rfT <SOURCE_DIR>/include <INSTALL_DIR>/include/CppSpec &&
-        cp -f <BINARY_DIR>/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CppSpec${CMAKE_SHARED_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
+        ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/CppSpec &&
+        ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include/CppSpec &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CppSpec${CMAKE_SHARED_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
      )
 
     find_package(CppSpec)
@@ -256,8 +257,7 @@ ExternalProject_Add(
   BUILD_COMMAND cmake --build <BINARY_DIR> --target cucumber-cpp
   UPDATE_COMMAND ""
   INSTALL_COMMAND
-    cp -rf <SOURCE_DIR>/include/cucumber-cpp <INSTALL_DIR>/include &&
-    cp -rf <SOURCE_DIR>/include/json_spirit <INSTALL_DIR>/include &&
-    cp -f <BINARY_DIR>/src/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}cucumber-cpp${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
+    ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&
+    ${CMAKE_COMMAND} -E copy <BINARY_DIR>/src/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}cucumber-cpp${CMAKE_STATIC_LIBRARY_SUFFIX} <INSTALL_DIR>/lib/
 )
 
