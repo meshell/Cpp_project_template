@@ -74,36 +74,46 @@ if(STEP_SOURCES)
   
   
   set(${PROJECT_NAME}_FEATURETEST_LIBRARIES 
-    ${@PROJECT_NAME@_LIBRARIES}
+    ${${PROJECT_NAME}_LIBRARIES}
     ${CUKE_LIBRARIES} 
     ${Boost_LIBRARIES})    
 
   if (CPPSPEC_FOUND)
     set(${PROJECT_NAME}_FEATURETEST_LIBRARIES
-        ${@PROJECT_NAME@_FEATURETEST_LIBRARIES}
+        ${${PROJECT_NAME}_FEATURETEST_LIBRARIES}
         ${CPPSPEC_LIBRARIES})
   endif(CPPSPEC_FOUND)
 
   if (GTEST_FOUND)
     set(${PROJECT_NAME}_FEATURETEST_LIBRARIES
-        ${@PROJECT_NAME@_FEATURETEST_LIBRARIES}
+        ${${PROJECT_NAME}_FEATURETEST_LIBRARIES}
         ${GTEST_LIBRARIES})
   endif(GTEST_FOUND)
 
-  add_executable(${@PROJECT_NAME@_BDDTEST_NAME} 
+  add_executable(${${PROJECT_NAME}_BDDTEST_NAME} 
     ${STEP_SOURCES}
     ${FEATURE_FILES})
-  target_link_libraries(${@PROJECT_NAME@_BDDTEST_NAME} ${@PROJECT_NAME@_FEATURETEST_LIBRARIES})    
+  target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} ${${PROJECT_NAME}_FEATURETEST_LIBRARIES})    
 
   if(NOT MSVC)
-    target_link_libraries(${@PROJECT_NAME@_BDDTEST_NAME} pthread rt)
+    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} pthread)
   endif(NOT MSVC)
 
-  if(MSVC)
-    set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${@PROJECT_NAME@_BDDTEST_NAME}.exe)
-  else(MSVC)
-    set(FEATURE_TEST_EXE_CMD ${CMAKE_CURRENT_BINARY_DIR}/${@PROJECT_NAME@_BDDTEST_NAME} &)
-  endif(MSVC)
+  if(WIN32)
+    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} ws2_32)
+  else(WIN32)
+    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} rt)
+  endif(WIN32)
+
+  if(WIN32)
+    if(MSVC)
+      set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${${PROJECT_NAME}_BDDTEST_NAME}.exe)
+    else(MSVC)
+      set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/${${PROJECT_NAME}_BDDTEST_NAME}.exe)
+    endif(MSVC)
+  else(WIN32)
+    set(FEATURE_TEST_EXE_CMD ${CMAKE_CURRENT_BINARY_DIR}/${${PROJECT_NAME}_BDDTEST_NAME} &)
+  endif(WIN32)
 
  # run feature tests target
   add_custom_target(run_feature_test
@@ -114,7 +124,7 @@ if(STEP_SOURCES)
   )
 
   add_dependencies(run_feature_test
-    ${@PROJECT_NAME@_BDDTEST_NAME}
+    ${${PROJECT_NAME}_BDDTEST_NAME}
   )
   
    # run wip features target
@@ -126,43 +136,43 @@ if(STEP_SOURCES)
   )
 
   add_dependencies(run_wip_features
-    ${@PROJECT_NAME@_BDDTEST_NAME}
+    ${${PROJECT_NAME}_BDDTEST_NAME}
   )
   
   # Coverage
-  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+  if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
     include(CodeCoverage)
   
     set(${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE 
       ${CUKE_LIBRARIES} 
       ${Boost_LIBRARIES}
-      ${@PROJECT_NAME@_LIBRARIES}_coverage)  
+      ${${PROJECT_NAME}_LIBRARIES}_coverage)  
 
     if (CPPSPEC_FOUND)
       set(${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE
-          ${@PROJECT_NAME@_FEATURETEST_LIBRARIES_COVERAGE}
+          ${${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE}
           ${CPPSPEC_LIBRARIES})
     endif(CPPSPEC_FOUND)
 
     if (GTEST_FOUND)
       set(${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE
-          ${@PROJECT_NAME@_FEATURETEST_LIBRARIES_COVERAGE}
+          ${${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE}
           ${GTEST_LIBRARIES})
     endif(GTEST_FOUND)
 
-    add_executable(${@PROJECT_NAME@_BDDTEST_NAME}_coverage  
+    add_executable(${${PROJECT_NAME}_BDDTEST_NAME}_coverage  
       EXCLUDE_FROM_ALL 
       ${STEP_SOURCES})
     
-    target_link_libraries(${@PROJECT_NAME@_BDDTEST_NAME}_coverage ${@PROJECT_NAME@_FEATURETEST_LIBRARIES_COVERAGE} pthread rt)
+    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME}_coverage ${${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE} pthread rt)
 
     setup_target_under_cucumber_for_coverage_cobertura(
       coverage_features 
-      ${@PROJECT_NAME@_BDDTEST_NAME}_coverage
+      ${${PROJECT_NAME}_BDDTEST_NAME}_coverage
       ${COVERAGE_REPORT_DIR}/features
       ${PROJECT_SOURCE_DIR}/tests/feature/features
       ""
       "-ggcov-${GCC_VERSION}"
     )
-  endif(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+  endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
 endif(STEP_SOURCES)

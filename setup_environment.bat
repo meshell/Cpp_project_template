@@ -22,12 +22,21 @@ IF "%~1"=="VS2012" (
   )
 )
 
+IF "%~1"=="VS2015" (
+  SET VISUAL_STUDIO="VS2015"
+  IF "%~2"=="--cmake_path" (
+    SET CMAKE_PATH="%~3"
+  )
+)
+
 IF "%~1"=="--cmake_path" (
   SET CMAKE_PATH="%~2"
   IF "%~3"=="VS2013" (
     SET VISUAL_STUDIO="VS2013"
   ) ELSE IF "%~3"=="VS2012" (
     SET VISUAL_STUDIO="VS2012"
+  ) ELSE IF "%~3"=="VS2015" (
+    SET VISUAL_STUDIO="VS2015"
   )
 )
 
@@ -48,6 +57,8 @@ IF %VISUAL_STUDIO%=="VS2013" (
   SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
 ) ELSE IF %VISUAL_STUDIO%=="VS2012" (
   SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 11.0\VC\vcvarsall.bat"
+) ELSE IF %VISUAL_STUDIO%=="VS2015" (
+  SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
 ) ELSE (
   SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
 )
@@ -71,11 +82,11 @@ IF EXIST lib DEL /S/Q lib
 .\win_externals_include.exe -y
 
 IF %VISUAL_STUDIO%=="VS2013" (
-  .\win_externals_lib-msvc12.exe -y
+ .\win_externals_lib-msvc12.exe -y
 ) ELSE IF %VISUAL_STUDIO%=="VS2012" (
-  .\win_externals_lib-msvc11.exe -y
+ .\win_externals_lib-msvc11.exe -y
 ) ELSE (
-  .\win_externals_lib-msvc10.exe -y
+ .\win_externals_lib-msvc10.exe -y
 )
 @ECHO.
 POPD

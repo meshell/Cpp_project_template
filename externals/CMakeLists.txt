@@ -105,7 +105,11 @@ set(BOOST_TOOLSET)
 set(BOOST_TOOLSET_BUILD)
 
 # Use the same compiler for building boost as for your own project
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
+  set(BOOST_TOOLSET "mingw")
+  set(BOOST_TOOLSET_BUILD "toolset=gcc")
+  set(BOOST_CXX_FLAGS "-std=c++11")
+elseif(CMAKE_COMPILER_IS_GNUCXX)
   set(BOOST_TOOLSET "gcc")
   set(BOOST_TOOLSET_BUILD "toolset=gcc-${GCC_VERSION}")
 elseif(CMAKE_CXX_COMPILER MATCHES ".*clang")
@@ -116,7 +120,7 @@ elseif(MSVC)
   if (NOT BOOST_TOOLSET)
     set(BOOST_TOOLSET "msvc")
   endif(NOT BOOST_TOOLSET)
-endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
 
 ExternalProject_Add(
   boost

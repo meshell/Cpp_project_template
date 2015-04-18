@@ -13,7 +13,7 @@ set(${PROJECT_NAME}_SPEC_NAME
   specs
 )
 
-set(@PROJECT_NAME@_SPEC_SOURCES
+set(${PROJECT_NAME}_SPEC_SOURCES
     include/dummy_spec.h
     src/specs.cpp
     src/dummy_spec.cpp
@@ -36,7 +36,7 @@ if(CPPSPEC_FOUND)
   function(register_test TEST_FILE)
       get_filename_component(TEST_NAME ${TEST_FILE} NAME)
       message(STATUS "Adding spec " ${TEST_NAME})
-      cppspec_add_tests(${@PROJECT_NAME@_SPEC_NAME} "" ${TEST_FILE}.h)
+      cppspec_add_tests(${${PROJECT_NAME}_SPEC_NAME} "" ${TEST_FILE}.h)
   endfunction()
 
   register_test(include/dummy_spec)
@@ -46,11 +46,11 @@ if(CPPSPEC_FOUND)
   set(${PROJECT_NAME}_SPEC_LIBRARIES 
     ${CPPSPEC_LIBRARIES}
     ${Boost_LIBRARIES}
-    ${@PROJECT_NAME@_LIBRARIES})
+    ${${PROJECT_NAME}_LIBRARIES})
   include_directories(SYSTEM ${CPPSPEC_INCLUDE_DIR})
   include_directories(include)
-  add_executable(${@PROJECT_NAME@_SPEC_NAME} ${@PROJECT_NAME@_SPEC_SOURCES})
-  target_link_libraries(${@PROJECT_NAME@_SPEC_NAME} ${@PROJECT_NAME@_SPEC_LIBRARIES} )
+  add_executable(${${PROJECT_NAME}_SPEC_NAME} ${${PROJECT_NAME}_SPEC_SOURCES})
+  target_link_libraries(${${PROJECT_NAME}_SPEC_NAME} ${${PROJECT_NAME}_SPEC_LIBRARIES} )
 
   # Coverage
   if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
@@ -58,15 +58,15 @@ if(CPPSPEC_FOUND)
     set(${PROJECT_NAME}_SPEC_LIBRARIES_COVERAGE
       ${CPPSPEC_LIBRARIES}
       ${Boost_LIBRARIES}
-      ${@PROJECT_NAME@_LIBRARIES}_coverage)
+      ${${PROJECT_NAME}_LIBRARIES}_coverage)
 
-    add_executable(${@PROJECT_NAME@_SPEC_NAME}_coverage
+    add_executable(${${PROJECT_NAME}_SPEC_NAME}_coverage
       EXCLUDE_FROM_ALL
-      ${@PROJECT_NAME@_SPEC_SOURCES})
-    target_link_libraries(${@PROJECT_NAME@_SPEC_NAME}_coverage ${@PROJECT_NAME@_SPEC_LIBRARIES_COVERAGE} )
+      ${${PROJECT_NAME}_SPEC_SOURCES})
+    target_link_libraries(${${PROJECT_NAME}_SPEC_NAME}_coverage ${${PROJECT_NAME}_SPEC_LIBRARIES_COVERAGE} )
 
     setup_target_spec_for_coverage_cobertura(coverage_specs
-      ${@PROJECT_NAME@_SPEC_NAME}_coverage
+      ${${PROJECT_NAME}_SPEC_NAME}_coverage
       ${COVERAGE_REPORT_DIR}/specifications
       "-m;-ojunit;--report-dir;'${TESTS_REPORT_DIR}/'"
       "-ggcov-${GCC_VERSION}"

@@ -21,6 +21,8 @@ IF %VISUAL_STUDIO%=="VS2013" (
   %CMAKE% -G"Visual Studio 12" ..
 ) ELSE IF %VISUAL_STUDIO%=="VS2012" (
   %CMAKE% -G"Visual Studio 11" ..
+) ELSE IF %VISUAL_STUDIO%=="VS2015" (
+  %CMAKE% -G"Visual Studio 14" ..
 ) ELSE (
   %CMAKE% -G"Visual Studio 10" ..
 )
