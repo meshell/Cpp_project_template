@@ -20,13 +20,12 @@ elseif(UNIX)
   # Set a install path in the project folder
   # Windows 7 can not install directly into the default folder (e.g. C:/Program Files (x86)/Cpp_Project_Template)
   set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install CACHE PATH "Install path prefix" FORCE)
-  add_definitions(-D_WIN32_WINNT=0x0502)
 endif (UNIX)
 
 
 # Cmake cache variables
 set(BUILD_EXTERNALS ${UNIX} CACHE BOOL "Build also external libraries")
-set(DISABLE_CPPSPEC TRUE CACHE BOOL "Do not use CppSpec")
+set(DISABLE_CPPSPEC FALSE CACHE BOOL "Do not use CppSpec")
 set(DISABLE_IGLOO FALSE CACHE BOOL "Do not use Igloo testing framework")
 set(USE_STATIC_BOOST ${WIN32} CACHE BOOL "Statically link Boost")
 
@@ -76,6 +75,14 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 elseif(CMAKE_COMPILER_IS_CLANGCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Weverything -Werror -Wno-c++98-compat -Wno-documentation -Wno-padded -Wno-weak-vtables -Wno-implicit-fallthrough")
 endif(CMAKE_COMPILER_IS_GNUCXX)
+
+if(WIN32)
+  if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /D_WIN32_WINNT=0x0502")
+  else(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x0502")
+  endif(MSVC)
+endif(WIN32)
 
 if(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")

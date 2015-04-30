@@ -12,17 +12,28 @@ file(MAKE_DIRECTORY
 
 set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals)
 if(MSVC)
-  set(LIB_DIR "Debug")
   set(SCRIPT_SUFFIX .bat)
 else(MSVC)
-  set(LIB_DIR "")
   set(SCRIPT_SUFFIX .sh)
 endif(MSVC)
+
+set(LIB_DIR "")
+
+#TODO USe this one if build from Visual Studio Solution
+#set(LIB_DIR "Debug")
 
 check_cxx_compiler_flag("-Wunused-local-typedefs" COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
 if(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
   set(CXX_FLAGS "-Wno-unused-local-typedefs")
 endif(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
+
+if(WIN32)
+  if(MSVC)
+    set(CXX_FLAGS "${CXX_FLAGS} /EHsc /D_WIN32_WINNT=0x0502")
+  else(MSVC)
+    set(CXX_FLAGS "${CXX_FLAGS} -D_WIN32_WINNT=0x0502")
+  endif(MSVC)
+endif(WIN32)
 
 ####################
 # Igloo

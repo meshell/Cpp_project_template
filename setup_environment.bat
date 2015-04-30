@@ -76,19 +76,6 @@ IF EXIST include DEL /S/Q include
 IF EXIST lib DEL /S/Q lib
 
 @ECHO.
-@ECHO ======================================================================================
-@ECHO -- Unzip external headers and libraries --
-@ECHO ------------------------------------------
-.\win_externals_include.exe -y
-
-IF %VISUAL_STUDIO%=="VS2013" (
- .\win_externals_lib-msvc12.exe -y
-) ELSE IF %VISUAL_STUDIO%=="VS2012" (
- .\win_externals_lib-msvc11.exe -y
-) ELSE (
- .\win_externals_lib-msvc10.exe -y
-)
-@ECHO.
 POPD
 
 GOTO end
