@@ -114,13 +114,7 @@ FUNCTION(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrun
 
 ENDFUNCTION() # SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA
 
-# Param _targetname     The name of new the custom make target
-# Param _testrunner     The name of the target which runs the tests
-# Param _outputname     cobertura output is generated as _outputname.xml
-# Optional fourth parameter is passed as arguments to _testrunner
-# Optional fifth parameter is passed as arguments to gcovr
-#   Pass them in list form, e.g.: "-j;2" for -j 2
-FUNCTION(SETUP_TARGET_SPEC_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname)
+FUNCTION(SETUP_TARGET_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname)
     TARGET_LINK_LIBRARIES(${_testrunner} gcov)
     set_target_properties(${_testrunner} PROPERTIES 
         COMPILE_FLAGS "-fprofile-arcs -ftest-coverage"
@@ -142,8 +136,7 @@ FUNCTION(SETUP_TARGET_SPEC_FOR_COVERAGE_COBERTURA _targetname _testrunner _outpu
         COMMAND ;
         COMMENT "Cobertura code coverage report saved in ${_outputname}.xml."
     )
-ENDFUNCTION() # SETUP_TARGET_SPEC_FOR_COVERAGE_COBERTURA
-
+ENDFUNCTION() # SETUP_TARGET_FOR_COVERAGE_COBERTURA
 
 # Param _targetname     The name of new the custom make target
 # Param _testrunner     The name of the target which runs the tests

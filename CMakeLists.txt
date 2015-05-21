@@ -27,6 +27,7 @@ endif (UNIX)
 set(BUILD_EXTERNALS ${UNIX} CACHE BOOL "Build also external libraries")
 set(DISABLE_CPPSPEC FALSE CACHE BOOL "Do not use CppSpec")
 set(DISABLE_IGLOO FALSE CACHE BOOL "Do not use Igloo testing framework")
+set(DISABLE_CATCH FALSE CACHE BOOL "Do not use CATCH testing framework")
 set(USE_STATIC_BOOST ${WIN32} CACHE BOOL "Statically link Boost")
 
 
@@ -166,6 +167,13 @@ if(IGLOO_FOUND AND NOT DISABLE_IGLOO)
   add_subdirectory(tests/igloo)
 endif(IGLOO_FOUND AND NOT DISABLE_IGLOO)
 
+# Catch is used for BDD style unittests
+# TODO remove the next lines if you dont want to use Catch
+find_package(Catch)
+
+if(CATCH_FOUND AND NOT DISABLE_CATCH)
+  add_subdirectory(tests/catch)
+endif(CATCH_FOUND AND NOT DISABLE_CATCH)
 
 # CppSpec is an alternative to Igloo , i.e. used for specifications (BDD style unittests)
 # TODO remove the next lines if you dont want to use CppSpec

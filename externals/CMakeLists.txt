@@ -44,7 +44,7 @@ if(NOT DISABLE_IGLOO)
     igloo
     INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
     URL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.zip
-    URL_MD5 c63f2c6cc47bd922197ae65acc8ef85a
+    URL_MD5 a5c77fcea616f217dda7ad518cef253d
     UPDATE_COMMAND ""
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -56,6 +56,24 @@ if(NOT DISABLE_IGLOO)
       ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/igloo <INSTALL_DIR>/include/igloo
    )
 endif(NOT DISABLE_IGLOO)
+
+####################
+# CATCH
+####################
+if(NOT DISABLE_CATCH)
+
+  ExternalProject_Add(
+    catch
+    INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
+    URL https://github.com/philsquared/Catch/archive/master.zip
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND
+      ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/catch &&
+      ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/single_include/catch.hpp <INSTALL_DIR>/include/catch/
+   )
+endif(NOT DISABLE_CATCH)
 
 ####################
 # Google Mock

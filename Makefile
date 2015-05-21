@@ -23,7 +23,7 @@ endif
 CUCUMBER_FEATURES_PATH=tests/feature
 CUCUMBER=cd $(CUCUMBER_FEATURES_PATH) && cucumber
 
-all: unittests specs features igloo-tests doc main
+all: unittests specs features igloo-tests catch-tests doc main
 
 $(OUTPUT_DIR)/Makefile:
 	@make prepare
@@ -44,6 +44,7 @@ prepare: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target boost
 	@cmake --build $(OUTPUT_DIR) --target cppspec
 	@cmake --build $(OUTPUT_DIR) --target igloo
+	@cmake --build $(OUTPUT_DIR) --target catch
 	@cmake --build $(OUTPUT_DIR) --target cucumber-cpp
 	@$(CONFIGURE)
 
@@ -56,6 +57,8 @@ test: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target dummy_spec
 	@cmake --build $(OUTPUT_DIR) --target dummy_describe
 	@cmake --build $(OUTPUT_DIR) --target dummy_when_then
+	@cmake --build $(OUTPUT_DIR) --target dummy_scenario_catch
+	@cmake --build $(OUTPUT_DIR) --target dummy_test_catch
 	@cmake --build $(OUTPUT_DIR) --target specs
 	@cmake --build $(OUTPUT_DIR) --target dummy_test
 	@cmake --build $(OUTPUT_DIR) --target test
@@ -80,6 +83,11 @@ igloo-tests: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target igloo-tests
 	$(OUTPUT_DIR)/tests/igloo/$(BINARY_DIR)/igloo-tests$(BINARY_SUFFIX)
 
+.PHONY: catch-tests
+catch-tests: $(OUTPUT_DIR)/CMakeFiles 
+	@cmake --build $(OUTPUT_DIR) --target catch-tests
+	$(OUTPUT_DIR)/tests/catch/$(BINARY_DIR)/catch-tests$(BINARY_SUFFIX) -s -d --order rand
+	
 .PHONY: features
 features: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target run_feature_test
@@ -112,12 +120,16 @@ coverage-specs: $(OUTPUT_DIR)/CMakeFiles
 coverage-igloo: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target coverage_igloo
 
+.PHONY: coverage-catch 
+coverage-catch: $(OUTPUT_DIR)/CMakeFiles
+	@cmake --build $(OUTPUT_DIR) --target coverage_catch	
+
 .PHONY: coverage-features
 coverage-features: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target coverage_features
 
 .PHONY: coverage
-coverage: $(REPORT_DIR) coverage-unittests coverage-features coverage-igloo coverage-specs
+coverage: $(REPORT_DIR) coverage-unittests coverage-features coverage-igloo coverage-catch coverage-specs
 
 .PHONY: memcheck
 memcheck: build-features

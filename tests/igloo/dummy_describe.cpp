@@ -9,7 +9,7 @@ using namespace igloo;
 
 namespace {
 
-Describe (A_newly_created_default_dummy)
+Describe (The_newly_created_default_dummy)
 {
   It(should_be_speechless)
   {
@@ -19,7 +19,7 @@ Describe (A_newly_created_default_dummy)
   Dummy dummy;
 };
 
-Describe (A_english_dummy)
+Describe (The_english_dummy)
 {
   void SetUp()
   {
