@@ -14,34 +14,37 @@ namespace igloo {
   class DoxTestListener : public TestListener
   {
     public:
-      virtual void TestRunStarting() {}
-      virtual void TestRunEnded(const TestResults&) 
+      void TestRunStarting() override {}
+      void TestRunEnded(const TestResults&) override
       {
         std::cout << std::endl;
       }
 
-      virtual void ContextRunStarting(const ContextBase& context) 
+      void ContextRunStarting(const ContextBase& context) override
       {
         std::string context_name = context.Name();
         std::replace(context_name.begin(), context_name.end(), '_', ' ');
         std::cout << context_name << ":"<< std::endl;
       }
-      virtual void ContextRunEnded(const ContextBase& ) 
+
+      void ContextRunEnded(const ContextBase& ) override
       {
         std::cout << std::endl;
       }
-      virtual void SpecRunStarting(const ContextBase& context, const std::string& specName) 
+
+      void SpecRunStarting(const ContextBase& context, const std::string& specName) override
       {
         std::string spec_name = specName;
         std::replace(spec_name.begin(), spec_name.end(), '_', ' ');
         std::cout << "  - " << spec_name;      
       }
-      virtual void SpecSucceeded(const ContextBase& context, const std::string& specName)
+
+      void SpecSucceeded(const ContextBase& context, const std::string& specName) override
       {
         std::cout << "\t\t Passed" << std::endl;    
       }
 
-      virtual void SpecFailed(const ContextBase& , const std::string& )
+      void SpecFailed(const ContextBase& , const std::string& ) override
       {
         std::cout <<  "\t\t FAILED" << std::endl; 
       }

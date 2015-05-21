@@ -8,7 +8,7 @@ void DefaultDummySpec::isSpeechless ()
 }
 
 Dummy* EnglishDummySpec::createContext() {
-    Dummy* dummy = new Dummy("Hello", "World");
+    Dummy* dummy = new Dummy{"Hello", "World"};
     return dummy;
 }
 

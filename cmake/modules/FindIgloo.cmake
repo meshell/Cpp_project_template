@@ -2,13 +2,13 @@
 #
 # Defines the following variables:
 #
-#   IGLOO_FOUND - Found cucumber-cpp
+#   IGLOO_FOUND - Found Igloo headerfiles
 #   IGLOO_INCLUDE_DIR - Include directories
 #
 
 function(IGLOO_ADD_TESTS executable extra_args)
   if(NOT ARGN)
-    message(FATAL_ERROR "Missing ARGN: Read the documentation for GTEST_ADD_TESTS")
+    message(FATAL_ERROR "Missing ARGN: Read the documentation for IGLOO_ADD_TESTS")
   endif()
   foreach(source ${ARGN})
     file(READ "${source}" contents)

@@ -9,7 +9,7 @@ using namespace igloo;
 
 namespace {
 
- Describe (A_newly_created_default_dummy)
+Describe (A_newly_created_default_dummy)
 {
   It(should_be_speechless)
   {
@@ -21,8 +21,9 @@ namespace {
 
 Describe (A_english_dummy)
 {
-  void SetUp() {
-    dummy.reset(new Dummy("Hello", "World"));
+  void SetUp()
+  {
+    dummy.reset(new Dummy{"Hello", "World"});
   }
 
   It(should_not_be_speechless)

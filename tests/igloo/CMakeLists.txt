@@ -1,6 +1,6 @@
-###################################################
+#########################################################################
 # Create test executables for every testclass (no coverage measurement) #
-###################################################
+#########################################################################
 
 # Disable some warnings issued by the Igloo macro expansions
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
@@ -21,7 +21,7 @@ function(register_iglootest TEST_FILE)
   igloo_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
  endfunction()
 
-# The follwing tests are all the same tests but with different syntax, i.e 
+# The following tests are all the same tests but with different syntax, i.e 
 # - Specification/Context
 # - Describe It
 # - When Then
@@ -29,10 +29,10 @@ register_iglootest(dummy_spec)
 register_iglootest(dummy_describe)
 register_iglootest(dummy_when_then)
 
-############################################
-# Create a single test executable including all testclass.           #
-# With coverage measurement                                             #
-############################################
+###########################################################
+# Create a single test executable including all testclass.#
+# With coverage measurement                               #
+###########################################################
 
 set(${PROJECT_NAME}_IGLOOTEST_NAME 
   igloo-tests

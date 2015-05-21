@@ -6,57 +6,58 @@
 
 using cucumber::ScenarioScope;
 
-namespace {
+namespace
+{
 
-struct DummyCtx {
-  DummyCtx ():
-    dummies_(),
-    say_hello_result_("")
-  {}
-
-  std::vector<CppTemplate::Dummy> dummies_;
-  std::string say_hello_result_;
+struct DummyCtx
+{
+  std::vector<CppTemplate::Dummy> dummies;
+  std::string say_hello_result;
 };
 
 
 
-GIVEN("^a dummy initialised with \"([^\"]*)\" and \"([^\"]*)\"$") {
+GIVEN("^a dummy initialised with \"([^\"]*)\" and \"([^\"]*)\"$")
+{
   REGEX_PARAM(std::string, hello_string);
   REGEX_PARAM(std::string, world_string);
-  CppTemplate::Dummy dummy(hello_string, world_string);
   ScenarioScope<DummyCtx> context;
-  context->dummies_.push_back(dummy);
+  context->dummies.emplace_back(CppTemplate::Dummy{hello_string, world_string});
 }
 
-GIVEN("^the following dummies:$") {
+GIVEN("^the following dummies:$")
+{
   TABLE_PARAM(dummy_params);
   ScenarioScope<DummyCtx> context;
-  const table_hashes_type& dummies = dummy_params.hashes();
+  const auto& dummies_table = dummy_params.hashes();
 
-  for (auto iter = dummies.begin(); iter != dummies.end(); ++iter) {
-    CppTemplate::Dummy dummy(std::string(iter->at("hello")),
-                              std::string(iter->at("world")));
-    context->dummies_.push_back(dummy);
+  for (const auto& table_row : dummies_table)
+  {
+    context->dummies.emplace_back(CppTemplate::Dummy{std::string{table_row.at("hello")},
+                                                     std::string{table_row.at("world")}});
   }
 }
 
-WHEN("^I command the dummy to say hello$") {
+WHEN("^I command the dummy to say hello$")
+{
   ScenarioScope<DummyCtx> context;
-  context->say_hello_result_ = context->dummies_.front().say_hello();
+  context->say_hello_result = context->dummies.front().say_hello();
 }
 
 
-WHEN("^I command the dummy (\\d+) to say hello$") {
+WHEN("^I command the dummy (\\d+) to say hello$")
+{
   REGEX_PARAM(size_t, dummy_index);
   ScenarioScope<DummyCtx> context;
-  context->say_hello_result_ = context->dummies_.at(dummy_index).say_hello();
+  context->say_hello_result = context->dummies.at(dummy_index).say_hello();
 }
 
 
-THEN("^the dummy should say \"([^\"]*)\"$") {
+THEN("^the dummy should say \"([^\"]*)\"$")
+{
   REGEX_PARAM(std::string, hello_world_string);
   ScenarioScope<DummyCtx> context;
-  ASSERT_STREQ(context->say_hello_result_.c_str(), hello_world_string.c_str());
+  ASSERT_STREQ(context->say_hello_result.c_str(), hello_world_string.c_str());
 }
 
 

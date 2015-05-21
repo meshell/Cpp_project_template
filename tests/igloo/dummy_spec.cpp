@@ -20,8 +20,9 @@ Context (A_newly_created_default_dummy)
 
 Context (A_english_dummy)
 {
-  void SetUp() {
-    dummy.reset(new Dummy("Hello", "World"));
+  void SetUp()
+  {
+    dummy.reset(new Dummy{"Hello", "World"});
   }
 
   Spec(should_not_be_speechless)

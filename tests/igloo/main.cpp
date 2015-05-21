@@ -30,7 +30,7 @@ int main(int argc, const char* argv[])
   }
 
   std::unique_ptr<TestResultsOutput> output;
-  bool use_default = false;
+  auto use_default = false;
   if(choices::has_option("output", opt))
   {
     std::string val = choices::option_value("output", opt);

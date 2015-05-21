@@ -65,7 +65,7 @@ if(CPPSPEC_FOUND)
       ${${PROJECT_NAME}_SPEC_SOURCES})
     target_link_libraries(${${PROJECT_NAME}_SPEC_NAME}_coverage ${${PROJECT_NAME}_SPEC_LIBRARIES_COVERAGE} )
 
-    setup_target_spec_for_coverage_cobertura(coverage_specs
+    setup_target_for_coverage_cobertura(coverage_specs
       ${${PROJECT_NAME}_SPEC_NAME}_coverage
       ${COVERAGE_REPORT_DIR}/specifications
       "-m;-ojunit;--report-dir;'${TESTS_REPORT_DIR}/'"
