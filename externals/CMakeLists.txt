@@ -251,8 +251,10 @@ endif(UNIX)
 ExternalProject_Add(
   cucumber-cpp
   INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
-  URL https://github.com/cucumber/cucumber-cpp/archive/v0.3.tar.gz
-  URL_MD5 c6498c974ddca7a87e07097d0172a1df
+  GIT_REPOSITORY https://github.com/meshell/cucumber-cpp
+  GIT_TAG gcc48
+#  URL https://github.com/cucumber/cucumber-cpp/archive/v0.3.tar.gz
+#  URL_MD5 c6498c974ddca7a87e07097d0172a1df
   DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
   CMAKE_ARGS
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
