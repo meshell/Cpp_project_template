@@ -29,9 +29,11 @@ The external dependencies are either
 __Visual Studio 2013__ _(Visual Studio 12)_
 * execute the `create_VS_solution.bat` batch file
 * if cmake is installed but can not be found, provide the path to the bin folder to the script
+  
   Usage: `create_VS_solution.bat --cmake_path <path_to_cmake_root>`
 * A visual studio 2013 solution will be placed into folder `vs_build`
-___Note:__ Creating a Visual Studio 2013 Solution requires a recent CMake version (> CMake 2.8.11.2)_
+
+_Note: Creating a Visual Studio 2013 Solution requires a recent CMake version (> CMake 2.8.11.2)_
 
 __Windows__
 * execute the `build.bat` batch file
