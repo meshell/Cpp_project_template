@@ -11,6 +11,7 @@ An example project which can be used as starting point for C++ projects using cm
 * A Dummy BDD Style (Gherkin) feature test using [Cucumber](http://cukes.info/) and [Cucumber-cpp] (https://github.com/cucumber/cucumber-cpp)
 * A Dummy BDD Style (Context/Specification) component test using [CppSpec] (https://github.com/tpuronen/cppspec)
 * A Dummy BDD Style test using [Igloo] (http://igloo-testing.org/) testing framework
+* A Dummy BDD Style test using [Catch] (https://github.com/philsquared/Catch) testing framework
 * [SonarQube](http://www.sonarqube.org/) project file
 * Makefile to build, run tests and meassure metrics under linux
 
@@ -25,34 +26,22 @@ The external dependencies are either
 
 # How to build
 --------------
-__Visual Studio 2010__ _(Visual Studio 10)_
+__Visual Studio 2013__ _(Visual Studio 12)_
 * execute the `create_VS_solution.bat` batch file
 * if cmake is installed but can not be found, provide the path to the bin folder to the script
   Usage: `create_VS_solution.bat --cmake_path <path_to_cmake_root>`
-* A visual studio 2010 solution will be placed into folder `vs_build`
-
-__Visual Studio 2012__ _(Visual Studio 11)_
-* execute the `create_VS_solution.bat` batch file with VS2012 as batch file argument
-* if cmake is installed but can not be found, provide the path to the bin folder to the script
-  Usage: `create_VS_solution.bat --cmake_path <path_to_cmake_root>`
-* A visual studio 2012 solution will be placed into folder `vs_build`
-
-__Visual Studio 2013__ _(Visual Studio 12)_
-* execute the `create_VS_solution.bat` batch file with VS2013 as batch file argument
-* if cmake is installed but can not be found, provide the path to the bin folder to the script
-  Usage: `create_VS_solution.bat --cmake_path <path_to_cmake_root>`
 * A visual studio 2013 solution will be placed into folder `vs_build`
-* ___Note:___ Creating a Visual Studio 2013 Solution requires a recent CMake version (> CMake 2.8.11.2)
+___Note:__ Creating a Visual Studio 2013 Solution requires a recent CMake version (> CMake 2.8.11.2)_
 
 __Windows__
-* execute the `build.bat` batch file (with VS2012 as batch file argument for VS2012)
+* execute the `build.bat` batch file
 * if cmake is installed but can not be found, provide the path to the bin folder to the script
   Usage: `build.bat --cmake_path <path_to_cmake_root>`
 * The project is built with nmake in folder `build`
 * All tests are executed 
 
 __Windows Installer__
-* execute the `create_windows_installer.bat` batch file (with VS2012 as batch file argument for VS2012)
+* execute the `create_windows_installer.bat` batch file
 * if cmake is installed but can not be found, provide the path to the bin folder to the script
   Usage: `create_windows_installer.bat --cmake_path <path_to_cmake_root>`
 * The project is built with in folder `build`
@@ -74,6 +63,7 @@ The following make targets are available
 * __specs__: Build the CppSpec BDD tests and run it
 * __specs-junit__: Build the CppSpec BDD tests and run it with junit (xml) output
 * __igloo-tests__: Build the Igloo specificationtest and run it
+* __catch-tests__: Build the Catch tests and run it
 * __features__: Build the cucumber feature tests and run it
 * __wip-features__: Build the cucumber feature tests and run only the WIP features
 * __features-doc__: Build the cucumber feature tests and run it producing html output at `reports/tests`

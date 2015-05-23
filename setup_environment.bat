@@ -2,26 +2,12 @@
 REM This script searchs for the tools neded to build the C++ template project, e.g. CMake, Visual Studio and Cucumber
 REM and further enpacks the dependencies
 
-SET VISUAL_STUDIO="VS2010"
+SET VISUAL_STUDIO="VS2013"
 SET PROGRAM_FILES=%PROGRAMFILES(X86)%
 IF NOT EXIST "%PROGRAM_FILES%" SET PROGRAM_FILES=%PROGRAMFILES%
 SET CMAKE_PATH="%PROGRAM_FILES%"
 
 REM Read arguments
-IF "%~1"=="VS2013" (
-  SET VISUAL_STUDIO="VS2013"
-  IF "%~2"=="--cmake_path" (
-    SET CMAKE_PATH="%~3"
-  )
-)
-
-IF "%~1"=="VS2012" (
-  SET VISUAL_STUDIO="VS2012"
-  IF "%~2"=="--cmake_path" (
-    SET CMAKE_PATH="%~3"
-  )
-)
-
 IF "%~1"=="VS2015" (
   SET VISUAL_STUDIO="VS2015"
   IF "%~2"=="--cmake_path" (
@@ -31,11 +17,7 @@ IF "%~1"=="VS2015" (
 
 IF "%~1"=="--cmake_path" (
   SET CMAKE_PATH="%~2"
-  IF "%~3"=="VS2013" (
-    SET VISUAL_STUDIO="VS2013"
-  ) ELSE IF "%~3"=="VS2012" (
-    SET VISUAL_STUDIO="VS2012"
-  ) ELSE IF "%~3"=="VS2015" (
+  IF "%~3"=="VS2015" (
     SET VISUAL_STUDIO="VS2015"
   )
 )
@@ -55,12 +37,8 @@ POPD
 REM Search for Visual studio and set the environment for using MS Visual Studio tools
 IF %VISUAL_STUDIO%=="VS2013" (
   SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 12.0\VC\vcvarsall.bat"
-) ELSE IF %VISUAL_STUDIO%=="VS2012" (
-  SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 11.0\VC\vcvarsall.bat"
 ) ELSE IF %VISUAL_STUDIO%=="VS2015" (
   SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
-) ELSE (
-  SET VISUAL_STUDIO_ENV="%PROGRAM_FILES%\Microsoft Visual Studio 10.0\VC\vcvarsall.bat"
 )
 
 IF NOT EXIST %VISUAL_STUDIO_ENV% GOTO visual_studio_missing

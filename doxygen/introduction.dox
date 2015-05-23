@@ -9,6 +9,7 @@ The idea of this project templates is to have a Walking Skeleton as starting poi
 <li>A Dummy BDD Style (Gherkin) feature test using [Cucumber] (http://cukes.info/) and [Cucumber-cpp] (https://github.com/cucumber/cucumber-cpp)</li>
 <li>A Dummy BDD Style (Context/Specification) component test using [CppSpec] (https://github.com/tpuronen/cppspec)</li>
 <li>A Dummy BDD Style test using [Igloo] (http://igloo-testing.org/) testing framework</li>
+<li>A Dummy BDD Style test using [Catch] (https://github.com/philsquared/Catch) testing framework</li>
 <li>[SonarQube] (http://www.sonarqube.org/) project file</li>
 <li>[Doxygen](www.doxygen.org) generated documentation</li>
 <li>A packages target which generates a [NSIS] (http://nsis.sourceforge.net) based installer (Windows) or a [Debian package] (http://en.wikipedia.org/wiki/Deb_%28file_format%29 ) (Linux)</li>
@@ -21,7 +22,7 @@ However it is a Walking Skeleton in the sense that it includes everything a C++ 
 
 \section ProjectPage Project Page
 
-The project sources can be found at github: https://github.com/meshell/Cpp_CMake_project_template
+The project sources can be found at github: https://github.com/meshell/CMake_project_template
 
 */
 

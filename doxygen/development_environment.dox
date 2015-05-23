@@ -16,28 +16,18 @@ The external dependcies are either
 <li>or provided as selfextracting zip (Windows)</li>
 </ul>
 
-<h3>Generate Visual Studio 2010 solution</h3>
-Executing the <tt>create_VS_solution.bat</tt> batch file creates a Visual Studio 2010 solution under <em>vs_build</em>.
+<h3>Generate Visual Studio 2013 solution</h3>
+Executing the <tt>create_VS_solution.bat</tt> batch file creates a Visual Studio 2013 solution under <em>vs_build</em>.
 <em>Note:</em>If cmake is installed but can not be found, provide the path to the bin folder to the script<br>
 Usage: <tt>create_VS_solution.bat --cmake_path &lt;path_to_cmake_root&gt;<tt>
-
-<h3>Generate Visual Studio 2012 solution</h3>
-Executing the <tt>create_VS_solution.bat</tt> batch file (with argument <tt>VS2012<tt>) creates a Visual Studio 2012 solution under <em>vs_build</em>
-<em>Note:</em>If cmake is installed but can not be found, provide the path to the bin folder to the script<br>
-Usage: <tt>create_VS_solution.bat VS2012 --cmake_path &lt;path_to_cmake_root&gt;</tt>
-
-<h3>Generate Visual Studio 2013 solution</h3>
-Executing the <tt>create_VS_solution.bat</tt> batch file (with argument <tt>VS2013<tt>) creates a Visual Studio 2013 solution under <em>vs_build</em>
-<em>Note:</em>If cmake is installed but can not be found, provide the path to the bin folder to the script<br>
-Usage: <tt>create_VS_solution.bat VS2013 --cmake_path &lt;path_to_cmake_root&gt;</tt>
 <em>Note:</em>Creating a Visual Studio 2013 Solution requires a recent CMake version (> CMake 2.8.11.2)<br>
 
 <h3>Windows (NMake)</h3>
-Executing the <tt>build.bat</tt> batch file (with the argument <tt>VS2012<tt> for using the Visual Studio 2012 compiler(MSVC11).) will build the project and all tests with nmake in folder <em>build</em>
+Executing the <tt>build.bat</tt> batch file will build the project and all tests with nmake in folder <em>build</em>
 <em>Note:</em>If cmake is installed but can not be found, provide the path to the bin folder to the script<br>
-Usage: <tt>build.bat VS2012 --cmake_path &lt;path_to_cmake_root&gt;</tt>
+Usage: <tt>build.bat --cmake_path &lt;path_to_cmake_root&gt;</tt>
 
-Executing the <tt>create_windows_installer.bat</tt> batch file (with argument <tt>VS2012</tt> for using the Visual Studio 2012 compiler(MSVC11).) will build the project in <em>build</em> and create a NSIS installer which is put in folder <em>install</em>.
+Executing the <tt>create_windows_installer.bat</tt> batch file will build the project in <em>build</em> and create a NSIS installer which is put in folder <em>install</em>.
 
 <h3>Linux</h3>
 
