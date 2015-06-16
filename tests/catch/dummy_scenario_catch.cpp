@@ -7,37 +7,35 @@ namespace {
 
 SCENARIO("Default dummy", "[creation]")
 {
-  GIVEN("A default dummy")
-  {
-    Dummy dummy;
-
-    WHEN("the dummy wants to speak")
+    GIVEN("A default dummy")
     {
-        THEN("the dummy is speechless")
+        Dummy dummy;
+
+        WHEN("the dummy wants to speak")
         {
-            REQUIRE(dummy.speechless());
+            THEN("the dummy is speechless")
+            {
+                REQUIRE(dummy.speechless());
+            }
         }
     }
-
-  }
 }
 
 SCENARIO("English dummy", "[creation]")
 {
-  GIVEN("A english dummy")
-  {
-    Dummy dummy{"Hello", "World"};
-
-    WHEN("the dummy speak")
+    GIVEN("A english dummy")
     {
-        THEN("the dummy speaks english")
+        Dummy dummy{"Hello", "World"};
+
+        WHEN("the dummy speak")
         {
-            REQUIRE(not dummy.speechless());
-            REQUIRE(dummy.say_hello() == "Hello World");
+            THEN("the dummy speaks english")
+            {
+                REQUIRE(not dummy.speechless());
+                REQUIRE(dummy.say_hello() == "Hello World");
+            }
         }
     }
-
-  }
 }
 
 } //namespace

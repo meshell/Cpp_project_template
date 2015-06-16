@@ -7,34 +7,34 @@
 using CppTemplate::Dummy;
 
 class DefaultDummySpec:
-  public CppSpec::Specification<Dummy, DefaultDummySpec>
+    public CppSpec::Specification<Dummy, DefaultDummySpec>
 {
-  public:
-  DefaultDummySpec()
-  {
-    REGISTER_BEHAVIOUR(DefaultDummySpec, isSpeechless);
-  }
+public:
+    DefaultDummySpec ()
+    {
+        REGISTER_BEHAVIOUR(DefaultDummySpec, isSpeechless);
+    }
 
-  void isSpeechless ();
+    void isSpeechless ();
 
 };
 
 
 class EnglishDummySpec :
-  public CppSpec::Specification<Dummy, EnglishDummySpec>
+    public CppSpec::Specification<Dummy, EnglishDummySpec>
 {
-  public:
-  EnglishDummySpec()
-  {
-    REGISTER_BEHAVIOUR(EnglishDummySpec, is_not_speechless);
-    REGISTER_BEHAVIOUR(EnglishDummySpec, speaks_english);
-  }
+public:
+    EnglishDummySpec ()
+    {
+        REGISTER_BEHAVIOUR(EnglishDummySpec, is_not_speechless);
+        REGISTER_BEHAVIOUR(EnglishDummySpec, speaks_english);
+    }
 
-  Dummy* createContext();
+    Dummy* createContext();
 
-  void is_not_speechless ();
+    void is_not_speechless ();
 
-  void speaks_english ();
+    void speaks_english ();
 
 };
 

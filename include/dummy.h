@@ -11,11 +11,11 @@ namespace CppTemplate
  */
 class Dummy
 {
-  public:
+public:
     /**
      * @brief Sp[eechless Dummy
     */
-    Dummy ();
+    Dummy () = default;
     /**
      * @brief Dummy who knows how to say hello world
      * @param hello_string 'Hello' in my language
@@ -29,10 +29,10 @@ class Dummy
     /** Do I know how to speak */
     bool speechless () const;
 
-  private:
-    std::string hello_string_;
-    std::string world_string_;
-    bool speechless_;
+    private:
+    std::string hello_string_{};
+    std::string world_string_{};
+    bool speechless_{true};
 };
 
 

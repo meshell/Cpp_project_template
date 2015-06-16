@@ -10,32 +10,32 @@ namespace {
 
 Context (A_newly_created_default_dummy)
 {
-  Spec(should_be_speechless)
-  {
-    Assert::That(dummy.speechless(), Is().EqualTo(true));
-  }
+    Spec(should_be_speechless)
+    {
+        Assert::That(dummy.speechless(), Is().EqualTo(true));
+    }
 
-  Dummy dummy;
+    Dummy dummy{};
 };
 
 Context (A_english_dummy)
 {
-  void SetUp()
-  {
-    dummy.reset(new Dummy{"Hello", "World"});
-  }
+    void SetUp()
+    {
+        dummy.reset(new Dummy{"Hello", "World"});
+    }
 
-  Spec(should_not_be_speechless)
-  {
-    Assert::That(dummy->speechless(), Is().Not().EqualTo(true));
-  }
+    Spec(should_not_be_speechless)
+    {
+        Assert::That(dummy->speechless(), Is().Not().EqualTo(true));
+    }
 
-  Spec(should_speak_english)
-  {
-    Assert::That(dummy->say_hello(), Is().EqualTo("Hello World"));
-  }
+    Spec(should_speak_english)
+    {
+        Assert::That(dummy->say_hello(), Is().EqualTo("Hello World"));
+    }
 
-  std::unique_ptr<Dummy> dummy;
+    std::unique_ptr<Dummy> dummy{};
 
 };
 

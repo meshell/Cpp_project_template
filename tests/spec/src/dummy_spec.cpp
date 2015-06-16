@@ -4,7 +4,7 @@ using CppTemplate::Dummy;
 
 void DefaultDummySpec::isSpeechless ()
 {
-  specify(should.be().speechless());
+    specify(should.be().speechless());
 }
 
 Dummy* EnglishDummySpec::createContext() {
@@ -15,10 +15,10 @@ Dummy* EnglishDummySpec::createContext() {
 
 void EnglishDummySpec::is_not_speechless ()
 {
-  specify(not should.be().speechless());
+    specify(not should.be().speechless());
 }
 
 void EnglishDummySpec::speaks_english ()
 {
-  specify(context().say_hello(), should.equal("Hello World"));
+    specify(context().say_hello(), should.equal("Hello World"));
 }
