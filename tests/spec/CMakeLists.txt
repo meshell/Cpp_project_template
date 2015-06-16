@@ -1,75 +1,154 @@
-#
-# Create a single test executable including all testclass.
-# With coverage measurement
-#
+# required minimum version of cmake
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
+# set the path to the additional cmake modules
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/modules)
 
-# Disable some warnings issued by the cppspec macro expansions
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-exit-time-destructors")
-endif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+# set path to externals
+set(CMAKE_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/include)
+set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/lib)
 
-set(${PROJECT_NAME}_SPEC_NAME 
-  specs
+# set report and documentation output paths
+set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
+set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
+set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+
+# create report and documentation output directories
+file(MAKE_DIRECTORY
+    ${REPORT_DIR}
+    ${COVERAGE_REPORT_DIR}
+    ${TESTS_REPORT_DIR}
 )
 
-set(${PROJECT_NAME}_SPEC_SOURCES
-    include/dummy_spec.h
-    src/specs.cpp
-    src/dummy_spec.cpp
-)
+option(USE_STATIC_BOOST "Statically link Boost" ${WIN32})
+
+#########################################################################
+# Create test executables for every testclass (no coverage measurement) #
+#########################################################################
+
+find_package(CppSpec REQUIRED)
+
+if(NOT TARGET internal::projectlib)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
+endif()
 
 set(CORE_BOOST_LIBS regex program_options filesystem date_time chrono thread system)
+find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
+
+add_executable(spectests
+    src/dummy_spec.cpp
+    src/specs.cpp
+)
+
+
+function(register_test TEST_FILE)
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+    message(STATUS "Adding spec " ${TEST_NAME})
+    cppspec_add_tests(spectests "" include/${TEST_FILE}.h)
+endfunction()
+
+register_test(dummy_spec)
+
+add_executable(tests::spec ALIAS spectests)
+
+target_include_directories(spectests
+    SYSTEM
+    PRIVATE
+        ${CPPSPEC_INCLUDE_DIRS}
+)
+
+target_include_directories(spectests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(spectests
+    ${CPPSPEC_LIBRARIES}
+    ${Boost_LIBRARIES}
+    internal::projectlib
+)
 
 if(USE_STATIC_BOOST)
   set(Boost_USE_STATIC_LIBS ON)
 else(USE_STATIC_BOOST)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
+    target_compile_definitions(spectests
+        PRIVATE
+            BOOST_ALL_DYN_LINK
+    )
 endif(USE_STATIC_BOOST)
 
+target_compile_definitions(spectests
+    PRIVATE
+        ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
+)
 
-find_package(CppSpec REQUIRED)
-find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
-add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
+# run allways catch tests target when make all
+add_custom_target(run_spectests
+    ALL
+        spectests -m
+)
 
-if(CPPSPEC_FOUND)
-  function(register_test TEST_FILE)
-      get_filename_component(TEST_NAME ${TEST_FILE} NAME)
-      message(STATUS "Adding spec " ${TEST_NAME})
-      cppspec_add_tests(${${PROJECT_NAME}_SPEC_NAME} "" ${TEST_FILE}.h)
-  endfunction()
+add_dependencies(run_spectests
+    tests::spec
+)
 
-  register_test(include/dummy_spec)
+add_custom_target(run_spectests-junit
+    spectests -m -o junit --report-dir ${TESTS_REPORT_DIR}/tests/
+)
 
+add_dependencies(run_spectests-junit
+    tests::spec
+)
 
-
-  set(${PROJECT_NAME}_SPEC_LIBRARIES 
-    ${CPPSPEC_LIBRARIES}
-    ${Boost_LIBRARIES}
-    ${${PROJECT_NAME}_LIBRARIES})
-  include_directories(SYSTEM ${CPPSPEC_INCLUDE_DIR})
-  include_directories(include)
-  add_executable(${${PROJECT_NAME}_SPEC_NAME} ${${PROJECT_NAME}_SPEC_SOURCES})
-  target_link_libraries(${${PROJECT_NAME}_SPEC_NAME} ${${PROJECT_NAME}_SPEC_LIBRARIES} )
-
-  # Coverage
-  if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+####################################################################
+# Create and run a single test executable including all testclass. #
+# With coverage measurement                                        #
+####################################################################
+if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
     include(CodeCoverage)
-    set(${PROJECT_NAME}_SPEC_LIBRARIES_COVERAGE
-      ${CPPSPEC_LIBRARIES}
-      ${Boost_LIBRARIES}
-      ${${PROJECT_NAME}_LIBRARIES}_coverage)
 
-    add_executable(${${PROJECT_NAME}_SPEC_NAME}_coverage
-      EXCLUDE_FROM_ALL
-      ${${PROJECT_NAME}_SPEC_SOURCES})
-    target_link_libraries(${${PROJECT_NAME}_SPEC_NAME}_coverage ${${PROJECT_NAME}_SPEC_LIBRARIES_COVERAGE} )
+    add_executable(spectests-cov
+        EXCLUDE_FROM_ALL
+            ${CPPSPECTEST_SOURCES}
+            src/dummy_spec.cpp
+            src/specs.cpp
+    )
+
+    target_include_directories(spectests-cov
+        SYSTEM
+        PRIVATE
+            ${CPPSPEC_INCLUDE_DIRS}
+    )
+
+    target_include_directories(spectests-cov
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    target_link_libraries(spectests-cov
+        ${CPPSPEC_LIBRARIES}
+        ${Boost_LIBRARIES}
+        internal::projectlib-cov
+    )
+
+    if(USE_STATIC_BOOST)
+      set(Boost_USE_STATIC_LIBS ON)
+    else(USE_STATIC_BOOST)
+        target_compile_definitions(spectests-cov
+            PRIVATE
+                BOOST_ALL_DYN_LINK
+        )
+    endif(USE_STATIC_BOOST)
+
+    target_compile_definitions(spectests-cov
+        PRIVATE
+            ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
+    )
 
     setup_target_for_coverage_cobertura(coverage_specs
-      ${${PROJECT_NAME}_SPEC_NAME}_coverage
+      spectests-cov
       ${COVERAGE_REPORT_DIR}/specifications
       "-m;-ojunit;--report-dir;'${TESTS_REPORT_DIR}/'"
-      "-ggcov-${GCC_VERSION}"
      )
-  endif(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-endif(CPPSPEC_FOUND) 
+endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+

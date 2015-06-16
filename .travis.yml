@@ -28,8 +28,10 @@ notifications:
 
 
 before_install:
+  - sudo apt-add-repository -y ppa:george-edison55/cmake-3.x
   - if test ${CC} = gcc ; then sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test ; fi
   - sudo apt-get update -qq
+  - sudo apt-get upgrade cmake -qq
   - if test ${CC} = gcc ; then sudo apt-get install -qq g++-4.8 ; fi
   - if test ${CC} = gcc ; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 40 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8 --slave /usr/bin/gcov gcov /usr/bin/gcov-4.8 ; fi
   - if test ${CC} = gcc ; then sudo update-alternatives --set gcc /usr/bin/gcc-4.8 ; fi
@@ -38,17 +40,15 @@ before_install:
   - if [ "${DOC}" = '1' ] ; then sudo apt-get install doxygen graphviz; fi
 
 before_script:
-  - ./configure.sh -DCMAKE_BUILD_TYPE=$CONFIG
-  - make prepare
+  - mkdir build && (cd build && cmake -DCMAKE_BUILD_TYPE=$CONFIG ..) 
+  - cmake --build build --target external_dependencies --config $CONFIG
 
 script:
-  - make unittests
-  - make specs
-  - make features
-  - make igloo-tests
-  - make main
-  - if [ "${COVERAGE}" = '1' ] ; then make coverage ; fi 
-  - if [ "${DOC}" = '1' ] ; then make doc ; fi
+  - cmake --build build --target all --config $CONFIG
+  - cmake --build build --target run_feature_tests --config $CONFIG
+  - cmake --build build --target CMake_project_template --config $CONFIG
+  - if [ "${COVERAGE}" = '1' ] ; then cmake --build build --target coverage --config $CONFIG ; fi 
+  - if [ "${DOC}" = '1' ] ; then cmake --build build --target doc ; fi
 
 after_success:
   - if [ "${COVERAGE}" = '1' ] ; then coveralls -E.*/externals/.* -E/usr/include/.* -E.*/tests/.* -E.*/CMakeFiles/.* ; fi

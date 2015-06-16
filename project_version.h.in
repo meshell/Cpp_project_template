@@ -7,9 +7,9 @@ namespace CppTemplate
 {
 
   // the configured options and settings for the Project
-  const auto version_major = "@Project_VERSION_MAJOR@";
-  const auto version_minor = "@Project_VERSION_MINOR@";
-  const auto version_patch = "@Project_VERSION_PATCH@";
+  const auto version_major = "@PROJECT_VERSION_MAJOR@";
+  const auto version_minor = "@PROJECT_VERSION_MINOR@";
+  const auto version_patch = "@PROJECT_VERSION_PATCH@";
 
 } // namespace CppTemplate
 

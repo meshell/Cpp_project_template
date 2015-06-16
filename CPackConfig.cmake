@@ -1,7 +1,7 @@
 ### versions
-set(CPACK_PACKAGE_VERSION_MAJOR "${Project_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${Project_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${Project_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 
 ### general settings
@@ -35,8 +35,8 @@ if(WIN32 AND NOT UNIX)
   set(CPACK_NSIS_COMPRESSOR "/SOLID zlib")   
 
   set(CPACK_NSIS_CONTACT "estermann.michel@gmail.com")
-  set(CPACK_NSIS_HELP_LINK "https://github.com/meshell/Cpp_CMake_project_template")
-  set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/meshell/Cpp_CMake_project_template")
+  set(CPACK_NSIS_HELP_LINK "https://github.com/meshell/${PROJECT_NAME}")
+  set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/meshell/${PROJECT_NAME}")
   
   set(CPACK_NSIS_CREATE_ICONS "
     SetOutPath \\\"$INSTDIR\\\\bin\\\"
@@ -66,9 +66,10 @@ else(WIN32 AND NOT UNIX)
 	endmacro(dpkg_arch)
 	
 	# DEB package config
+        string(TOLOWER ${PROJECT_NAME} LOWER_CASE_PROJECT_NAME)
 	set(CPACK_DEBIAN_PACKAGE_NAME ${LOWER_CASE_PROJECT_NAME})
 	set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Michel Estermann <estermann.michel@gmail.com>")
-	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/meshell/Cpp_CMake_project_template")
+        set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/meshell/${PROJECT_NAME}")
 	#set(CPACK_DEBIAN_PACKAGE_SECTION "")
 	#set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
 	set(CPACK_GENERATOR "DEB")

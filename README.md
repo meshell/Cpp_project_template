@@ -18,11 +18,9 @@ An example project which can be used as starting point for C++ projects using cm
 
 # Dependencies
 ---------------
-* Building the Project requires [CMake](http://www.cmake.org/) Version 2.8. See CMake documentation for more information about building using CMake.
+* Building the Project requires a recent Version of [CMake](http://www.cmake.org/) (3.2.x). See CMake documentation for more information about building using CMake.
 
-The external dependencies are either
-* downloaded and built using CMake's ExternalProject (Linux)
-* or provided as selfextracting zip (Windows)
+The external dependencies can be downloaded and build using CMake's ExternalProject (make target external_dependencies).
 
 # How to build
 --------------
@@ -32,8 +30,6 @@ __Visual Studio 2013__ _(Visual Studio 12)_
   
   Usage: `create_VS_solution.bat --cmake_path <path_to_cmake_root>`
 * A visual studio 2013 solution will be placed into folder `vs_build`
-
-_Note: Creating a Visual Studio 2013 Solution requires a recent CMake version (> CMake 2.8.11.2)_
 
 __Windows__
 * execute the `build.bat` batch file
@@ -50,33 +46,12 @@ __Windows Installer__
 * A NSIS installer is created in folder `install`.
 
 __Linux__
-* > make prepare
-* make any of the other targets provided (see below)
+Since cmake is used the normal cmake build workflor can be applied. Just make sure to build the external dependencies first.
+E.g.
+* mkdir build && (cd build && cmake ..)
+* cmake --build build --target external_dependencies --config Debug
+* cmake --build build --target all --config Debug
 
-# Make Targets (Linux)
------------------------
-The following make targets are available
-* __all__: Build target test unittests and features
-* __clean__: Run cmake target clean and delete the output folder (`build`)
-* __prepare__: Download and build all external dependencies (boost, gmock/gtest, CppSpec, cucumber-cpp)
-* __main__: Build the main application
-* __test__: Build the individual tests and run cmake target test
-* __unittest__: Build a single unit test test runner including all unit tests and run it 
-* __specs__: Build the CppSpec BDD tests and run it
-* __specs-junit__: Build the CppSpec BDD tests and run it with junit (xml) output
-* __igloo-tests__: Build the Igloo specificationtest and run it
-* __catch-tests__: Build the Catch tests and run it
-* __features__: Build the cucumber feature tests and run it
-* __wip-features__: Build the cucumber feature tests and run only the WIP features
-* __features-doc__: Build the cucumber feature tests and run it producing html output at `reports/tests`
-* __coverage__: Build and run all tests with coverage measurement enabled. Generates coverage reports which can be found in `reports/coverage`and JUnit compatible test result reports in `reports/tests`
-* __memcheck__: Build and run the feature tests with valgrind. A report is generated in `reports`
-* __cppcheck__: Run the cppcheck static code analysis. A report is generated in `reports`
-* __rats__: Run the RATS static code analysis. A report is generated in `reports`
-* __sonar-runner__: Make target coverage, memcheck, rats and cppcheck and publish the reports on the [SonarQube] (http://www.sonarqube.org/) server
-* __doc__: Run doxygen and generate a html documentation in `doc/html`
-* __install__: Install target
-* __package__: Create a installer with CPack under `install`. (NSIS installer under windows, Debian package under linux)
 
 # Running Feature tests
 ------------------------

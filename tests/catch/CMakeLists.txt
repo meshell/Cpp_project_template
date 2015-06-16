@@ -1,20 +1,55 @@
+# required minimum version of cmake
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+
+# set the path to the additional cmake modules
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/modules)
+
+# set path to externals
+set(CMAKE_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/include)
+set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/lib)
+
+# set report and documentation output paths
+set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
+set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
+set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+
+# create report and documentation output directories
+file(MAKE_DIRECTORY
+    ${REPORT_DIR}
+    ${COVERAGE_REPORT_DIR}
+    ${TESTS_REPORT_DIR}
+)
+
 #########################################################################
 # Create test executables for every testclass (no coverage measurement) #
 #########################################################################
 
 find_package(Catch REQUIRED)
 
-include_directories(SYSTEM ${CATCH_INCLUDE_DIR})
- 
-set(CATCH_DIR ${CMAKE_CURRENT_SOURCE_DIR})  
+if(NOT TARGET internal::projectlib)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
+endif()
+
+
 function(register_catchtest TEST_FILE)
-  get_filename_component(TEST_NAME ${TEST_FILE} NAME)
-  message(STATUS "Adding Catch test " ${TEST_NAME})
-  add_executable(${TEST_NAME} EXCLUDE_FROM_ALL ${TEST_FILE}.cpp ${CATCH_DIR}/main.cpp)
-  link_directories(${${PROJECT_NAME}_LIBRARY_DIRS})
-  target_link_libraries(${TEST_NAME} ${${PROJECT_NAME}_LIBRARIES} ${ARGN})
-  catch_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
- endfunction()
+    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+    message(STATUS "Adding Catch test " ${TEST_NAME})
+    add_executable(${TEST_NAME}
+            ${TEST_FILE}.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+
+    target_include_directories(${TEST_NAME}
+        SYSTEM
+        PRIVATE
+            ${CATCH_INCLUDE_DIRS}
+    )
+
+    target_link_libraries(${TEST_NAME}
+        internal::projectlib ${ARGN}
+    )
+    catch_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
+    set(CATCHTEST_SOURCES ${CATCHTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
+endfunction()
 
 # The following tests are all the same tests but with different syntax, i.e 
 # - Classic Test
@@ -24,41 +59,63 @@ register_catchtest(dummy_scenario_catch)
 
 ############################################################
 # Create a single test executable including all testclass. #
-# With coverage measurement                                #
+# Without coverage measurement                             #
 ############################################################
 
-set(${PROJECT_NAME}_CATCHTEST_NAME 
-  catch-tests
+add_executable(catchtests
+    ${CATCHTEST_SOURCES}
+    main.cpp
 )
 
-set(${PROJECT_NAME}_CATCHTEST_SOURCES
-  dummy_test_catch.cpp
-  dummy_scenario_catch.cpp
-  main.cpp
+add_executable(tests::catch ALIAS catchtests)
+
+target_include_directories(catchtests
+    SYSTEM
+    PRIVATE
+        ${CATCH_INCLUDE_DIRS}
 )
 
-set(${PROJECT_NAME}_CATCHTEST_LIBRARIES
-     ${${PROJECT_NAME}_LIBRARIES})
+target_link_libraries(catchtests
+    internal::projectlib
+)
 
-add_executable(${${PROJECT_NAME}_CATCHTEST_NAME} ${${PROJECT_NAME}_CATCHTEST_SOURCES})
-link_directories(${${PROJECT_NAME}_LIBRARY_DIRS})
-target_link_libraries(${${PROJECT_NAME}_CATCHTEST_NAME} ${${PROJECT_NAME}_CATCHTEST_LIBRARIES} )
+# run allways catch tests target when make all
+add_custom_target(run_catchtests
+    ALL
+        catchtests -s --order rand
+)
 
-# Coverage
+add_dependencies(run_catchtests
+    tests::catch
+)
+
+####################################################################
+# Create and run a single test executable including all testclass. #
+# With coverage measurement                                        #
+####################################################################
 if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-  include(CodeCoverage)
-  set(${PROJECT_NAME}_CATCHTEST_LIBRARIES_COVERAGE 
-       ${${PROJECT_NAME}_LIBRARIES}_coverage)
+    include(CodeCoverage)
 
-  add_executable(${${PROJECT_NAME}_CATCHTEST_NAME}_coverage  
-                          EXCLUDE_FROM_ALL 
-                          ${${PROJECT_NAME}_CATCHTEST_SOURCES})
-  target_link_libraries(${${PROJECT_NAME}_CATCHTEST_NAME}_coverage ${${PROJECT_NAME}_CATCHTEST_LIBRARIES_COVERAGE} )
+    add_executable(catchtests-cov
+        EXCLUDE_FROM_ALL
+            ${CATCHTEST_SOURCES}
+            main.cpp
+    )
+
+    target_include_directories(catchtests-cov
+        SYSTEM
+        PRIVATE
+            ${CATCH_INCLUDE_DIRS}
+    )
+
+    target_link_libraries(catchtests-cov
+        internal::projectlib-cov
+    )
+
 
   setup_target_for_coverage_cobertura(coverage_catch
-    ${${PROJECT_NAME}_CATCHTEST_NAME}_coverage
+    catchtests-cov
     ${COVERAGE_REPORT_DIR}/catchtests
     "-r junit;-o '${TESTS_REPORT_DIR}/catch-tests.xml'"
-    "-ggcov-${GCC_VERSION}"
   )
 endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)

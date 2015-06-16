@@ -22,3 +22,7 @@
 
 doc/
 reports/
+
+#generated file
+include/project_version.h
+project-export.cmake

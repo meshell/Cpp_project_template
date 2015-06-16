@@ -13,8 +13,16 @@
 #
 
 # Check prereqs
-SET(GCOVR_PATH ${CMAKE_SOURCE_DIR}/scripts/gcovr)
-#FIND_PROGRAM( GCOVR_PATH gcovr PATHS ${CMAKE_SOURCE_DIR}/scripts)
+FIND_PROGRAM(GCOVR_EXE gcovr PATHS ${CMAKE_SOURCE_DIR}/scripts)
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+# Determine the gcc version
+  execute_process(COMMAND
+    ${CMAKE_CXX_COMPILER} -dumpversion
+    OUTPUT_VARIABLE
+    GCC_VERSION
+  )
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 IF(NOT CMAKE_COMPILER_IS_GNUCXX)
     MESSAGE(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
@@ -29,9 +37,9 @@ IF(NOT PYTHON_EXECUTABLE)
     MESSAGE(FATAL_ERROR "Python not found! Aborting...")
 ENDIF() # NOT PYTHON_EXECUTABLE
 
-IF(NOT GCOVR_PATH)
+IF(NOT GCOVR_EXE)
     MESSAGE(FATAL_ERROR "gcovr not found! Aborting...")
-ENDIF() # NOT GCOVR_PATH
+ENDIF() # NOT GCOVR_EXE
 
 SET(COVERAGE_EXCLUDE "")
 IF (EXISTS ${PROJECT_SOURCE_DIR}/tests/coverage.ignore)
@@ -61,7 +69,7 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname
         ${_testrunner} ${ARGV3}
 
         # Running gcovr
-        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
+        COMMAND ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
     )
@@ -96,7 +104,7 @@ FUNCTION(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrun
 
     ADD_CUSTOM_TARGET(${_targetname}
         # Running gcovr
-        ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
+        ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
     )
@@ -113,30 +121,6 @@ FUNCTION(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrun
     )
 
 ENDFUNCTION() # SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA
-
-FUNCTION(SETUP_TARGET_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname)
-    TARGET_LINK_LIBRARIES(${_testrunner} gcov)
-    set_target_properties(${_testrunner} PROPERTIES 
-        COMPILE_FLAGS "-fprofile-arcs -ftest-coverage"
-    )
-
-    ADD_CUSTOM_TARGET(${_targetname}
-
-        # Run tests
-        ${_testrunner} ${ARGV3}
-
-        # Running gcovr
-        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMENT "Running gcovr to produce Cobertura code coverage report."
-    )
-
-    # Show info where to find the report
-    ADD_CUSTOM_COMMAND(TARGET ${_targetname} POST_BUILD
-        COMMAND ;
-        COMMENT "Cobertura code coverage report saved in ${_outputname}.xml."
-    )
-ENDFUNCTION() # SETUP_TARGET_FOR_COVERAGE_COBERTURA
 
 # Param _targetname     The name of new the custom make target
 # Param _testrunner     The name of the target which runs the tests
@@ -157,7 +141,7 @@ FUNCTION(SETUP_TARGET_FOR_IGLOO_COVERAGE_COBERTURA _targetname _testrunner _outp
         ${_testrunner} ${ARGV3} > ${ARGV4}
 
         # Running gcovr
-        COMMAND ${GCOVR_PATH} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
+        COMMAND ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Running gcovr to produce Cobertura code coverage report."
     )

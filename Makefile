@@ -65,8 +65,7 @@ test: $(OUTPUT_DIR)/CMakeFiles
 
 .PHONY: unittests
 unittests: $(OUTPUT_DIR)/CMakeFiles 
-	@cmake --build $(OUTPUT_DIR) --target unittests
-	$(OUTPUT_DIR)/tests/unit/$(BINARY_DIR)/unittests$(BINARY_SUFFIX) --gtest_shuffle
+	@cmake --build $(OUTPUT_DIR) --target run_unittests
 
 .PHONY: specs
 specs: $(OUTPUT_DIR)/CMakeFiles 
@@ -87,7 +86,7 @@ igloo-tests: $(OUTPUT_DIR)/CMakeFiles
 catch-tests: $(OUTPUT_DIR)/CMakeFiles 
 	@cmake --build $(OUTPUT_DIR) --target catch-tests
 	$(OUTPUT_DIR)/tests/catch/$(BINARY_DIR)/catch-tests$(BINARY_SUFFIX) -s -d --order rand
-	
+
 .PHONY: features
 features: $(OUTPUT_DIR)/CMakeFiles
 	@cmake --build $(OUTPUT_DIR) --target run_feature_test
@@ -103,7 +102,7 @@ build-features: $(OUTPUT_DIR)/CMakeFiles
 .PHONY: launch-wireserver
 launch-wireserver: build-features
 	$(LAUNCH_PREFIX) $(OUTPUT_DIR)/tests/feature/$(BINARY_DIR)/features$(BINARY_SUFFIX) $(LAUNCH_SUFFIX)
-	
+
 .PHONY: features-doc
 features-doc: launch-wireserver
 	$(CUCUMBER) --profile html

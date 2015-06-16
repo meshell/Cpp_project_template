@@ -1,39 +1,43 @@
-#
-# Create a single feature test executable
-#
+# required minimum version of cmake
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
-set(${PROJECT_NAME}_BDDTEST_NAME 
-  features
+# set the path to the additional cmake modules
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/modules)
+
+# set path to externals
+set(CMAKE_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/include)
+set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/lib)
+
+# set report and documentation output paths
+set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
+set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
+set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+
+# create report and documentation output directories
+file(MAKE_DIRECTORY
+    ${REPORT_DIR}
+    ${COVERAGE_REPORT_DIR}
+    ${TESTS_REPORT_DIR}
 )
 
-# Disable some warnings issued by the cucumber-cpp macro expansions
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-non-virtual-dtor -Wno-global-constructors")
-endif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGCXX)
+set(DOC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../doc CACHE PATH "Documentation directory")
 
-#
-# Boost
-#
-set(CORE_BOOST_LIBS thread system regex date_time chrono)
+file(MAKE_DIRECTORY
+  ${DOC_DIR}
+)
 
-if(USE_STATIC_BOOST)
-  set(Boost_USE_STATIC_LIBS ON)
-else(USE_STATIC_BOOST)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
-endif(USE_STATIC_BOOST)
+option(USE_STATIC_BOOST "Statically link Boost" ${WIN32})
 
-find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
 
-#
-# CppSpec driver
-#
-# TODO uncomment next line if cppspec driver should be used
-#find_package(CppSpec REQUIRED)
+if(NOT TARGET internal::projectlib)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
+endif()
 
-#
-# Google Test driver
-#
-find_package(GTest REQUIRED)
+
+############################################
+# Create a single feature test executable. #
+# Without coverage measurement             #
+############################################
 
 #
 # cucumber-cpp
@@ -56,123 +60,187 @@ if(CUKE_FOUND)
   register_feature_steps(features/step_definition/dummy_steps)
 endif(CUKE_FOUND)
 
+#
+# Boost
+#
+set(CORE_BOOST_LIBS thread system regex date_time chrono)
+
+if(USE_STATIC_BOOST)
+  set(Boost_USE_STATIC_LIBS ON)
+else(USE_STATIC_BOOST)
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE
+            BOOST_ALL_DYN_LINK
+    )
+endif(USE_STATIC_BOOST)
+
+find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
+
+#
+# CppSpec driver
+#
+# TODO uncomment next line if cppspec driver should be used
+find_package(CppSpec REQUIRED)
+
+#
+# Google Test driver
+#
+find_package(GTest REQUIRED)
+
 # Find all feature files
 FILE(GLOB_RECURSE FEATURE_FILES features *.feature)
 
 if(STEP_SOURCES)
-  include_directories(SYSTEM 
-    ${CUKE_INCLUDE_DIR} 
-    ${Boost_INCLUDE_DIRS})
+    add_executable(features
+        ${STEP_SOURCES}
+        ${FEATURE_FILES}
+    )
 
-  if (CPPSPEC_FOUND)
-    include_directories(SYSTEM ${CPPSPEC_INCLUDE_DIR})  
-  endif(CPPSPEC_FOUND)
-  
-  if (GTEST_FOUND)
-    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})  
-  endif(GTEST_FOUND)
-  
-  
-  set(${PROJECT_NAME}_FEATURETEST_LIBRARIES 
-    ${${PROJECT_NAME}_LIBRARIES}
-    ${CUKE_LIBRARIES} 
-    ${Boost_LIBRARIES})    
+    add_executable(tests::features ALIAS features)
 
-  if (CPPSPEC_FOUND)
-    set(${PROJECT_NAME}_FEATURETEST_LIBRARIES
-        ${${PROJECT_NAME}_FEATURETEST_LIBRARIES}
-        ${CPPSPEC_LIBRARIES})
-  endif(CPPSPEC_FOUND)
-
-  if (GTEST_FOUND)
-    set(${PROJECT_NAME}_FEATURETEST_LIBRARIES
-        ${${PROJECT_NAME}_FEATURETEST_LIBRARIES}
-        ${GTEST_LIBRARIES})
-  endif(GTEST_FOUND)
-
-  add_executable(${${PROJECT_NAME}_BDDTEST_NAME} 
-    ${STEP_SOURCES}
-    ${FEATURE_FILES})
-  target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} ${${PROJECT_NAME}_FEATURETEST_LIBRARIES})    
-
-  if(NOT MSVC)
-    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} pthread)
-  endif(NOT MSVC)
-
-  if(WIN32)
-    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} ws2_32)
-  else(WIN32)
-    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME} rt)
-  endif(WIN32)
-
-  if(WIN32)
-    if(MSVC)
-      set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/${${PROJECT_NAME}_BDDTEST_NAME}.exe)
-    else(MSVC)
-      set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/${${PROJECT_NAME}_BDDTEST_NAME}.exe)
-    endif(MSVC)
-  else(WIN32)
-    set(FEATURE_TEST_EXE_CMD ${CMAKE_CURRENT_BINARY_DIR}/${${PROJECT_NAME}_BDDTEST_NAME} &)
-  endif(WIN32)
-
- # run feature tests target
-  add_custom_target(run_feature_test
-    # Run tests
-    ${FEATURE_TEST_EXE_CMD}
-    COMMAND cucumber --tags ~@wip --no-color -f pretty -s  ${PROJECT_SOURCE_DIR}/tests/feature/features
-    COMMENT "Running cucumber."
-  )
-
-  add_dependencies(run_feature_test
-    ${${PROJECT_NAME}_BDDTEST_NAME}
-  )
-  
-   # run wip features target
-  add_custom_target(run_wip_features
-    # Run tests
-    ${FEATURE_TEST_EXE_CMD}
-    COMMAND cucumber --tags @wip --no-color -f pretty -s  ${PROJECT_SOURCE_DIR}/tests/feature/features
-    COMMENT "Running cucumber (wip features)."
-  )
-
-  add_dependencies(run_wip_features
-    ${${PROJECT_NAME}_BDDTEST_NAME}
-  )
-  
-  # Coverage
-  if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    include(CodeCoverage)
-  
-    set(${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE 
-      ${CUKE_LIBRARIES} 
-      ${Boost_LIBRARIES}
-      ${${PROJECT_NAME}_LIBRARIES}_coverage)  
+    target_link_libraries(features
+        ${CUKE_LIBRARIES}
+        ${Boost_LIBRARIES}
+        internal::projectlib
+    )
 
     if (CPPSPEC_FOUND)
-      set(${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE
-          ${${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE}
-          ${CPPSPEC_LIBRARIES})
+        target_include_directories(features
+            SYSTEM
+            PRIVATE
+                ${CPPSPEC_INCLUDE_DIRS}
+        )
+        target_link_libraries(features
+            ${CPPSPEC_LIBRARIES}
+        )
+
     endif(CPPSPEC_FOUND)
 
     if (GTEST_FOUND)
-      set(${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE
-          ${${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE}
-          ${GTEST_LIBRARIES})
+        target_include_directories(features
+            SYSTEM
+            PRIVATE
+                ${GTEST_INCLUDE_DIRS}
+        )
+        target_link_libraries(features
+            ${GTEST_LIBRARIES}
+        )
     endif(GTEST_FOUND)
 
-    add_executable(${${PROJECT_NAME}_BDDTEST_NAME}_coverage  
-      EXCLUDE_FROM_ALL 
-      ${STEP_SOURCES})
-    
-    target_link_libraries(${${PROJECT_NAME}_BDDTEST_NAME}_coverage ${${PROJECT_NAME}_FEATURETEST_LIBRARIES_COVERAGE} pthread rt)
 
-    setup_target_under_cucumber_for_coverage_cobertura(
-      coverage_features 
-      ${${PROJECT_NAME}_BDDTEST_NAME}_coverage
-      ${COVERAGE_REPORT_DIR}/features
-      ${PROJECT_SOURCE_DIR}/tests/feature/features
-      ""
-      "-ggcov-${GCC_VERSION}"
+    if(NOT MSVC)
+        find_library(PTREAD_LIB pthread)
+        target_link_libraries(features
+            ${PTREAD_LIB}
+        )
+    endif(NOT MSVC)
+
+    if(WIN32)
+        find_library(WS2_LIB ws2_32)
+        target_link_libraries(features
+            ${WS2_LIB}
+        )
+    else(WIN32)
+        find_library(RT_LIB rt)
+        target_link_libraries(features
+            ${RT_LIB}
+        )
+    endif(WIN32)
+
+    if(WIN32)
+        if(MSVC)
+            set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/features.exe)
+        else(MSVC)
+            set(FEATURE_TEST_EXE_CMD start /B ${CMAKE_CURRENT_BINARY_DIR}/features.exe)
+        endif(MSVC)
+    else(WIN32)
+        set(FEATURE_TEST_EXE_CMD ${CMAKE_CURRENT_BINARY_DIR}/features &)
+    endif(WIN32)
+
+ # run feature tests target
+    add_custom_target(run_feature_test
+        # Run tests
+        ${FEATURE_TEST_EXE_CMD}
+        COMMAND cucumber --tags ~@wip --tags ~@proposal --no-color -f pretty -s ${CMAKE_CURRENT_SOURCE_DIR}/features
+        COMMENT "Running cucumber."
     )
-  endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+
+    add_dependencies(run_feature_test
+        tests::features
+    )
+  
+    # run wip features target
+    add_custom_target(run_wip_features
+        # Run tests
+        ${FEATURE_TEST_EXE_CMD}
+        COMMAND cucumber --tags @wip --tags ~@proposal --no-color -f pretty -s ${CMAKE_CURRENT_SOURCE_DIR}/features
+        COMMENT "Running cucumber (wip features)."
+    )
+
+    add_dependencies(run_wip_features
+        features
+    )
+
+    # run wip features target
+    add_custom_target(document_features
+        # Run tests
+        ${FEATURE_TEST_EXE_CMD}
+        COMMAND cucumber --tags ~@wip --tags ~@proposal --no-color -f pretty --no-source -f html -o ${DOC_DIR}/Features.html ${CMAKE_CURRENT_SOURCE_DIR}/features
+        COMMENT "Running cucumber (features documentation)."
+    )
+
+    add_dependencies(document_features
+        features
+    )
+  
+#############################################
+# Create and run a feature test executable. #
+# With coverage measurement                 #
+#############################################
+    if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+        include(CodeCoverage)
+
+        add_executable(features-cov
+            EXCLUDE_FROM_ALL
+            ${STEP_SOURCES}
+        )
+        target_link_libraries(features-cov
+            ${CUKE_LIBRARIES}
+            ${Boost_LIBRARIES}
+            internal::projectlib-cov
+            ${PTREAD_LIB}
+            ${RT_LIB}
+        )
+
+        if (CPPSPEC_FOUND)
+            target_include_directories(features-cov
+                SYSTEM
+                PRIVATE
+                    ${CPPSPEC_INCLUDE_DIRS}
+            )
+            target_link_libraries(features-cov
+                ${CPPSPEC_LIBRARIES}
+            )
+
+        endif(CPPSPEC_FOUND)
+
+        if (GTEST_FOUND)
+            target_include_directories(features-cov
+                SYSTEM
+                PRIVATE
+                    ${GTEST_INCLUDE_DIRS}
+            )
+            target_link_libraries(features-cov
+                ${GTEST_LIBRARIES}
+            )
+        endif(GTEST_FOUND)
+
+        setup_target_under_cucumber_for_coverage_cobertura(
+            coverage_features
+            features-cov
+            ${COVERAGE_REPORT_DIR}/features
+            ${PROJECT_SOURCE_DIR}/tests/feature/features
+            ""
+        )
+    endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
 endif(STEP_SOURCES)

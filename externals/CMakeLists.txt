@@ -1,16 +1,27 @@
-# CMake file to build the external dependencies
+option(DISABLE_CPPSPEC "Do not use CppSpec" FALSE)
+option(DISABLE_IGLOO "Do not use Igloo testing framework" FALSE)
+option(DISABLE_CATCH "Do not use CATCH testing framework" FALSE)
 
+# CMake file to build the external dependencies
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+
+# set the path to the additional cmake modules
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/modules)
+
+# set default built type to Debug
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif(NOT CMAKE_BUILD_TYPE)
 
 include(ExternalProject)
 
 # create output directories
 file(MAKE_DIRECTORY
-  ${PROJECT_SOURCE_DIR}/externals/lib
-  ${PROJECT_SOURCE_DIR}/externals/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-set(CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/externals)
+set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 if(MSVC)
   set(SCRIPT_SUFFIX .bat)
 else(MSVC)
@@ -22,18 +33,13 @@ set(LIB_DIR "")
 #TODO USe this one if build from Visual Studio Solution
 #set(LIB_DIR "Debug")
 
-check_cxx_compiler_flag("-Wunused-local-typedefs" COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
-if(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
-  set(CXX_FLAGS "-Wno-unused-local-typedefs")
-endif(COMPILER_KNOWS_UNUSED_LOCAL_TYPEDEF)
-
-if(WIN32)
-  if(MSVC)
-    set(CXX_FLAGS "${CXX_FLAGS} /EHsc /D_WIN32_WINNT=0x0502")
-  else(MSVC)
-    set(CXX_FLAGS "${CXX_FLAGS} -D_WIN32_WINNT=0x0502")
-  endif(MSVC)
-endif(WIN32)
+# Add an target to build all external dependencies
+add_custom_target(external_dependencies)
+add_dependencies(external_dependencies
+    googlemock
+    boost
+    cucumber-cpp
+)
 
 ####################
 # Igloo
@@ -42,19 +48,21 @@ if(NOT DISABLE_IGLOO)
   
   ExternalProject_Add(
     igloo
-    INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
+    INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
     URL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.zip
     URL_MD5 a5c77fcea616f217dda7ad518cef253d
     UPDATE_COMMAND ""
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
       -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-      -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
+      -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
     BUILD_COMMAND cmake --build <BINARY_DIR> --target igloo-tests
     INSTALL_COMMAND
       ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/igloo &&
       ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/igloo <INSTALL_DIR>/include/igloo
    )
+
+    add_dependencies(external_dependencies igloo)
 endif(NOT DISABLE_IGLOO)
 
 ####################
@@ -64,7 +72,7 @@ if(NOT DISABLE_CATCH)
 
   ExternalProject_Add(
     catch
-    INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
+    INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
     URL https://github.com/philsquared/Catch/archive/master.zip
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
@@ -73,6 +81,8 @@ if(NOT DISABLE_CATCH)
       ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/catch &&
       ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/single_include/catch.hpp <INSTALL_DIR>/include/catch/
    )
+
+    add_dependencies(external_dependencies catch)
 endif(NOT DISABLE_CATCH)
 
 ####################
@@ -80,14 +90,14 @@ endif(NOT DISABLE_CATCH)
 ####################
 ExternalProject_Add(
   googlemock
-  INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals
+  INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   URL http://googlemock.googlecode.com/files/gmock-1.7.0.zip
   URL_MD5 073b984d8798ea1594f5e44d85b20d66
   UPDATE_COMMAND ""
   CMAKE_ARGS
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
     -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
-    -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
+    -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -Dgtest_force_shared_crt=${MSVC}
     -DBUILD_SHARED_LIBS=OFF
@@ -139,6 +149,12 @@ if(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
   set(BOOST_TOOLSET_BUILD "toolset=gcc")
   set(BOOST_CXX_FLAGS "-std=c++11")
 elseif(CMAKE_COMPILER_IS_GNUCXX)
+# Determine the gcc version
+  execute_process(COMMAND
+    ${CMAKE_CXX_COMPILER} -dumpversion
+    OUTPUT_VARIABLE
+    GCC_VERSION
+  )
   set(BOOST_TOOLSET "gcc")
   set(BOOST_TOOLSET_BUILD "toolset=gcc-${GCC_VERSION}")
 elseif(CMAKE_CXX_COMPILER MATCHES ".*clang")
@@ -155,7 +171,7 @@ ExternalProject_Add(
   boost
   URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.tar.bz2
   URL_MD5 ${Boost_MD5}
-  INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
+  INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ./bootstrap${SCRIPT_SUFFIX} --with-toolset=${BOOST_TOOLSET} --prefix=<INSTALL_DIR>
   BUILD_COMMAND ./b2 install --prefix=<INSTALL_DIR>
@@ -175,7 +191,7 @@ if(MSVC)
   string( REPLACE "_0" "" Boost_Version_Shorten ${Boost_Version_Underscore} )
   ExternalProject_Add_Step(
     boost MoveHeaders
-    COMMAND move ${CMAKE_SOURCE_DIR}/externals/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_SOURCE_DIR}/externals/include/boost
+    COMMAND move ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_CURRENT_SOURCE_DIR}/include/boost
     DEPENDEES install
   )
     
@@ -189,9 +205,13 @@ find_package(Threads)
 # set boost cmake variables such that only the ones from external are used
 ExternalProject_Get_Property(boost INSTALL_DIR)
 set(BOOST_ROOT ${INSTALL_DIR})
-set(BOOST_ROOT ${INSTALL_DIR} PARENT_SCOPE)
 set(Boost_NO_SYSTEM_PATHS ON)
-set(Boost_NO_SYSTEM_PATHS ON PARENT_SCOPE)
+
+get_directory_property(hasParent PARENT_DIRECTORY)
+if(hasParent)
+    set(BOOST_ROOT ${INSTALL_DIR} PARENT_SCOPE)
+    set(Boost_NO_SYSTEM_PATHS ON PARENT_SCOPE)
+endif(hasParent)
 
 find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${Boost_Components})
 
@@ -231,7 +251,7 @@ if(UNIX)
     ####################
     ExternalProject_Add(
       cppspec
-      INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
+      INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
       GIT_REPOSITORY https://github.com/meshell/cppspec.git
       GIT_TAG cmake_fix
      # URL https://github.com/tpuronen/cppspec/archive/release-0.5.tar.gz
@@ -241,7 +261,7 @@ if(UNIX)
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
         -DCMAKE_CXX_FLAGS='-Wno-unused-local-typedefs'
-        -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
+        -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
     BUILD_COMMAND cmake --build <BINARY_DIR> --target CppSpec
       UPDATE_COMMAND ""
       INSTALL_COMMAND
@@ -258,6 +278,8 @@ if(UNIX)
     else(CPPSPEC_FOUND)
       set(CUKE_EXTERNAL_PROJ_DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS} cppspec)
     endif(CPPSPEC_FOUND)
+
+    add_dependencies(external_dependencies cppspec)
   endif(NOT DISABLE_CPPSPEC)
 else(UNIX)  
   set(CPPSPEC_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -268,7 +290,7 @@ endif(UNIX)
 ####################
 ExternalProject_Add(
   cucumber-cpp
-  INSTALL_DIR ${CMAKE_SOURCE_DIR}/externals/
+  INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   GIT_REPOSITORY https://github.com/meshell/cucumber-cpp
   GIT_TAG gcc48
 #  URL https://github.com/cucumber/cucumber-cpp/archive/v0.3.tar.gz
@@ -278,7 +300,7 @@ ExternalProject_Add(
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
     -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-    -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
+    -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
     -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
     -DCUKE_USE_STATIC_BOOST=ON
     -DCUKE_DISABLE_BOOST_TEST=ON
@@ -286,7 +308,6 @@ ExternalProject_Add(
     -DCUKE_DISABLE_CPPSPEC=OFF
     -DCUKE_ENABLE_EXAMPLES=OFF
     -DBUILD_SHARED_LIBS=ON
-    -DCMAKE_MODULE_PATH=${PROJECT_SOURCE_DIR}/cmake/
   BUILD_COMMAND cmake --build <BINARY_DIR> --target cucumber-cpp
   UPDATE_COMMAND ""
   INSTALL_COMMAND

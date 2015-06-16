@@ -10,11 +10,7 @@ Building the feature tests (BDD style tests using Gerkhin) requires [Cucumber-cp
 Building the Specification/Context tests requires [CppSpec] (https://github.com/tpuronen/cppspec) by Timo Puronen.<br>
 Building the BDD style Igloo tests requires [Igloo] (http://igloo-testing.org/) by Joakim Karlsson.<br>
 
-The external dependcies are either
-<ul>
-<li>downloaded and built using CMake's ExternalProject (Linux)</li>
-<li>or provided as selfextracting zip (Windows)</li>
-</ul>
+The external dependencies can be downloaded and build using CMake's ExternalProject (make target external_dependencies).
 
 <h3>Generate Visual Studio 2013 solution</h3>
 Executing the <tt>create_VS_solution.bat</tt> batch file creates a Visual Studio 2013 solution under <em>vs_build</em>.
@@ -30,34 +26,10 @@ Usage: <tt>build.bat --cmake_path &lt;path_to_cmake_root&gt;</tt>
 Executing the <tt>create_windows_installer.bat</tt> batch file will build the project in <em>build</em> and create a NSIS installer which is put in folder <em>install</em>.
 
 <h3>Linux</h3>
-
-<ul>
-  <li>execute <tt>make prepare</tt></li>
-  <li>make any of the targets provided in the <tt>Makefile</tt></li>
-    <ul>
-      <li>\e all: Build target test unittests and features</li>
-      <li>\e clean: Run cmake target clean and delete the output folder (build/)</li>
-      <li>\e prepare: Download and build all external dependencies (boost, gmock/gtest, CppSpec, cucumber-cpp)</li>
-      <li>\e main: Build the main application</li>
-      <li>\e test: Build the individual tests and run cmake target test</li>
-      <li>\e unittest: Build a single unit test test runner including all unit tests and run it </li>
-      <li>\e specs: Build the CppSpec BDD tests and run it </li>
-      <li>\e specs-junit: Build the CppSpec BDD tests and run it with junit (xml) output</li>
-      <li>\e igloo-tests: Build the Igloo BDD tests and run it </li>
-      <li>\e features: Build the cucumber feature tests and run it</li>
-      <li>\e wip-features: Build the cucumber feature tests and run only the WIP features</li>
-      <li>\e features-doc: Build the cucumber feature tests and run it producing html output at <em>doc</em></li>
-      <li>\e coverage: Build and run the unit test test runner and feature tests with coverage measurement enabled. Generates coverage reports which can be found in <em>reports/coverage</em> and JUnit compatible test result reports in <em>reportsreports/tests</em></li>
-      <li>\e memcheck: Build and run the feature tests with valgrind. A report is generated in <em>reports</em></li>
-      <li>\e cppcheck: Run the [cppcheck] (http://cppcheck.sourceforge.net/) static code analysis. A report is generated in <em>reports</em></li>
-      <li>\e rats: Run the [RATS] (http://code.google.com/p/rough-auditing-tool-for-security/) static code analysis. A report is generated in <em>reports</em></li>
-      <li>\e sonar-runner: Make target coverage, memcheck, rats and cppcheck and publish the reports on the [SonarQube] (http://www.sonarqube.org/) server </li>
-      <li>\e doc: Run doxygen and generate a html documentation in <em>doc/html</em></li>
-      <li>\e install: Install target</li>
-      <li>\e package: Create a installer with CPack under <em>install</em>. (NSIS installer under windows, Debian package under linux)</li>
-    </ul>
-  </li>
-</ul>
+E.g.
+<tt>mkdir build && (cd build && cmake ..)</tt><br>
+<tt>cmake --build build --target external_dependencies --config Debug</tt><br>
+<tt>cmake --build build --target all --config Debug</tt><br>
 
 <h2>Running Feature tests</h2>
 

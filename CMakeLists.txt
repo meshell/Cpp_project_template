@@ -1,11 +1,13 @@
 # C++ Project template main cmake file
 
-# require minimum version of cmake
-cmake_minimum_required(VERSION 2.8)
+# required minimum version of cmake
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+
+cmake_policy(SET CMP0048 NEW)
 
 # project name
-# TODO fill in your project name
-project(CMake_Project_Template)
+# TODO fill in your project name and version
+project(CMake_project_template VERSION 1.1.0 LANGUAGES CXX C)
 
 # project name used in doxygen docu
 STRING(REGEX REPLACE "_" " " PROJECT_DOC_NAME ${PROJECT_NAME})
@@ -13,35 +15,19 @@ STRING(REGEX REPLACE "_" " " PROJECT_DOC_NAME ${PROJECT_NAME})
 # project name used for installation
 set(APPLICATION_NAME ${PROJECT_DOC_NAME})
 
-if (UNIX)
-  string(TOLOWER ${PROJECT_NAME} LOWER_CASE_PROJECT_NAME)
-  set(CMAKE_INSTALL_PREFIX /usr/local/${LOWER_CASE_PROJECT_NAME} CACHE PATH "Install path prefix" FORCE)
-elseif(UNIX)
+if (WIN32)
   # Set a install path in the project folder
   # Windows 7 can not install directly into the default folder (e.g. C:/Program Files (x86)/Cpp_Project_Template)
   set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install CACHE PATH "Install path prefix" FORCE)
-endif (UNIX)
+endif (WIN32)
 
 
 # Cmake cache variables
-set(BUILD_EXTERNALS ${UNIX} CACHE BOOL "Build also external libraries")
-set(DISABLE_CPPSPEC FALSE CACHE BOOL "Do not use CppSpec")
-set(DISABLE_IGLOO FALSE CACHE BOOL "Do not use Igloo testing framework")
-set(DISABLE_CATCH FALSE CACHE BOOL "Do not use CATCH testing framework")
-set(USE_STATIC_BOOST ${WIN32} CACHE BOOL "Statically link Boost")
+option(BUILD_EXTERNALS "Build also external libraries" ${UNIX})
+option(DISABLE_CPPSPEC "Do not use CppSpec" FALSE)
+option(DISABLE_IGLOO "Do not use Igloo testing framework" FALSE)
+option(DISABLE_CATCH "Do not use CATCH testing framework" FALSE)
 
-
-# The version number.
-set (Project_VERSION_MAJOR 1)
-set (Project_VERSION_MINOR 0)
-set (Project_VERSION_PATCH 0000)
-
-# configure a header file to pass the version number to the source code
-
-configure_file (
-  "${PROJECT_SOURCE_DIR}/project_version.h.in"
-  "${CMAKE_CURRENT_SOURCE_DIR}/include/project_version.h"
-)
 
 # set default built type to Debug
 if(NOT CMAKE_BUILD_TYPE)
@@ -68,15 +54,6 @@ if (MSVC11)
   add_definitions(/D_VARIADIC_MAX=10)
 endif(MSVC11)
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-# Determine the gcc version
-  execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
-                          OUTPUT_VARIABLE GCC_VERSION)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror")
-elseif(CMAKE_COMPILER_IS_CLANGCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Weverything -Werror -Wno-c++98-compat -Wno-documentation -Wno-padded -Wno-weak-vtables -Wno-implicit-fallthrough")
-endif(CMAKE_COMPILER_IS_GNUCXX)
-
 if(WIN32)
   if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /D_WIN32_WINNT=0x0502")
@@ -89,74 +66,41 @@ if(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif(UNIX)
 
-# Enable C++11 or C++0x features if possible
-include(CheckCXXCompilerFlag)
-enable_language(CXX)
-
-check_cxx_compiler_flag("-std=c++11" COMPILER_KNOWS_CXX11)
-if(COMPILER_KNOWS_CXX11)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-else(COMPILER_KNOWS_CXX11)
-  check_cxx_compiler_flag("-std=c++0x" COMPILER_KNOWS_CXX0X)
-  if(COMPILER_KNOWS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-  endif(COMPILER_KNOWS_CXX0X)
-endif(COMPILER_KNOWS_CXX11)
-
 # set the path to the additional cmake modules
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
-
-# set report and documentation output paths
-set(REPORT_DIR ${CMAKE_SOURCE_DIR}/reports)
-set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage)
-set(TESTS_REPORT_DIR ${REPORT_DIR}/tests)
-
-# create report and documentation output directories
-file(MAKE_DIRECTORY
-  ${REPORT_DIR}
-  ${COVERAGE_REPORT_DIR}
-  ${TESTS_REPORT_DIR}
-)
-
-# set project include directory
-set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${${PROJECT_NAME}_INCLUDE_DIRS})
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 # set path to externals
-set(EXTERNALS_INC_DIR ${PROJECT_SOURCE_DIR}/externals/include)
-set(EXTERNALS_LIB_DIR ${PROJECT_SOURCE_DIR}/externals/lib)
-
-set(CMAKE_INCLUDE_PATH ${EXTERNALS_INC_DIR} ${CMAKE_INCLUDE_PATH})
-set(CMAKE_LIBRARY_PATH ${EXTERNALS_LIB_DIR} ${CMAKE_LIBRARY_PATH})
-
-set(${PROJECT_NAME}_LIBRARY ${PROJECT_NAME}-library)
-set(${PROJECT_NAME}_LIBRARIES ${${PROJECT_NAME}_LIBRARY})
-
+set(CMAKE_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/externals/include)
+set(CMAKE_LIBRARY_PATH ${PROJECT_SOURCE_DIR}/externals/lib)
 
 # external libraries
 if(BUILD_EXTERNALS)
   add_subdirectory(externals)
 endif(BUILD_EXTERNALS)
 
-set(SRC_HEADER_FILES ${PROJECT_SOURCE_DIR}/include/dummy.h)
-
 find_package(Boost)
 if(Boost_FOUND)
-  add_subdirectory(src)
+    add_subdirectory(src)
 endif(Boost_FOUND)
+
+# Add some custom target
+
+add_custom_target(coverage)
 
 # unit tests require gmock
 find_package(GMock)
 
 if(GMOCK_FOUND)
-  add_subdirectory(tests/unit)
+    add_subdirectory(tests/unit)
+    add_dependencies(coverage coverage_unittests)
 endif(GMOCK_FOUND)
 
 # feature tests require cucumber-cpp (aka cuke)
 find_package(Cuke)
 
 if(CUKE_FOUND AND Boost_FOUND)
-  add_subdirectory(tests/feature)
+    add_subdirectory(tests/feature)
+    add_dependencies(coverage coverage_features)
 endif(CUKE_FOUND AND Boost_FOUND)
 
 # Igloo is used for specifications (BDD style unittests)
@@ -164,7 +108,8 @@ endif(CUKE_FOUND AND Boost_FOUND)
 find_package(Igloo)
 
 if(IGLOO_FOUND AND NOT DISABLE_IGLOO)
-  add_subdirectory(tests/igloo)
+    add_subdirectory(tests/igloo)
+    add_dependencies(coverage coverage_igloo)
 endif(IGLOO_FOUND AND NOT DISABLE_IGLOO)
 
 # Catch is used for BDD style unittests
@@ -172,7 +117,8 @@ endif(IGLOO_FOUND AND NOT DISABLE_IGLOO)
 find_package(Catch)
 
 if(CATCH_FOUND AND NOT DISABLE_CATCH)
-  add_subdirectory(tests/catch)
+    add_subdirectory(tests/catch)
+    add_dependencies(coverage coverage_catch)
 endif(CATCH_FOUND AND NOT DISABLE_CATCH)
 
 # CppSpec is an alternative to Igloo , i.e. used for specifications (BDD style unittests)
@@ -180,12 +126,13 @@ endif(CATCH_FOUND AND NOT DISABLE_CATCH)
 find_package(CppSpec)
 
 if(CPPSPEC_FOUND AND Boost_FOUND AND NOT DISABLE_CPPSPEC)
-  add_subdirectory(tests/spec)
+    add_subdirectory(tests/spec)
+    add_dependencies(coverage coverage_specs)
 endif(CPPSPEC_FOUND AND Boost_FOUND AND NOT DISABLE_CPPSPEC)
 
 
 # add a target to generate API documentation with Doxygen
-set(DOC_DIR ${CMAKE_SOURCE_DIR}/doc)
+set(DOC_DIR ${PROJECT_SOURCE_DIR}/doc CACHE PATH "Documentation directory")
 
 file(MAKE_DIRECTORY
   ${DOC_DIR}
@@ -194,17 +141,17 @@ file(MAKE_DIRECTORY
 # Doxygen documentation
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doxygen/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-  add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${DOC_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM
-  )
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doxygen/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    add_custom_target(doc
+        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+        WORKING_DIRECTORY ${DOC_DIR}
+        COMMENT "Generating API documentation with Doxygen." VERBATIM
+    )
 
-  install(DIRECTORY ${DOC_DIR}/html
-    DESTINATION doc
-    COMPONENT doc
-  )
+    install(DIRECTORY ${DOC_DIR}/html
+        DESTINATION doc
+        COMPONENT doc
+    )
 endif(DOXYGEN_FOUND)
 
 install(FILES README.md LICENSE
@@ -212,5 +159,37 @@ install(FILES README.md LICENSE
   COMPONENT doc
 )
   
-include(CPackConfig.cmake)
 
+# Targets for code anyalysis
+# set report and documentation output paths
+set(REPORT_DIR ${PROJECT_SOURCE_DIR}/reports CACHE PATH "Reports directory")
+
+# create report and documentation output directories
+file(MAKE_DIRECTORY
+    ${REPORT_DIR}
+)
+
+find_program(CPPCHECK_EXE cppcheck)
+
+if(CPPCHECK_EXE)
+    add_custom_target(run_cppcheck
+        ${CPPCHECK_EXE}  -iexternals --enable=style -f --std=c++11 -j2 --xml --suppress=*:externals/include/gtest/gtest.h --suppress=*:externals/include/gtest/internal/gtest-tuple.h --suppress=*:externals/include/gmock/gmock.h ./ 2> ${REPORT_DIR}/cppcheck.xml
+        COMMENT "Run cppcheck and output report to ${REPORT_DIR}/cppcheck.xml" VERBATIM
+    )
+endif(CPPCHECK_EXE)
+
+find_program(RATS_EXE rats)
+
+if(RATS_EXE)
+    add_custom_target(run_rats
+        ${RATS_EXE}  --quiet --xml ./src > ${REPORT_DIR}/rats.xml
+        COMMENT "Run cppcheck and output report to ${REPORT_DIR}/rats.xml" VERBATIM
+    )
+endif(RATS_EXE)
+
+add_custom_target(clean-reports
+    ${CMAKE_COMMAND} -E remove_directory ${REPORT_DIR}
+    COMMENT "Delete all reports." VERBATIM
+)
+
+include(CPackConfig.cmake)
