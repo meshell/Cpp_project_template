@@ -46,7 +46,7 @@ before_script:
 
 script:
   - ./cmake-3 --build build --target all --config $CONFIG
-  - ./cmake-3 --build build --target run_feature_tests --config $CONFIG
+  - ./cmake-3 --build build --target run_feature_test --config $CONFIG
   - ./cmake-3 --build build --target CMake_project_template --config $CONFIG
   - if [ "${COVERAGE}" = '1' ] ; then ./cmake-3 --build build --target coverage --config $CONFIG ; fi 
   - if [ "${DOC}" = '1' ] ; then ./cmake-3 --build build --target doc ; fi

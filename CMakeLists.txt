@@ -83,16 +83,11 @@ if(Boost_FOUND)
     add_subdirectory(src)
 endif(Boost_FOUND)
 
-# Add some custom target
-
-add_custom_target(coverage)
-
 # unit tests require gmock
 find_package(GMock)
 
 if(GMOCK_FOUND)
     add_subdirectory(tests/unit)
-    add_dependencies(coverage coverage_unittests)
 endif(GMOCK_FOUND)
 
 # feature tests require cucumber-cpp (aka cuke)
@@ -100,7 +95,6 @@ find_package(Cuke)
 
 if(CUKE_FOUND AND Boost_FOUND)
     add_subdirectory(tests/feature)
-    add_dependencies(coverage coverage_features)
 endif(CUKE_FOUND AND Boost_FOUND)
 
 # Igloo is used for specifications (BDD style unittests)
@@ -109,7 +103,6 @@ find_package(Igloo)
 
 if(IGLOO_FOUND AND NOT DISABLE_IGLOO)
     add_subdirectory(tests/igloo)
-    add_dependencies(coverage coverage_igloo)
 endif(IGLOO_FOUND AND NOT DISABLE_IGLOO)
 
 # Catch is used for BDD style unittests
@@ -118,7 +111,6 @@ find_package(Catch)
 
 if(CATCH_FOUND AND NOT DISABLE_CATCH)
     add_subdirectory(tests/catch)
-    add_dependencies(coverage coverage_catch)
 endif(CATCH_FOUND AND NOT DISABLE_CATCH)
 
 # CppSpec is an alternative to Igloo , i.e. used for specifications (BDD style unittests)
@@ -127,7 +119,6 @@ find_package(CppSpec)
 
 if(CPPSPEC_FOUND AND Boost_FOUND AND NOT DISABLE_CPPSPEC)
     add_subdirectory(tests/spec)
-    add_dependencies(coverage coverage_specs)
 endif(CPPSPEC_FOUND AND Boost_FOUND AND NOT DISABLE_CPPSPEC)
 
 
@@ -159,6 +150,28 @@ install(FILES README.md LICENSE
   COMPONENT doc
 )
   
+# Add some custom target
+add_custom_target(coverage)
+
+if(TARGET coverage_unittests)
+    add_dependencies(coverage coverage_unittests)
+endif(TARGET coverage_unittests)
+
+if(TARGET coverage_features)
+    add_dependencies(coverage coverage_features)
+endif(TARGET coverage_features)
+
+if(TARGET coverage_igloo)
+    add_dependencies(coverage coverage_igloo)
+endif(TARGET coverage_igloo)
+
+if(TARGET coverage_catch)
+    add_dependencies(coverage coverage_catch)
+endif(TARGET coverage_catch)
+
+if(TARGET coverage_specs)
+    add_dependencies(coverage coverage_specs)
+endif(TARGET coverage_specs)
 
 # Targets for code anyalysis
 # set report and documentation output paths
