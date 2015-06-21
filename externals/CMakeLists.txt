@@ -41,6 +41,12 @@ add_dependencies(external_dependencies
     cucumber-cpp
 )
 
+add_custom_command(TARGET external_dependencies
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} ..
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+
 ####################
 # Igloo
 ####################

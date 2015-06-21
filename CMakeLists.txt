@@ -192,4 +192,21 @@ add_custom_target(clean-reports
     COMMENT "Delete all reports." VERBATIM
 )
 
+add_custom_target(remove_externals
+    ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/include
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/lib
+    COMMENT "Remove externals (lib & include)." VERBATIM
+)
+
+find_program(SONAR_RUNNER_EXE sonar-runner)
+
+if(SONAR_RUNNER_EXE)
+    add_custom_target(run_sonar-runner
+        ${SONAR_RUNNER_EXE}
+        COMMENT "Remove externals (lib & include)." VERBATIM
+    )
+    add_dependencies(run_sonar-runner clean-reports run_cppcheck run_rats coverage)
+endif(SONAR_RUNNER_EXE)
+
+
 include(CPackConfig.cmake)
