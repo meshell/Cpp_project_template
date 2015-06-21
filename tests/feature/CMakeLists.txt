@@ -28,11 +28,14 @@ file(MAKE_DIRECTORY
 
 option(USE_STATIC_BOOST "Statically link Boost" ${WIN32})
 
-
 if(NOT TARGET internal::projectlib)
     include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
 endif()
 
+# Check for clang compiler
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGCXX 1)
+endif()
 
 ############################################
 # Create a single feature test executable. #
@@ -104,7 +107,15 @@ if(STEP_SOURCES)
         internal::projectlib
     )
 
-    if (CPPSPEC_FOUND)
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(features
+            PRIVATE
+                -Wno-non-virtual-dtor
+                -Wno-global-constructors
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
+
+    if(CPPSPEC_FOUND)
         target_include_directories(features
             SYSTEM
             PRIVATE
@@ -116,7 +127,7 @@ if(STEP_SOURCES)
 
     endif(CPPSPEC_FOUND)
 
-    if (GTEST_FOUND)
+    if(GTEST_FOUND)
         target_include_directories(features
             SYSTEM
             PRIVATE
@@ -212,7 +223,15 @@ if(STEP_SOURCES)
             ${RT_LIB}
         )
 
-        if (CPPSPEC_FOUND)
+        if(CMAKE_COMPILER_IS_CLANGCXX)
+            target_compile_options(features-cov
+                PRIVATE
+                    -Wno-non-virtual-dtor
+                    -Wno-global-constructors
+            )
+        endif(CMAKE_COMPILER_IS_CLANGCXX)
+
+        if(CPPSPEC_FOUND)
             target_include_directories(features-cov
                 SYSTEM
                 PRIVATE
@@ -224,7 +243,7 @@ if(STEP_SOURCES)
 
         endif(CPPSPEC_FOUND)
 
-        if (GTEST_FOUND)
+        if(GTEST_FOUND)
             target_include_directories(features-cov
                 SYSTEM
                 PRIVATE

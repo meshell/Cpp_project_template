@@ -20,6 +20,11 @@ file(MAKE_DIRECTORY
     ${TESTS_REPORT_DIR}
 )
 
+# Check for clang compiler
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGCXX 1)
+endif()
+
 #########################################################################
 # Create test executables for every testclass (no coverage measurement) #
 #########################################################################
@@ -36,7 +41,15 @@ function(register_catchtest TEST_FILE)
     message(STATUS "Adding Catch test " ${TEST_NAME})
     add_executable(${TEST_NAME}
             ${TEST_FILE}.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    )
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(${TEST_NAME}
+            PRIVATE
+                -Wno-exit-time-destructors
+
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
 
     target_include_directories(${TEST_NAME}
         SYSTEM
@@ -68,6 +81,14 @@ add_executable(catchtests
 )
 
 add_executable(tests::catch ALIAS catchtests)
+
+if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(catchtests
+        PRIVATE
+            -Wno-exit-time-destructors
+
+    )
+endif(CMAKE_COMPILER_IS_CLANGCXX)
 
 target_include_directories(catchtests
     SYSTEM
@@ -101,6 +122,14 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
             ${CATCHTEST_SOURCES}
             main.cpp
     )
+
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(catchtests-cov
+            PRIVATE
+                -Wno-exit-time-destructors
+
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
 
     target_include_directories(catchtests-cov
         SYSTEM

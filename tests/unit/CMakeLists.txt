@@ -20,6 +20,11 @@ file(MAKE_DIRECTORY
     ${TESTS_REPORT_DIR}
 )
 
+# Check for clang compiler
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGCXX 1)
+endif()
+
 #########################################################################
 # Create test executables for every testclass (no coverage measurement) #
 #########################################################################
@@ -46,6 +51,14 @@ function(register_test TEST_FILE)
         ${GMOCK_BOTH_LIBRARIES}
         internal::projectlib ${ARGN}
     )
+
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(${TEST_NAME}
+            PRIVATE
+                -Wno-global-constructors
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
+
     if(UNIX)
         find_package(Threads) # GTest needs this and it's a static library
         target_link_libraries(${TEST_NAME}
@@ -78,6 +91,13 @@ target_link_libraries(unittests
     ${GMOCK_BOTH_LIBRARIES}
     internal::projectlib
 )
+
+if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(unittests
+        PRIVATE
+            -Wno-global-constructors
+    )
+endif(CMAKE_COMPILER_IS_CLANGCXX)
 
 if(UNIX)
     find_package(Threads) # GTest needs this and it's a static library
@@ -118,6 +138,14 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
         ${GMOCK_BOTH_LIBRARIES}
         internal::projectlib-cov
     )
+
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(unittests-cov
+            PRIVATE
+                -Wno-global-constructors
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
+
     if(UNIX)
         find_package(Threads) # GTest needs this and it's a static library
         target_link_libraries(unittests-cov

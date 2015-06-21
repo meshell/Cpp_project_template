@@ -20,6 +20,11 @@ file(MAKE_DIRECTORY
     ${TESTS_REPORT_DIR}
 )
 
+# Check for clang compiler
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGCXX 1)
+endif()
+
 #########################################################################
 # Create test executables for every testclass (no coverage measurement) #
 #########################################################################
@@ -49,6 +54,15 @@ function(register_iglootest TEST_FILE)
         PRIVATE
             -Wno-unused-parameter
     )
+
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(${TEST_NAME}
+            PRIVATE
+                -Wno-global-constructors
+                -Wno-non-virtual-dtor
+                -Wno-weak-vtables
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
 
     igloo_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
     set(IGLOOTEST_SOURCES ${IGLOOTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
@@ -91,6 +105,15 @@ target_compile_options(iglootests
         -Wno-unused-parameter
 )
 
+if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(iglootests
+        PRIVATE
+            -Wno-global-constructors
+            -Wno-non-virtual-dtor
+            -Wno-weak-vtables
+    )
+endif(CMAKE_COMPILER_IS_CLANGCXX)
+
 # run allways igloo tests target when make all
 add_custom_target(run_iglootests
     ALL
@@ -129,6 +152,15 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
         PRIVATE
             -Wno-unused-parameter
     )
+
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(iglootests-cov
+            PRIVATE
+                -Wno-global-constructors
+                -Wno-non-virtual-dtor
+                -Wno-weak-vtables
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
 
   setup_target_for_igloo_coverage_cobertura(coverage_igloo
     iglootests-cov

@@ -22,6 +22,11 @@ file(MAKE_DIRECTORY
 
 option(USE_STATIC_BOOST "Statically link Boost" ${WIN32})
 
+# Check for clang compiler
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGCXX 1)
+endif()
+
 #########################################################################
 # Create test executables for every testclass (no coverage measurement) #
 #########################################################################
@@ -61,6 +66,15 @@ target_include_directories(spectests
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(spectests
+        PRIVATE
+            -Wno-weak-vtables
+            -Wno-exit-time-destructors
+
+    )
+endif(CMAKE_COMPILER_IS_CLANGCXX)
 
 target_link_libraries(spectests
     ${CPPSPEC_LIBRARIES}
@@ -113,6 +127,15 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
             src/dummy_spec.cpp
             src/specs.cpp
     )
+
+    if(CMAKE_COMPILER_IS_CLANGCXX)
+        target_compile_options(spectests-cov
+            PRIVATE
+                -Wno-weak-vtables
+                -Wno-exit-time-destructors
+
+        )
+    endif(CMAKE_COMPILER_IS_CLANGCXX)
 
     target_include_directories(spectests-cov
         SYSTEM

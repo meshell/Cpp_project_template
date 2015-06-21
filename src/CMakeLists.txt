@@ -9,6 +9,11 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
+# Check for clang compiler
+if(CMAKE_CXX_COMPILER MATCHES ".*clang")
+  set(CMAKE_COMPILER_IS_CLANGCXX 1)
+endif()
+
 # Cache options
 option(USE_STATIC_BOOST "Statically link Boost" ${WIN32})
 
@@ -73,6 +78,8 @@ elseif(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(projectlib
         PUBLIC
             -Weverything
+            -Wno-c++98-compat
+            -Wno-padded
         PRIVATE
             -Werror
     )
