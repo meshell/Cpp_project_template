@@ -100,7 +100,6 @@ if(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
         UPDATE_COMMAND ""
         CMAKE_ARGS
           -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-          -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
           -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
           -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
           -Dgtest_force_shared_crt=${MSVC}
@@ -168,7 +167,7 @@ if(NOT Boost_FOUND)
       set(BOOST_TOOLSET_BUILD "toolset=gcc-${GCC_VERSION}")
       set(BOOST_CXX_FLAGS "-std=c++11")
       set(BOOST_LINK_FLAGS "")
-    elseif(CMAKE_CXX_COMPILER MATCHES ".*clang")
+    elseif(CMAKE_COMPILER_IS_CLANGCXX)
       set(BOOST_TOOLSET "clang")
       set(BOOST_TOOLSET_BUILD "toolset=clang")
       set(BOOST_CXX_FLAGS "-std=c++11 -Wno-c99-extensions")
@@ -273,7 +272,6 @@ if(UNIX)
                 CMAKE_ARGS
                   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                   -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-                  -DCMAKE_CXX_FLAGS='-Wno-unused-local-typedefs'
                   -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
                 BUILD_COMMAND cmake --build <BINARY_DIR> --target CppSpec
                 UPDATE_COMMAND ""
@@ -314,7 +312,6 @@ if(NOT CUKE_FOUND)
         DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
         CMAKE_ARGS
           -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-          -DCMAKE_CXX_FLAGS=${CXX_FLAGS}
           -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
           -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
           -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
