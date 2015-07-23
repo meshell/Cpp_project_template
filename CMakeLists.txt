@@ -7,7 +7,7 @@ cmake_policy(SET CMP0048 NEW)
 
 # project name
 # TODO fill in your project name and version
-project(CMake_project_template VERSION 1.1.0 LANGUAGES CXX C)
+project(CMake_project_template VERSION 1.2.0 LANGUAGES CXX C)
 
 # project name used in doxygen docu
 STRING(REGEX REPLACE "_" " " PROJECT_DOC_NAME ${PROJECT_NAME})
