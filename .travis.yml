@@ -3,9 +3,13 @@ compiler:
   - gcc
 
 env:
-  - CONFIG=Debug COVERAGE=0 
-  - CONFIG=Debug COVERAGE=1 DOC=1
-  - CONFIG=Release COVERAGE=0
+  global:
+    - GCC_VERSION=4.8
+
+  matrix:
+    - CONFIG=Debug COVERAGE=0 
+    - CONFIG=Debug COVERAGE=1 DOC=1
+    - CONFIG=Release COVERAGE=0
 
 matrix:
   exclude:
@@ -32,9 +36,9 @@ before_install:
   - sudo apt-get -qq update 
 
 install:
-  - if test ${CC} = gcc ; then sudo apt-get -y -qq install g++-4.8 ; fi
-  - if test ${CC} = gcc ; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 40 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8 --slave /usr/bin/gcov gcov /usr/bin/gcov-4.8 ; fi
-  - if test ${CC} = gcc ; then sudo update-alternatives --set gcc /usr/bin/gcc-4.8 ; fi
+  - if test ${CC} = gcc ; then sudo apt-get -y -qq install g++-${GCC_VERSION} ; fi
+  - if test ${CC} = gcc ; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 40 --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} ; fi
+  - if test ${CC} = gcc ; then sudo update-alternatives --set gcc /usr/bin/gcc-${GCC_VERSION} ; fi
   - gem install cucumber
   - if [ "${COVERAGE}" = '1' ] ; then sudo pip install cpp-coveralls --use-mirrors; fi
   - if [ "${DOC}" = '1' ] ; then sudo apt-get -y -qq install doxygen graphviz; fi
