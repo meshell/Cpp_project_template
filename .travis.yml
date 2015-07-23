@@ -1,7 +1,6 @@
 language: cpp
 compiler:
   - gcc
-  - clang
 
 env:
   - CONFIG=Debug COVERAGE=0 
@@ -10,8 +9,6 @@ env:
 
 matrix:
   exclude:
-    - compiler: clang
-      env: CONFIG=Debug COVERAGE=1 DOC=1
     - compiler: gcc
       env: CONFIG=Debug COVERAGE=0  
 
@@ -33,6 +30,8 @@ before_install:
   - tar -zxvf cmake-3.2.3-Linux-x86_64.tar.gz
   - ln -s cmake-3.2.3-Linux-x86_64/bin/cmake cmake-3 
   - sudo apt-get -qq update 
+
+install:
   - if test ${CC} = gcc ; then sudo apt-get -y -qq install g++-4.8 ; fi
   - if test ${CC} = gcc ; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 40 --slave /usr/bin/g++ g++ /usr/bin/g++-4.8 --slave /usr/bin/gcov gcov /usr/bin/gcov-4.8 ; fi
   - if test ${CC} = gcc ; then sudo update-alternatives --set gcc /usr/bin/gcc-4.8 ; fi
