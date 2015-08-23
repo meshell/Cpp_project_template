@@ -23,7 +23,7 @@ endif (WIN32)
 
 
 # Cmake cache variables
-option(BUILD_EXTERNALS "Build also external libraries" ${UNIX})
+option(BUILD_EXTERNALS "Build also external libraries" TRUE)
 option(DISABLE_CPPSPEC "Do not use CppSpec" FALSE)
 option(DISABLE_IGLOO "Do not use Igloo testing framework" FALSE)
 option(DISABLE_CATCH "Do not use CATCH testing framework" FALSE)
@@ -49,18 +49,6 @@ endif()
 #
 # Generic Compiler Flags
 #
-# Visual Studio 2012 needs _VARIADIC_MAX preprocessor define set in order to build google test
-if (MSVC11)
-  add_definitions(/D_VARIADIC_MAX=10)
-endif(MSVC11)
-
-if(WIN32)
-  if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /D_WIN32_WINNT=0x0502")
-  else(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x0502")
-  endif(MSVC)
-endif(WIN32)
 
 if(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
@@ -151,7 +139,9 @@ install(FILES README.md LICENSE
 )
   
 # Add some custom target
-add_custom_target(coverage)
+if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
+	add_custom_target(coverage)
+endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
 
 if(TARGET coverage_unittests)
     add_dependencies(coverage coverage_unittests)

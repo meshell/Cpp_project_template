@@ -16,7 +16,6 @@ IF EXIST %VS_DIR% DEL /S/Q %VS_DIR%
 MKDIR %VS_DIR%
 PUSHD %VS_DIR%
 
-
 IF %VISUAL_STUDIO%=="VS2015" (
   %CMAKE% -G"Visual Studio 14" ..
 ) ELSE (
