@@ -16,10 +16,6 @@ matrix:
     - compiler: gcc
       env: CONFIG=Debug COVERAGE=0  
 
-branches:
-  only:
-    - master
-
 notifications:
   email:
     recipients:
