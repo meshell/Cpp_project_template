@@ -15,6 +15,9 @@ matrix:
   exclude:
     - compiler: gcc
       env: CONFIG=Debug COVERAGE=0  
+branches:
+ except:
+  - VisualStudio
 
 notifications:
   email:

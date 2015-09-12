@@ -1,34 +1,25 @@
 # Specify version format
-version: 1.0.{build}
+version: 1.2.0.{build}
 
 # branches to build
 branches:
   # whitelist
-  only: 
-     - VisualStudio
+  only:
+  - VisualStudio
   # blacklist
   #except:
-  #  - gh-pages
-
-# Do not build on tags (GitHub only)
+ 
+# Do not build on tags (GitHub only) 
 skip_tags: true
 
-# Operating system (build VM template)
 os: Visual Studio 2015
 
-# build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
-platform: 
-  - Win32
-  #- x64
+# build configuration, i.e. Debug, Release, etc.
+configuration: Debug, Release
 
- # build configuration, i.e. Debug, Release, etc.
-configuration:
-  - Debug
-  - Release 
- 
-# clone directory
-clone_folder: C:\projects\cpp_project_template
- 
+# build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
+platform: Win32
+
 # scripts that run after cloning repository
 install:
   - cmd: cinst cmake -version 3.2.1 -y
@@ -48,8 +39,7 @@ before_build:
 
 # scripts to run after build
 after_build:
-  - cmd: cd build
-  - cmd: if "%configuration%"=="Release" msbuild PACKAGE.vcxproj
+  - cmd: if "%configuration%"=="Release" msbuild build\PACKAGE.vcxproj
 # to run your custom scripts instead of automatic MSBuild
 build_script:
 
@@ -63,11 +53,18 @@ build:
 
 
 test_script:
-  - cmd: cd build
-  - cmd: msbuild RUN_TESTS.vcxproj
+  - cmd: msbuild build\RUN_TESTS.vcxproj
 
 deploy_script:
 
+notifications:
+- provider: Email
+  to:
+    - estermann.michel@gmail.com
+  subject: Cpp_project_template AppVeyor Build
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: true
 
 #---------------------------------#
 #      artifacts configuration    #

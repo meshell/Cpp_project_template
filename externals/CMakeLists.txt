@@ -178,7 +178,6 @@ if(NOT Boost_FOUND)
     elseif(MSVC)
         set(BOOST_TOOLSET "msvc")
 		set(BOOST_LAYOUT versioned)
-		set(BOOST_LAYOUT versioned)
     endif(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
 
     ExternalProject_Add(
