@@ -51,14 +51,6 @@ function(register_catchtest TEST_FILE)
         )
     endif(CMAKE_COMPILER_IS_CLANGCXX)
 	
-	# Visual Studio is not C compliend and doesn't know about not, therefore define it
-	if (MSVC)
-		target_compile_definitions(${TEST_NAME}
-            PUBLIC
-				not=!
-		)
-	endif(MSVC)
-
     target_include_directories(${TEST_NAME}
         SYSTEM
         PRIVATE
@@ -98,14 +90,6 @@ if(CMAKE_COMPILER_IS_CLANGCXX)
     )
 endif(CMAKE_COMPILER_IS_CLANGCXX)
 
-# Visual Studio is not C compliend and doesn't know about not, therefore define it
-if (MSVC)
-	target_compile_definitions(catchtests
-		PUBLIC
-			not=!
-	)
-endif(MSVC)
-	
 target_include_directories(catchtests
     SYSTEM
     PRIVATE

@@ -146,13 +146,15 @@ if(NOT Boost_FOUND)
     set(BOOST_THREADING multi)
     set(BOOST_LAYOUT tagged)
 
-    if(MSVC)
-      set(BOOST_LAYOUT versioned)
-    endif(MSVC)
-
     set(BOOST_TOOLSET)
     set(BOOST_TOOLSET_BUILD)
 
+	if(MSVC12)
+		set(BOOST_TOOLSET_BUILD "toolset=msvc-12.0")
+	elseif(MSVC14)
+		set(BOOST_TOOLSET_BUILD "toolset=msvc-14.0")
+	endif(MSVC12)	
+	
     # Use the same compiler for building boost as for your own project
     if(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
       set(BOOST_TOOLSET "mingw")
@@ -173,12 +175,10 @@ if(NOT Boost_FOUND)
       set(BOOST_TOOLSET "clang")
       set(BOOST_TOOLSET_BUILD "toolset=clang")
       set(BOOST_CXX_FLAGS "cxxflags='-std=c++11 -Wno-c99-extensions'")
-    elseif(MSVC12)
+    elseif(MSVC)
         set(BOOST_TOOLSET "msvc")
-		set(BOOST_TOOLSET_BUILD "toolset=msvc-12.0")
-	elseif(MSVC14)
-        set(BOOST_TOOLSET "msvc")
-		set(BOOST_TOOLSET_BUILD "toolset=msvc-14.0")
+		set(BOOST_LAYOUT versioned)
+		set(BOOST_LAYOUT versioned)
     endif(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
 
     ExternalProject_Add(
