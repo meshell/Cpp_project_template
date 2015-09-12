@@ -33,10 +33,10 @@ clone_folder: C:\projects\cpp_project_template
 install:
   - cmd: cinst cmake -version 3.2.1 -y
   - cmd: cmake --version
+  - cmd: cinst nsis --version 2.46.0.20150406
 
 # scripts to run before build
 before_build:
-  - cmd: cd C:\projects\cpp_project_template
   - cmd: md build
   - cmd: cd build
   - cmd: if "%platform%"=="Win32" set CMAKE_GENERATOR_NAME=Visual Studio 14 2015
@@ -44,11 +44,12 @@ before_build:
   - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" -DCMAKE_BUILD_TYPE=%configuration% ..
   - cmd: cd ..
 # build first the external dependencies
-  - cmd: cmake --build build --target externals/external_dependencies
+  - cmd: cmake --build build --target externals/external_dependencies --config %configuration%
 
 # scripts to run after build
 after_build:
-
+  - cmd: cd build
+  - cmd: if "%configuration%"=="Release" msbuild PACKAGE.vcxproj
 # to run your custom scripts instead of automatic MSBuild
 build_script:
 
@@ -56,13 +57,23 @@ build_script:
 #build: off  
   
 build:
-  project: C:\projects\cpp_project_template\build\Cpp_project_template.sln # path to Visual Studio solution or project
+  project: build\Cpp_project_template.sln # path to Visual Studio solution or project
   parallel: true                           # enable MSBuild parallel builds
   verbosity: minimal                       # MSBuild verbosity level (quiet|minimal|normal|detailed)
 
 
 test_script:
-  - cmd: cd C:\projects\cpp_project_template\build
+  - cmd: cd build
   - cmd: msbuild RUN_TESTS.vcxproj
 
 deploy_script:
+
+
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
+artifacts:
+
+  # pushing a single file
+  - path: install\*.exe
