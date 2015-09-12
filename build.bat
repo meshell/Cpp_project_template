@@ -19,9 +19,9 @@ PUSHD %BUILD_DIR%
 @ECHO -- Run cmake --
 @ECHO ----------------------
 IF %VISUAL_STUDIO%=="VS2015" (
-  %CMAKE% -G"Visual Studio 14" ..
+  %CMAKE% -G"Visual Studio 14 2015" ..
 ) ELSE (
-  %CMAKE% -G"Visual Studio 12" ..
+  %CMAKE% -G"Visual Studio 12 2013" ..
 )
 POPD
 IF ERRORLEVEL 1 GOTO error

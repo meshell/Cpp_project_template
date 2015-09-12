@@ -1,0 +1,68 @@
+# Specify version format
+version: 1.0.{build}
+
+# branches to build
+branches:
+  # whitelist
+  only: 
+     - VisualStudio
+  # blacklist
+  #except:
+  #  - gh-pages
+
+# Do not build on tags (GitHub only)
+skip_tags: true
+
+# Operating system (build VM template)
+os: Visual Studio 2015
+
+# build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
+platform: 
+  - Win32
+  #- x64
+
+ # build configuration, i.e. Debug, Release, etc.
+configuration:
+  - Debug
+  - Release 
+ 
+# clone directory
+clone_folder: C:\projects\cpp_project_template
+ 
+# scripts that run after cloning repository
+install:
+  - cmd: cinst cmake -version 3.2.1 -y
+  - cmd: cmake --version
+
+# scripts to run before build
+before_build:
+  - cmd: cd C:\projects\cpp_project_template
+  - cmd: md build
+  - cmd: cd build
+  - cmd: if "%platform%"=="Win32" set CMAKE_GENERATOR_NAME=Visual Studio 14 2015
+  - cmd: if "%platform%"=="x64" set CMAKE_GENERATOR_NAME=Visual Studio 14 2015 Win64
+  - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" -DCMAKE_BUILD_TYPE=%configuration% ..
+  - cmd: cd ..
+# build first the external dependencies
+  - cmd: cmake --build build --target externals/external_dependencies
+
+# scripts to run after build
+after_build:
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+
+# to disable automatic builds
+#build: off  
+  
+build:
+  project: C:\projects\cpp_project_template\build\Cpp_project_template.sln # path to Visual Studio solution or project
+  parallel: true                           # enable MSBuild parallel builds
+  verbosity: minimal                       # MSBuild verbosity level (quiet|minimal|normal|detailed)
+
+
+test_script:
+  - cmd: cd C:\projects\cpp_project_template\build
+  - cmd: msbuild RUN_TESTS.vcxproj
+
+deploy_script:

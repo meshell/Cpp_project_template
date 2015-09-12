@@ -17,9 +17,9 @@ MKDIR %VS_DIR%
 PUSHD %VS_DIR%
 
 IF %VISUAL_STUDIO%=="VS2015" (
-  %CMAKE% -G"Visual Studio 14" ..
+  %CMAKE% -G"Visual Studio 14 2015" ..
 ) ELSE (
-  %CMAKE% -G"Visual Studio 12" ..
+  %CMAKE% -G"Visual Studio 12 2013" ..
 )
 POPD
 GOTO end

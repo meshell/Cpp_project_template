@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/meshell/Cpp_project_template.png)](https://travis-ci.org/meshell/Cpp_project_template)
+[![Build Status Travis](https://travis-ci.org/meshell/Cpp_project_template.png)](https://travis-ci.org/meshell/Cpp_project_template)
+[![Build Status AppVeyor] (https://ci.appveyor.com/api/projects/status/github/meshell/Cpp_project_template?svg=true)
 [![Coverage Status](https://coveralls.io/repos/meshell/Cpp_project_template/badge.svg)](https://coveralls.io/r/meshell/Cpp_project_template)
 
 Cpp_project_template
