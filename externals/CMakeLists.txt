@@ -55,11 +55,8 @@ if(NOT DISABLE_IGLOO AND NOT IGLOO_FOUND)
         URL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.zip
         URL_MD5 a5c77fcea616f217dda7ad518cef253d
         UPDATE_COMMAND ""
-        CMAKE_ARGS
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-          -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-          -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
-        BUILD_COMMAND cmake --build <BINARY_DIR> --target igloo-tests
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
         INSTALL_COMMAND
           ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/igloo &&
           ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/igloo <INSTALL_DIR>/include/igloo
@@ -276,7 +273,7 @@ if(UNIX)
                   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                   -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
                   -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
-                BUILD_COMMAND cmake --build <BINARY_DIR> --target CppSpec
+                BUILD_COMMAND cmake --build <BINARY_DIR> --target CppSpec --config ${CMAKE_BUILD_TYPE}
                 UPDATE_COMMAND ""
                 INSTALL_COMMAND
                   ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/CppSpec &&
@@ -314,7 +311,7 @@ if(NOT CUKE_FOUND)
         #  URL_MD5 c6498c974ddca7a87e07097d0172a1df
         DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
         CMAKE_ARGS
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+		  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
           -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
           -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
           -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
@@ -324,7 +321,7 @@ if(NOT CUKE_FOUND)
           -DCUKE_DISABLE_CPPSPEC=OFF
           -DCUKE_ENABLE_EXAMPLES=OFF
           -DBUILD_SHARED_LIBS=ON
-        BUILD_COMMAND cmake --build <BINARY_DIR> --target cucumber-cpp
+        BUILD_COMMAND cmake --build <BINARY_DIR> --target cucumber-cpp --config ${CMAKE_BUILD_TYPE}
         UPDATE_COMMAND ""
         INSTALL_COMMAND
           ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&
