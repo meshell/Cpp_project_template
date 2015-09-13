@@ -24,7 +24,7 @@ file(MAKE_DIRECTORY
 set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 if(MSVC)
   set(SCRIPT_SUFFIX .bat)
-  set(LIB_DIR "Debug")
+  set(LIB_DIR ${CMAKE_BUILD_TYPE})
 else(MSVC)
   set(SCRIPT_SUFFIX .sh)
   set(LIB_DIR "")
