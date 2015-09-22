@@ -212,4 +212,4 @@ if(SONAR_RUNNER_EXE)
 endif(SONAR_RUNNER_EXE)
 
 
-include(CPackConfig.cmake)
+include(CMakeInstallation.cmake)

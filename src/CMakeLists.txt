@@ -33,7 +33,7 @@ configure_file (
 #
 
 add_library(projectlib STATIC
-    EXCLUDE_FROM_ALL
+#    EXCLUDE_FROM_ALL
     dummy.cpp
 )
 
@@ -196,9 +196,19 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 #Install targets
+
+
 install(TARGETS ${PROJECT_NAME}
    RUNTIME DESTINATION bin
    COMPONENT main
+)
+
+#Install targets
+install(TARGETS projectlib
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib/static
+		COMPONENT library
 )
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../include/dummy.h
