@@ -31,7 +31,7 @@ install:
   - cmd: cinst nsis --version 2.46.0.20150406
   - cmd: cinst ruby
   - cmd: cinst rubygems
-  - cmd: gem install cucumber
+  - cmd: gem install cucumber --no-document
 
 # scripts to run before build
 before_build:
