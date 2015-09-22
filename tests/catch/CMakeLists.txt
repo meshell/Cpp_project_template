@@ -50,7 +50,7 @@ function(register_catchtest TEST_FILE)
 
         )
     endif(CMAKE_COMPILER_IS_CLANGCXX)
-
+	
     target_include_directories(${TEST_NAME}
         SYSTEM
         PRIVATE

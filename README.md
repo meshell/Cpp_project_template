@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/meshell/Cpp_project_template.png)](https://travis-ci.org/meshell/Cpp_project_template)
+[![Build Status Travis](https://travis-ci.org/meshell/Cpp_project_template.png)](https://travis-ci.org/meshell/Cpp_project_template)
+[![Build status](https://ci.appveyor.com/api/projects/status/u0axo813um798dc7?svg=true)](https://ci.appveyor.com/project/meshell/cpp-project-template)
 [![Coverage Status](https://coveralls.io/repos/meshell/Cpp_project_template/badge.svg)](https://coveralls.io/r/meshell/Cpp_project_template)
 
 Cpp_project_template
@@ -20,7 +21,7 @@ An example project which can be used as starting point for C++ projects using cm
 ---------------
 Building the Project requires 
 * a recent Version of [CMake](http://www.cmake.org/) (3.2.x). See CMake documentation for more information about building using CMake.
-* a recent C++ compiler supporting C++11 (tested on gcc 4.8, 4.9 and clang 3.5)
+* a recent C++ compiler supporting C++11 (tested on gcc 4.8, 4.9, clang 3.5, 3.6 and Visual Studio 2013 & 2015)
 
 The external dependencies can be downloaded and build using CMake's ExternalProject (make target external_dependencies).
 
@@ -28,11 +29,17 @@ The external dependencies can be downloaded and build using CMake's ExternalProj
 --------------
 
 __Linux__
-Since cmake is used the normal cmake build workflor can be applied. Just make sure to build the external dependencies first.
+You can run the build.sh script or since cmake is used the normal cmake build workflow can be applied. Just make sure to build the external dependencies first.
 E.g.
 * mkdir build && (cd build && cmake ..)
 * cmake --build build --target external_dependencies --config Debug
 * cmake --build build --target all --config Debug
+
+__Windows__
+Run the build.bat script to build the project and run the tests or run create_windows_installer.bat to create the installer exe.
+Usage:
+ build.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
+ create_windows_installer.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
 
 
 # Running Feature tests

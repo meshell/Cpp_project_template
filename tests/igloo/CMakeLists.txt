@@ -49,20 +49,19 @@ function(register_iglootest TEST_FILE)
     target_link_libraries(${TEST_NAME}
         internal::projectlib ${ARGN}
     )
-
-    target_compile_options(${TEST_NAME}
-        PRIVATE
-            -Wno-unused-parameter
-    )
-
-    if(CMAKE_COMPILER_IS_CLANGCXX)
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		target_compile_options(${TEST_NAME}
+			PRIVATE
+				-Wno-unused-parameter
+		)
+    elseif(CMAKE_COMPILER_IS_CLANGCXX)
         target_compile_options(${TEST_NAME}
             PRIVATE
                 -Wno-global-constructors
                 -Wno-non-virtual-dtor
                 -Wno-weak-vtables
         )
-    endif(CMAKE_COMPILER_IS_CLANGCXX)
+    endif(CMAKE_COMPILER_IS_GNUCXX)
 
     igloo_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
     set(IGLOOTEST_SOURCES ${IGLOOTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
@@ -100,19 +99,19 @@ target_link_libraries(iglootests
     internal::projectlib
 )
 
-target_compile_options(iglootests
-    PRIVATE
-        -Wno-unused-parameter
-)
-
-if(CMAKE_COMPILER_IS_CLANGCXX)
+if(CMAKE_COMPILER_IS_GNUCXX)
+	target_compile_options(iglootests
+		PRIVATE
+			-Wno-unused-parameter
+	)
+elseif(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(iglootests
         PRIVATE
             -Wno-global-constructors
             -Wno-non-virtual-dtor
             -Wno-weak-vtables
     )
-endif(CMAKE_COMPILER_IS_CLANGCXX)
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # run allways igloo tests target when make all
 add_custom_target(run_iglootests

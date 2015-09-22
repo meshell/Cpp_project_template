@@ -65,6 +65,7 @@ function(register_test TEST_FILE)
             ${CMAKE_THREAD_LIBS_INIT}
         )
     endif(UNIX)
+	
     gtest_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
     set(UNITTEST_SOURCES ${UNITTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()

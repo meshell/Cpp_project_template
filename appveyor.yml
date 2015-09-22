@@ -1,0 +1,83 @@
+# Specify version format
+version: 1.2.0.{build}
+
+# branches to build
+branches:
+  # whitelist
+  only:
+  - VisualStudio
+  # blacklist
+  #except:
+ 
+# Do not build on tags (GitHub only) 
+skip_tags: true
+
+os: Visual Studio 2015
+
+# build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
+platform: 
+  - Win32
+  #- x64
+
+ # build configuration, i.e. Debug, Release, etc.
+configuration:
+  - Debug
+  - Release 
+
+# scripts that run after cloning repository
+install:
+  - cmd: cinst cmake -version 3.2.1 -y
+  - cmd: cmake --version
+  - cmd: cinst nsis --version 2.46.0.20150406
+  - cmd: cinst ruby
+  - cmd: cinst rubygems
+  - cmd: gem install cucumber --no-document
+
+# scripts to run before build
+before_build:
+  - cmd: md build
+  - cmd: cd build
+  - cmd: if "%platform%"=="Win32" set CMAKE_GENERATOR_NAME=Visual Studio 14 2015
+  - cmd: if "%platform%"=="x64" set CMAKE_GENERATOR_NAME=Visual Studio 14 2015 Win64
+  - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" -DCMAKE_BUILD_TYPE=%configuration% ..
+  - cmd: cd ..
+# build first the external dependencies
+  - cmd: cmake --build build --target externals/external_dependencies --config %configuration%
+
+# scripts to run after build
+after_build:
+  - cmd: if "%configuration%"=="Release" msbuild build\PACKAGE.vcxproj
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+
+# to disable automatic builds
+#build: off  
+  
+build:
+  project: build\Cpp_project_template.sln # path to Visual Studio solution or project
+  parallel: true                           # enable MSBuild parallel builds
+  verbosity: minimal                       # MSBuild verbosity level (quiet|minimal|normal|detailed)
+
+
+test_script:
+  - cmd: msbuild build\RUN_TESTS.vcxproj
+
+deploy_script:
+
+notifications:
+- provider: Email
+  to:
+    - estermann.michel@gmail.com
+  subject: Cpp_project_template AppVeyor Build
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: true
+
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
+artifacts:
+
+  # pushing a single file
+  - path: install\*.exe

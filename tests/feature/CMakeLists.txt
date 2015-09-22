@@ -83,7 +83,7 @@ find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
 # CppSpec driver
 #
 # TODO uncomment next line if cppspec driver should be used
-find_package(CppSpec REQUIRED)
+find_package(CppSpec)
 
 #
 # Google Test driver

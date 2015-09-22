@@ -24,14 +24,16 @@ file(MAKE_DIRECTORY
 set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 if(MSVC)
   set(SCRIPT_SUFFIX .bat)
+  set(LIB_DIR ${CMAKE_BUILD_TYPE})
 else(MSVC)
   set(SCRIPT_SUFFIX .sh)
+  set(LIB_DIR "")
 endif(MSVC)
 
-set(LIB_DIR "")
+
 
 #TODO USe this one if build from Visual Studio Solution
-#set(LIB_DIR "Debug")
+
 
 # Add an target to build all external dependencies
 add_custom_target(external_dependencies)
@@ -53,11 +55,8 @@ if(NOT DISABLE_IGLOO AND NOT IGLOO_FOUND)
         URL https://github.com/joakimkarlsson/igloo/archive/igloo.1.1.1.zip
         URL_MD5 a5c77fcea616f217dda7ad518cef253d
         UPDATE_COMMAND ""
-        CMAKE_ARGS
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-          -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-          -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
-        BUILD_COMMAND cmake --build <BINARY_DIR> --target igloo-tests
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
         INSTALL_COMMAND
           ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/igloo &&
           ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/igloo <INSTALL_DIR>/include/igloo
@@ -124,9 +123,9 @@ endif(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
 ####################
 
 # Set boost minimal version in order to build cppspec and cucumber-cpp with the same library versions
-set(BOOST_MIN_VERSION 1.55)
+set(BOOST_MIN_VERSION 1.58)
 set(Boost_Version ${BOOST_MIN_VERSION}.0)
-set(Boost_MD5 d6eef4b4cacb2183f2bf265a5a03a354)
+set(Boost_MD5 b8839650e61e9c1c0a89f371dd475546)
 
 find_package(Boost ${Boost_Version})
 if(NOT Boost_FOUND)
@@ -144,13 +143,15 @@ if(NOT Boost_FOUND)
     set(BOOST_THREADING multi)
     set(BOOST_LAYOUT tagged)
 
-    if(MSVC)
-      set(BOOST_LAYOUT versioned)
-    endif(MSVC)
-
     set(BOOST_TOOLSET)
     set(BOOST_TOOLSET_BUILD)
 
+	if(MSVC12)
+		set(BOOST_TOOLSET_BUILD "toolset=msvc-12.0")
+	elseif(MSVC14)
+		set(BOOST_TOOLSET_BUILD "toolset=msvc-14.0")
+	endif(MSVC12)	
+	
     # Use the same compiler for building boost as for your own project
     if(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
       set(BOOST_TOOLSET "mingw")
@@ -165,16 +166,15 @@ if(NOT Boost_FOUND)
       )
       set(BOOST_TOOLSET "gcc")
       set(BOOST_TOOLSET_BUILD "toolset=gcc-${GCC_VERSION}")
-      set(BOOST_CXX_FLAGS "-std=c++11")
+      set(BOOST_CXX_FLAGS "cxxflags='-std=c++11'")
       set(BOOST_LINK_FLAGS "")
     elseif(CMAKE_COMPILER_IS_CLANGCXX)
       set(BOOST_TOOLSET "clang")
       set(BOOST_TOOLSET_BUILD "toolset=clang")
-      set(BOOST_CXX_FLAGS "-std=c++11 -Wno-c99-extensions")
+      set(BOOST_CXX_FLAGS "cxxflags='-std=c++11 -Wno-c99-extensions'")
     elseif(MSVC)
-      if (NOT BOOST_TOOLSET)
         set(BOOST_TOOLSET "msvc")
-      endif(NOT BOOST_TOOLSET)
+		set(BOOST_LAYOUT versioned)
     endif(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
 
     ExternalProject_Add(
@@ -192,7 +192,7 @@ if(NOT Boost_FOUND)
                         link=shared,static
                         threading=${BOOST_THREADING}
                         --layout=${BOOST_LAYOUT}
-                        cxxflags=${BOOST_CXX_FLAGS}
+                        ${BOOST_CXX_FLAGS}
                         ${BOOST_TOOLSET_BUILD}
         BUILD_IN_SOURCE 1
         INSTALL_COMMAND ""
@@ -202,7 +202,7 @@ if(NOT Boost_FOUND)
       string( REPLACE "_0" "" Boost_Version_Shorten ${Boost_Version_Underscore} )
       ExternalProject_Add_Step(
         boost MoveHeaders
-        COMMAND move ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_CURRENT_SOURCE_DIR}/include/boost
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}/boost ${CMAKE_CURRENT_SOURCE_DIR}/include/boost && ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}
         DEPENDEES install
       )
 
@@ -273,7 +273,7 @@ if(UNIX)
                   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                   -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
                   -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
-                BUILD_COMMAND cmake --build <BINARY_DIR> --target CppSpec
+                BUILD_COMMAND cmake --build <BINARY_DIR> --target CppSpec --config ${CMAKE_BUILD_TYPE}
                 UPDATE_COMMAND ""
                 INSTALL_COMMAND
                   ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/CppSpec &&
@@ -311,7 +311,7 @@ if(NOT CUKE_FOUND)
         #  URL_MD5 c6498c974ddca7a87e07097d0172a1df
         DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
         CMAKE_ARGS
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+		  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
           -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
           -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
           -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
@@ -321,7 +321,7 @@ if(NOT CUKE_FOUND)
           -DCUKE_DISABLE_CPPSPEC=OFF
           -DCUKE_ENABLE_EXAMPLES=OFF
           -DBUILD_SHARED_LIBS=ON
-        BUILD_COMMAND cmake --build <BINARY_DIR> --target cucumber-cpp
+        BUILD_COMMAND cmake --build <BINARY_DIR> --target cucumber-cpp --config ${CMAKE_BUILD_TYPE}
         UPDATE_COMMAND ""
         INSTALL_COMMAND
           ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include &&

@@ -8,10 +8,22 @@ IF ERRORLEVEL 1 GOTO error
 
 MKDIR %BUILD_DIR%
 PUSHD %BUILD_DIR%
+@ECHO -- Run cmake --
+@ECHO ----------------------
 %CMAKE% ..
+POPD
+IF ERRORLEVEL 1 GOTO error
+@ECHO.
+@ECHO -- Build external Dependencies --
+@ECHO ---------------------------------
+%CMAKE% --build %BUILD_DIR% --target externals/external_dependencies
+IF ERRORLEVEL 1 GOTO error
+@ECHO.
+@ECHO -- Build installer --
+@ECHO ---------------------------
+%CMAKE% --build %BUILD_DIR% --target PACKAGE
 
-%CMAKE% --build . --target PACKAGE
-
+IF ERRORLEVEL 1 GOTO error
 GOTO end
 :error
 PAUSE
