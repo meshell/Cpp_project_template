@@ -30,7 +30,6 @@ install:
   - cmd: cmake --version
   - cmd: cinst nsis --version 2.46.0.20150406
   - cmd: cinst ruby
-  - cmd: cinst ruby2.devkit
   - cmd: cinst rubygems
   - cmd: gem install cucumber
 
