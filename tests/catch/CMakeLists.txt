@@ -110,6 +110,14 @@ add_dependencies(run_catchtests
     tests::catch
 )
 
+add_custom_target(run_catchtests_junit
+    catchtests -r junit;-o ${TESTS_REPORT_DIR}/catch-tests.xml
+)
+
+add_dependencies(run_catchtests_junit
+    tests::catch
+)
+
 ####################################################################
 # Create and run a single test executable including all testclass. #
 # With coverage measurement                                        #

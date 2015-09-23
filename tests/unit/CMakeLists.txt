@@ -117,6 +117,14 @@ add_dependencies(run_unittests
     tests::unit
 )
 
+add_custom_target(run_unittests_xunit
+    unittests --gtest_output=xml:${TESTS_REPORT_DIR}/unittests.xml
+)
+
+add_dependencies(run_unittests_xunit
+    tests::unit
+)
+
 ####################################################################
 # Create and run a single test executable including all testclass. #
 # With coverage measurement                                        #

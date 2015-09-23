@@ -17,7 +17,7 @@ os: Visual Studio 2015
 # build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
 platform: 
   - Win32
-  #- x64
+  - x64
 
  # build configuration, i.e. Debug, Release, etc.
 configuration:
@@ -46,7 +46,7 @@ before_build:
 
 # scripts to run after build
 after_build:
-  - cmd: if "%configuration%"=="Release" msbuild build\PACKAGE.vcxproj
+  - cmd: if "%configuration%"=="Release" cmake --build build --target package --config %configuration%
 # to run your custom scripts instead of automatic MSBuild
 build_script:
 
@@ -60,8 +60,17 @@ build:
 
 
 test_script:
-  - cmd: msbuild build\RUN_TESTS.vcxproj
+  - cmd: cmake --build build --target run_unittests_xunit --config %configuration%
+  - cmd: cmake --build build --target run_iglootests_xunit --config %configuration%
+  - cmd: cmake --build build --target run_catchtests_junit --config %configuration%
 
+after_test:
+# upload results to AppVeyor
+  -ps: $wc = New-Object 'System.Net.WebClient'
+  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
+  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
+  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))
+   
 deploy_script:
 
 notifications:
