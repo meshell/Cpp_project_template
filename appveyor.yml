@@ -2,7 +2,7 @@
 version: 1.2.0.{build}
 
 # branches to build
-branches:
+#branches:
   # whitelist
 #  only:
 #  - VisualStudio
@@ -66,11 +66,12 @@ test_script:
 
 after_test:
 # upload results to AppVeyor
-  -ps: $wc = New-Object 'System.Net.WebClient'
-  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
-  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
-  - ps: $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))
-   
+- ps: >-
+    $wc = New-Object 'System.Net.WebClient'
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))   
+
 deploy_script:
 
 notifications:
