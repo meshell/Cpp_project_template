@@ -60,9 +60,9 @@ build:
 
 
 test_script:
-  - cmd: cmake --build build --target run_unittests_xunit --config %configuration%
-  - cmd: cmake --build build --target run_iglootests_xunit --config %configuration%
-  - cmd: cmake --build build --target run_catchtests_junit --config %configuration%
+  - cmd: cmake --build build --target tests/unit/run_unittests_xunit --config %configuration%
+  - cmd: cmake --build build --target tests/igloo/run_iglootests_xunit --config %configuration%
+  - cmd: cmake --build build --target tests/catch/run_catchtests_junit --config %configuration%
 
 after_test:
 # upload results to AppVeyor
