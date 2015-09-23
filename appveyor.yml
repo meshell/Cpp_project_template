@@ -4,8 +4,8 @@ version: 1.2.0.{build}
 # branches to build
 branches:
   # whitelist
-  only:
-  - VisualStudio
+#  only:
+#  - VisualStudio
   # blacklist
   #except:
  
