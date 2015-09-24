@@ -36,7 +36,7 @@ install:
   - cmd: cinst rubygems
   - cmd: gem install cucumber --no-document
   - cmd: cinst doxygen.install 
-  - cmd: cinst graphviz 
+#  - cmd: cinst graphviz 
 
 # scripts to run before build
 before_build:
