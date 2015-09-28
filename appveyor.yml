@@ -20,7 +20,7 @@ os: Visual Studio 2015
 # build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
 platform: 
   - Win32
-#  - x64
+  - x64
 
  # build configuration, i.e. Debug, Release, etc.
 configuration:
@@ -35,8 +35,6 @@ install:
   - cmd: cinst ruby
   - cmd: cinst rubygems
   - cmd: gem install cucumber --no-document
-  - cmd: cinst doxygen.install 
-#  - cmd: cinst graphviz 
 
 # scripts to run before build
 before_build:
@@ -51,7 +49,7 @@ before_build:
 
 # scripts to run after build
 after_build:
-  - cmd: if "%configuration%"=="Release" cmake --build build --target doc --config %configuration%
+#  - cmd: if "%configuration%"=="Release" cmake --build build --target doc --config %configuration%
   - cmd: if "%configuration%"=="Release" cmake --build build --target package --config %configuration%
 # to run your custom scripts instead of automatic MSBuild
 build_script:
@@ -71,12 +69,12 @@ test_script:
   - cmd: cmake --build build --target tests/catch/run_catchtests_junit --config %configuration%
 
 #after_test:
-#- ps: >-
+- ps: |
 # upload results to AppVeyor
-#    $wc = New-Object 'System.Net.WebClient'
-#    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
-#    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
-#    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))   
+    $wc = New-Object 'System.Net.WebClient'
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))   
 
 deploy_script:
 
@@ -103,7 +101,7 @@ deploy:
   description: 'Release description'
   provider: GitHub
   auth_token:
-    secure: ovl7WniqPK9YJQdz34lxr0bRMA3iqLXmVsqSHnsUHpEv7HAyYJra3s2un/n2QThq # your encrypted token from GitHub
+    secure: 92cc4dd902c7609d99f57504c5b1c375d68c8ef0 # your encrypted token from GitHub
   artifact: /.*\.exe/            # upload installer
   draft: false
   prerelease: false
