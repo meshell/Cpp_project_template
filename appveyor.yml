@@ -68,9 +68,10 @@ test_script:
   - cmd: cmake --build build --target tests/igloo/run_iglootests_xunit --config %configuration%
   - cmd: cmake --build build --target tests/catch/run_catchtests_junit --config %configuration%
 
+  
 after_test:
+  # upload results to AppVeyor
   ps: |
-# upload results to AppVeyor
         $wc = New-Object 'System.Net.WebClient'
         $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
         $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
