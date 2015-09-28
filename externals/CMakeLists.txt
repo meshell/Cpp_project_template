@@ -173,8 +173,11 @@ if(NOT Boost_FOUND)
       set(BOOST_TOOLSET_BUILD "toolset=clang")
       set(BOOST_CXX_FLAGS "cxxflags='-std=c++11 -Wno-c99-extensions'")
     elseif(MSVC)
-        set(BOOST_TOOLSET "msvc")
-		set(BOOST_LAYOUT versioned)
+      set(BOOST_TOOLSET "msvc")
+      set(BOOST_LAYOUT versioned)
+      if(CMAKE_CL_64)
+        set(BOOST_TOOLSET_ADDRESSMODEL "address-model=64")
+      endif(CMAKE_CL_64)
     endif(CMAKE_COMPILER_IS_GNUCXX AND WIN32)
 
     ExternalProject_Add(
@@ -194,6 +197,7 @@ if(NOT Boost_FOUND)
                         --layout=${BOOST_LAYOUT}
                         ${BOOST_CXX_FLAGS}
                         ${BOOST_TOOLSET_BUILD}
+                        ${BOOST_TOOLSET_ADDRESSMODEL}
         BUILD_IN_SOURCE 1
         INSTALL_COMMAND ""
     )
