@@ -2,22 +2,25 @@
 version: 1.2.0.{build}
 
 # branches to build
-branches:
+#branches:
   # whitelist
-  only:
-  - VisualStudio
+#  only:
+#  - VisualStudio
   # blacklist
   #except:
  
 # Do not build on tags (GitHub only) 
-skip_tags: true
+#skip_tags: true
+
+pull_requests:
+  do_not_increment_build_number: true
 
 os: Visual Studio 2015
 
 # build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
 platform: 
   - Win32
-  #- x64
+  - x64
 
  # build configuration, i.e. Debug, Release, etc.
 configuration:
@@ -46,7 +49,8 @@ before_build:
 
 # scripts to run after build
 after_build:
-  - cmd: if "%configuration%"=="Release" msbuild build\PACKAGE.vcxproj
+#  - cmd: if "%configuration%"=="Release" cmake --build build --target doc --config %configuration%
+  - cmd: if "%configuration%"=="Release" cmake --build build --target package --config %configuration%
 # to run your custom scripts instead of automatic MSBuild
 build_script:
 
@@ -60,7 +64,14 @@ build:
 
 
 test_script:
-  - cmd: msbuild build\RUN_TESTS.vcxproj
+  ps: |
+        cmake --build build --target tests/unit/run_unittests_xunit --config $($env:CONFIGURATION)
+        $wc = New-Object 'System.Net.WebClient'
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
+        cmake --build build --target tests/igloo/run_iglootests_xunit --config $($env:CONFIGURATION)
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
+        cmake --build build --target tests/catch/run_catchtests_junit --config $($env:CONFIGURATION)
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))
 
 deploy_script:
 
@@ -81,3 +92,16 @@ artifacts:
 
   # pushing a single file
   - path: install\*.exe
+
+deploy:
+#  release: Cpp_project_template-v$(appveyor_build_version)
+  description: 'Release description'
+  provider: GitHub
+  auth_token:
+    secure: 92cc4dd902c7609d99f57504c5b1c375d68c8ef0 # your encrypted token from GitHub
+  artifact: /.*\.exe/            # upload installer
+  draft: false
+  prerelease: false
+  on:
+    branch: master                 # release from master branch only
+    appveyor_repo_tag: true        # deploy on tag push only

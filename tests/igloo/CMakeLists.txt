@@ -123,6 +123,14 @@ add_dependencies(run_iglootests
     tests::igloo
 )
 
+add_custom_target(run_iglootests_xunit
+    iglootests --output=xunit > ${TESTS_REPORT_DIR}/igloo-tests.xml
+)
+
+add_dependencies(run_iglootests_xunit
+    tests::igloo
+)
+
 ####################################################################
 # Create and run a single test executable including all testclass. #
 # With coverage measurement                                        #
