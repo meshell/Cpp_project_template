@@ -1,5 +1,6 @@
 [![Build Status Travis](https://travis-ci.org/meshell/Cpp_project_template.png)](https://travis-ci.org/meshell/Cpp_project_template)
-[![Build status](https://ci.appveyor.com/api/projects/status/u0axo813um798dc7?svg=true)](https://ci.appveyor.com/project/meshell/cpp-project-template)
+[![Build status AppVeyor](https://ci.appveyor.com/api/projects/status/u0axo813um798dc7?svg=true)](https://ci.appveyor.com/project/meshell/cpp-project-template)
+[![Build Status Drone.io](https://drone.io/github.com/meshell/Cpp_project_template/status.png)](https://drone.io/github.com/meshell/Cpp_project_template/latest)
 [![Coverage Status](https://coveralls.io/repos/meshell/Cpp_project_template/badge.svg)](https://coveralls.io/r/meshell/Cpp_project_template)
 
 Cpp_project_template
@@ -29,22 +30,27 @@ The external dependencies can be downloaded and build using CMake's ExternalProj
 --------------
 
 __Linux__
-You can run the build.sh script or since cmake is used the normal cmake build workflow can be applied. Just make sure to build the external dependencies first.
+You can use cmake to configure and build. Just make sure to build the external dependencies first.
 E.g.
 * mkdir build && (cd build && cmake ..)
 * cmake --build build --target external_dependencies --config Debug
 * cmake --build build --target all --config Debug
 
 __Windows__
-Run the build.bat script to build the project and run the tests or run create_windows_installer.bat to create the installer exe.
-Usage:
- build.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
- create_windows_installer.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
+You can use cmake to configure and build, you can also run the build.bat script to build the project and run the tests or run create_windows_installer.bat to create the installer exe.
 
+Usage:
+* build.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
+* create_windows_installer.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
+
+# Running Unit tests / specification
+------------------------
+A cmake targets exists for each test framework to run the tests. And additionally the CTest target contains all tests from all unittests frameworks included. 
 
 # Running Feature tests
 ------------------------
-See the Cucumber-cpp documentation on how to run the feature tests with cucumber.
+A cmake target exists to run the feature tests (run_feature_test). 
+For more details on how to run cucumber feature tests see the Cucumber-cpp documentation.
 
 # Sonar Metrics
 ----------------
