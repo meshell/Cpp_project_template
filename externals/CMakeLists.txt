@@ -125,11 +125,14 @@ set(BOOST_MIN_VERSION 1.58)
 set(Boost_Version ${BOOST_MIN_VERSION}.0)
 set(Boost_MD5 b8839650e61e9c1c0a89f371dd475546)
 
-find_package(Boost ${Boost_Version})
+# cucumber-cpp and CppSpec needs filesystem, date_time, chrono, thread, system, regex and program_options
+ # TODO: add your boost libraries here if you need one
+set(Boost_Components filesystem date_time chrono thread system regex program_options)
+
+find_package(Boost COMPONENTS ${Boost_Components})
+
 if(NOT Boost_FOUND)
-  # cucumber-cpp and CppSpec needs filesystem, date_time, chrono, thread, system, regex and program_options
-  # TODO: add your boost libraries here if you need one
-  set(Boost_Components filesystem date_time chrono thread system regex program_options)
+  
   string( REPLACE "." "_" Boost_Version_Underscore ${Boost_Version} )
 
   foreach(library ${Boost_Components})
@@ -225,7 +228,7 @@ if(NOT Boost_FOUND)
   add_dependencies(external_dependencies boost)
 endif(NOT Boost_FOUND)
 
-find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${Boost_Components})
+find_package(Boost COMPONENTS ${Boost_Components})
 
 if(Boost_FOUND)
   set(CUKE_EXTERNAL_PROJ_DEPENDS)
