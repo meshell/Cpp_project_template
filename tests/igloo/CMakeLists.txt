@@ -1,6 +1,13 @@
 # required minimum version of cmake
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
+# TODO add your header files here
+set(IGLOOTEST_HEADER_FILES
+   ${CMAKE_CURRENT_SOURCE_DIR}/include/doxtestlistener.h
+)
+
+source_group("Header Files" FILES ${IGLOOTEST_HEADER_FILES})
+
 # set the path to the additional cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/modules)
 
@@ -40,12 +47,13 @@ function(register_iglootest TEST_FILE)
   message(STATUS "Adding Igloo test " ${TEST_NAME})
   add_executable(${TEST_NAME}
     ${TEST_FILE}.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
   )
   target_include_directories(${TEST_NAME}
     SYSTEM
     PRIVATE
       ${IGLOO_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
   target_link_libraries(${TEST_NAME}
     internal::projectlib ${ARGN}
@@ -72,9 +80,11 @@ endfunction()
 # - Specification/Context
 # - Describe It
 # - When Then
-register_iglootest(dummy_spec)
-register_iglootest(dummy_describe)
-register_iglootest(dummy_when_then)
+register_iglootest(src/dummy_spec)
+register_iglootest(src/dummy_describe)
+register_iglootest(src/dummy_when_then)
+
+set(IGLOOTEST_SOURCES ${IGLOOTEST_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
 ############################################################
 # Create a single test executable including all testclass. #
@@ -83,8 +93,7 @@ register_iglootest(dummy_when_then)
 
 add_executable(iglootests
   ${IGLOOTEST_SOURCES}
-  doxtestlistener.h
-  main.cpp
+  ${IGLOOTEST_HEADER_FILES}
 )
 
 add_executable(tests::igloo ALIAS iglootests)
@@ -93,6 +102,7 @@ target_include_directories(iglootests
   SYSTEM
   PRIVATE
     ${IGLOO_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(iglootests
@@ -141,13 +151,14 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
   add_executable(iglootests-cov
     EXCLUDE_FROM_ALL
       ${IGLOOTEST_SOURCES}
-      doxtestlistener.h
-      main.cpp
+      ${IGLOOTEST_HEADER_FILES}
+
   )
   target_include_directories(iglootests-cov
     SYSTEM
     PRIVATE
       ${IGLOO_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
 
   target_link_libraries(iglootests-cov
