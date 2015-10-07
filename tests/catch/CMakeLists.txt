@@ -1,6 +1,13 @@
 # required minimum version of cmake
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
+# TODO add your test specific header files here
+set(CATCH_HEADER_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/googlemock_catch_listener.h
+)
+
+source_group("Header Files" FILES ${CATCH_HEADER_FILES})
+
 # set the path to the additional cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/modules)
 
@@ -31,6 +38,8 @@ endif()
 
 find_package(Catch REQUIRED)
 
+find_package(GMock)
+
 if(NOT TARGET internal::projectlib)
   include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
 endif()
@@ -41,8 +50,9 @@ function(register_catchtest TEST_FILE)
   message(STATUS "Adding Catch test " ${TEST_NAME})
   add_executable(${TEST_NAME}
     ${TEST_FILE}.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
   )
+  
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(${TEST_NAME}
       PRIVATE
@@ -54,7 +64,19 @@ function(register_catchtest TEST_FILE)
     SYSTEM
     PRIVATE
       ${CATCH_INCLUDE_DIRS}
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
+
+  if(GMOCK_FOUND)
+    target_include_directories(${TEST_NAME}
+      SYSTEM
+      PRIVATE
+        ${GMOCK_INCLUDE_DIRS}
+    )
+    target_link_libraries(${TEST_NAME}
+      ${GMOCK_LIBRARIES}
+    )
+  endif(GMOCK_FOUND)
 
   target_link_libraries(${TEST_NAME}
     internal::projectlib ${ARGN}
@@ -66,8 +88,11 @@ endfunction()
 # The following tests are all the same tests but with different syntax, i.e 
 # - Classic Test
 # - BDD Style Test
-register_catchtest(dummy_test_catch)
-register_catchtest(dummy_scenario_catch)
+register_catchtest(src/dummy_test_catch)
+register_catchtest(src/dummy_scenario_catch)
+register_catchtest(src/mock_test_catch)
+
+set(CATCHTEST_SOURCES ${CATCHTEST_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
 ############################################################
 # Create a single test executable including all testclass. #
@@ -76,7 +101,7 @@ register_catchtest(dummy_scenario_catch)
 
 add_executable(catchtests
   ${CATCHTEST_SOURCES}
-  main.cpp
+  ${CATCH_HEADER_FILES}
 )
 
 add_executable(tests::catch ALIAS catchtests)
@@ -92,11 +117,23 @@ target_include_directories(catchtests
   SYSTEM
   PRIVATE
     ${CATCH_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(catchtests
   internal::projectlib
 )
+
+if(GMOCK_FOUND)
+  target_include_directories(catchtests
+    SYSTEM
+    PRIVATE
+      ${GMOCK_INCLUDE_DIRS}
+  )
+  target_link_libraries(catchtests
+    ${GMOCK_LIBRARIES}
+  )
+endif(GMOCK_FOUND)
 
 # run allways catch tests target when make all
 add_custom_target(run_catchtests
@@ -126,7 +163,8 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
     add_executable(catchtests-cov
       EXCLUDE_FROM_ALL
         ${CATCHTEST_SOURCES}
-        main.cpp
+        ${CATCH_HEADER_FILES}
+        
     )
 
     if(CMAKE_COMPILER_IS_CLANGCXX)
@@ -140,11 +178,23 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
       SYSTEM
       PRIVATE
         ${CATCH_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
     target_link_libraries(catchtests-cov
       internal::projectlib-cov
     )
+  
+  if(GMOCK_FOUND)
+    target_include_directories(catchtests-cov
+      SYSTEM
+      PRIVATE
+        ${GMOCK_INCLUDE_DIRS}
+    )
+    target_link_libraries(catchtests-cov
+      ${GMOCK_LIBRARIES}
+    )
+  endif(GMOCK_FOUND)
 
   setup_target_for_coverage_cobertura(coverage_catch
     catchtests-cov
