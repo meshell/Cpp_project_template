@@ -60,8 +60,8 @@ function(register_feature_steps STEP_DEFINITION_FILE)
 endfunction()
 
 if(CUKE_FOUND)
-  register_feature_steps(features/step_definition/dummy_steps)
-  register_feature_steps(features/step_definition/mock_steps)
+  register_feature_steps(features/step_definitions/dummy_steps)
+  register_feature_steps(features/step_definitions/mock_steps)
 endif(CUKE_FOUND)
 
 #
