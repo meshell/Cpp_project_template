@@ -1,6 +1,7 @@
 language: cpp
 compiler:
   - gcc
+  - clang
 
 env:
   global:
@@ -13,6 +14,8 @@ env:
 
 matrix:
   exclude:
+    - compiler: clang
+      env: CONFIG=Debug COVERAGE=1 DOC=1
     - compiler: gcc
       env: CONFIG=Debug COVERAGE=0  
 
