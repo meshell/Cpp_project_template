@@ -2,11 +2,10 @@
 #include <igloo/igloo_alt.h>
 #include "dummy.h"
 
+namespace {
+
 using CppTemplate::Dummy;
 using namespace igloo;
-
-
-namespace {
 
 When (New_default_dummy_is_created)
 {

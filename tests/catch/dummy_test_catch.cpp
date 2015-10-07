@@ -4,9 +4,9 @@
 #include <catch/catch.hpp>
 #include "dummy.h"
 
-using CppTemplate::Dummy;
-
 namespace {
+
+using CppTemplate::Dummy;
 
 TEST_CASE("A newly created default dummy", "[creation]")
 {

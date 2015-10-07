@@ -3,11 +3,10 @@
 #include <gmock/gmock.h>
 #include "dummy.h"
 
+namespace {
+
 using CppTemplate::Dummy;
 using namespace igloo;
-
-
-namespace {
 
 Describe (The_newly_created_default_dummy)
 {

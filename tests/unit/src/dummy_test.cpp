@@ -2,9 +2,9 @@
 #include <gtest/gtest.h>
 #include "dummy.h"
 
-using CppTemplate::Dummy;
-
 namespace {
+
+using CppTemplate::Dummy;
 
 TEST(A_default_Dummy, should_be_speechless)
 {
