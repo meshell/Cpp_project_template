@@ -21,7 +21,7 @@ Describe (The_newly_created_default_dummy)
 
 Describe (The_english_dummy)
 {
-    void SetUp()
+    void SetUp() override
     {
         dummy.reset(new Dummy{"Hello", "World"});
     }

@@ -14,6 +14,7 @@ namespace igloo {
 class DoxTestListener : public TestListener
 {
 public:
+	virtual ~DoxTestListener() {};
     void TestRunStarting() override {}
     void TestRunEnded(const TestResults&) override
     {

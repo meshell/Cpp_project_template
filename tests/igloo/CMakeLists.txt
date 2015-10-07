@@ -15,9 +15,9 @@ set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
-    ${REPORT_DIR}
-    ${COVERAGE_REPORT_DIR}
-    ${TESTS_REPORT_DIR}
+  ${REPORT_DIR}
+  ${COVERAGE_REPORT_DIR}
+  ${TESTS_REPORT_DIR}
 )
 
 # Check for clang compiler
@@ -32,39 +32,40 @@ endif()
 find_package(Igloo REQUIRED)
 
 if(NOT TARGET internal::projectlib)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
 endif()
 
 function(register_iglootest TEST_FILE)
-    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
-    message(STATUS "Adding Igloo test " ${TEST_NAME})
-    add_executable(${TEST_NAME}
-            ${TEST_FILE}.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
-    target_include_directories(${TEST_NAME}
-        SYSTEM
-        PRIVATE
-            ${IGLOO_INCLUDE_DIRS}
+  get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+  message(STATUS "Adding Igloo test " ${TEST_NAME})
+  add_executable(${TEST_NAME}
+    ${TEST_FILE}.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+  )
+  target_include_directories(${TEST_NAME}
+    SYSTEM
+    PRIVATE
+      ${IGLOO_INCLUDE_DIRS}
+  )
+  target_link_libraries(${TEST_NAME}
+    internal::projectlib ${ARGN}
+  )
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    target_compile_options(${TEST_NAME}
+      PRIVATE
+        -Wno-unused-parameter
     )
-    target_link_libraries(${TEST_NAME}
-        internal::projectlib ${ARGN}
+  elseif(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(${TEST_NAME}
+      PRIVATE
+        -Wno-global-constructors
+        -Wno-non-virtual-dtor
+        -Wno-weak-vtables
     )
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		target_compile_options(${TEST_NAME}
-			PRIVATE
-				-Wno-unused-parameter
-		)
-    elseif(CMAKE_COMPILER_IS_CLANGCXX)
-        target_compile_options(${TEST_NAME}
-            PRIVATE
-                -Wno-global-constructors
-                -Wno-non-virtual-dtor
-                -Wno-weak-vtables
-        )
-    endif(CMAKE_COMPILER_IS_GNUCXX)
+  endif(CMAKE_COMPILER_IS_GNUCXX)
 
-    igloo_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
-    set(IGLOOTEST_SOURCES ${IGLOOTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
+  igloo_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
+  set(IGLOOTEST_SOURCES ${IGLOOTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
 
 # The following tests are all the same tests but with different syntax, i.e 
@@ -81,54 +82,53 @@ register_iglootest(dummy_when_then)
 ############################################################
 
 add_executable(iglootests
-    ${IGLOOTEST_SOURCES}
-    doxtestlistener.h
-    dummy_describe.cpp
-    main.cpp
+  ${IGLOOTEST_SOURCES}
+  doxtestlistener.h
+  main.cpp
 )
 
 add_executable(tests::igloo ALIAS iglootests)
 
 target_include_directories(iglootests
-    SYSTEM
-    PRIVATE
-        ${IGLOO_INCLUDE_DIRS}
+  SYSTEM
+  PRIVATE
+    ${IGLOO_INCLUDE_DIRS}
 )
 
 target_link_libraries(iglootests
-    internal::projectlib
+  internal::projectlib
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-	target_compile_options(iglootests
-		PRIVATE
-			-Wno-unused-parameter
-	)
+  target_compile_options(iglootests
+    PRIVATE
+      -Wno-unused-parameter
+  )
 elseif(CMAKE_COMPILER_IS_CLANGCXX)
-    target_compile_options(iglootests
-        PRIVATE
-            -Wno-global-constructors
-            -Wno-non-virtual-dtor
-            -Wno-weak-vtables
-    )
+  target_compile_options(iglootests
+    PRIVATE
+      -Wno-global-constructors
+      -Wno-non-virtual-dtor
+      -Wno-weak-vtables
+  )
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # run allways igloo tests target when make all
 add_custom_target(run_iglootests
-    ALL
-        iglootests
+  ALL
+    iglootests
 )
 
 add_dependencies(run_iglootests
-    tests::igloo
+  tests::igloo
 )
 
 add_custom_target(run_iglootests_xunit
-    iglootests --output=xunit > ${TESTS_REPORT_DIR}/igloo-tests.xml
+  iglootests --output=xunit > ${TESTS_REPORT_DIR}/igloo-tests.xml
 )
 
 add_dependencies(run_iglootests_xunit
-    tests::igloo
+  tests::igloo
 )
 
 ####################################################################
@@ -136,38 +136,37 @@ add_dependencies(run_iglootests_xunit
 # With coverage measurement                                        #
 ####################################################################
 if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    include(CodeCoverage)
+  include(CodeCoverage)
 
-    add_executable(iglootests-cov
-        EXCLUDE_FROM_ALL
-            ${IGLOOTEST_SOURCES}
-            doxtestlistener.h
-            dummy_describe.cpp
-            main.cpp
-    )
-    target_include_directories(iglootests-cov
-        SYSTEM
-        PRIVATE
-            ${IGLOO_INCLUDE_DIRS}
-    )
+  add_executable(iglootests-cov
+    EXCLUDE_FROM_ALL
+      ${IGLOOTEST_SOURCES}
+      doxtestlistener.h
+      main.cpp
+  )
+  target_include_directories(iglootests-cov
+    SYSTEM
+    PRIVATE
+      ${IGLOO_INCLUDE_DIRS}
+  )
 
-    target_link_libraries(iglootests-cov
-        internal::projectlib-cov
-    )
+  target_link_libraries(iglootests-cov
+    internal::projectlib-cov
+  )
 
+  target_compile_options(iglootests-cov
+    PRIVATE
+      -Wno-unused-parameter
+  )
+
+  if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(iglootests-cov
-        PRIVATE
-            -Wno-unused-parameter
+      PRIVATE
+        -Wno-global-constructors
+        -Wno-non-virtual-dtor
+        -Wno-weak-vtables
     )
-
-    if(CMAKE_COMPILER_IS_CLANGCXX)
-        target_compile_options(iglootests-cov
-            PRIVATE
-                -Wno-global-constructors
-                -Wno-non-virtual-dtor
-                -Wno-weak-vtables
-        )
-    endif(CMAKE_COMPILER_IS_CLANGCXX)
+  endif(CMAKE_COMPILER_IS_CLANGCXX)
 
   setup_target_for_igloo_coverage_cobertura(coverage_igloo
     iglootests-cov

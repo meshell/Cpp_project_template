@@ -15,9 +15,9 @@ set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
-    ${REPORT_DIR}
-    ${COVERAGE_REPORT_DIR}
-    ${TESTS_REPORT_DIR}
+  ${REPORT_DIR}
+  ${COVERAGE_REPORT_DIR}
+  ${TESTS_REPORT_DIR}
 )
 
 option(USE_STATIC_BOOST "Statically link Boost" ${WIN32})
@@ -40,78 +40,81 @@ endif()
 set(CORE_BOOST_LIBS regex program_options filesystem date_time chrono thread system)
 find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
 
-add_executable(spectests
-    src/dummy_spec.cpp
-    src/specs.cpp
-)
-
-
 function(register_test TEST_FILE)
-    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
-    message(STATUS "Adding spec " ${TEST_NAME})
-    cppspec_add_tests(spectests "" include/${TEST_FILE}.h)
+  get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+  message(STATUS "Adding spec " ${TEST_NAME})
+  cppspec_add_tests(spectests "" include/${TEST_FILE}.h)
+  set(CPPSPECTEST_SOURCES ${CPPSPECTEST_SOURCES} src/${TEST_FILE}.cpp PARENT_SCOPE)
+  set(CPPSPECTEST_HEADERS ${CPPSPECTEST_HEADERS} include/${TEST_FILE}.h PARENT_SCOPE)
 endfunction()
 
 register_test(dummy_spec)
 
+source_group("Header Files" FILES ${CPPSPECTEST_HEADERS})
+
+add_executable(spectests
+    src/specs.cpp
+    ${CPPSPECTEST_SOURCES}
+    ${CPPSPECTEST_HEADERS}
+)
 add_executable(tests::spec ALIAS spectests)
 
 target_include_directories(spectests
-    SYSTEM
-    PRIVATE
-        ${CPPSPEC_INCLUDE_DIRS}
+  SYSTEM
+  PRIVATE
+    ${CPPSPEC_INCLUDE_DIRS}
 )
 
 target_include_directories(spectests
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 if(CMAKE_COMPILER_IS_CLANGCXX)
-    target_compile_options(spectests
-        PRIVATE
-            -Wno-weak-vtables
-            -Wno-exit-time-destructors
+  target_compile_options(spectests
+    PRIVATE
+      -Wno-weak-vtables
+      -Wno-exit-time-destructors
 
-    )
+  )
 endif(CMAKE_COMPILER_IS_CLANGCXX)
 
 target_link_libraries(spectests
-    ${CPPSPEC_LIBRARIES}
-    ${Boost_LIBRARIES}
-    internal::projectlib
+  ${CPPSPEC_LIBRARIES}
+  ${Boost_LIBRARIES}
+  internal::projectlib
 )
 
 if(USE_STATIC_BOOST)
   set(Boost_USE_STATIC_LIBS ON)
 else(USE_STATIC_BOOST)
-    target_compile_definitions(spectests
-        PRIVATE
-            BOOST_ALL_DYN_LINK
-    )
+  target_compile_definitions(spectests
+    PRIVATE
+      BOOST_ALL_DYN_LINK
+  )
 endif(USE_STATIC_BOOST)
 
 target_compile_definitions(spectests
-    PRIVATE
-        ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
+  PRIVATE
+    ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
 )
 
 # run allways catch tests target when make all
 add_custom_target(run_spectests
-    ALL
-        spectests -m
+  ALL
+    spectests -m
 )
 
 add_dependencies(run_spectests
-    tests::spec
+  tests::spec
 )
 
 add_custom_target(run_spectests-junit
-    spectests -m -o junit --report-dir ${TESTS_REPORT_DIR}/tests/
+  spectests -m -o junit --report-dir ${TESTS_REPORT_DIR}/tests/
 )
 
 add_dependencies(run_spectests-junit
-    tests::spec
+  tests::spec
 )
 
 ####################################################################
@@ -119,59 +122,57 @@ add_dependencies(run_spectests-junit
 # With coverage measurement                                        #
 ####################################################################
 if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    include(CodeCoverage)
+  include(CodeCoverage)
 
-    add_executable(spectests-cov
-        EXCLUDE_FROM_ALL
-            ${CPPSPECTEST_SOURCES}
-            src/dummy_spec.cpp
-            src/specs.cpp
+  add_executable(spectests-cov
+    EXCLUDE_FROM_ALL
+      src/specs.cpp
+      ${CPPSPECTEST_SOURCES}
+      ${CPPSPECTEST_HEADERS}
+  )
+
+  if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(spectests-cov
+      PRIVATE
+          -Wno-weak-vtables
+          -Wno-exit-time-destructors
     )
+  endif(CMAKE_COMPILER_IS_CLANGCXX)
 
-    if(CMAKE_COMPILER_IS_CLANGCXX)
-        target_compile_options(spectests-cov
-            PRIVATE
-                -Wno-weak-vtables
-                -Wno-exit-time-destructors
+  target_include_directories(spectests-cov
+    SYSTEM
+    PRIVATE
+        ${CPPSPEC_INCLUDE_DIRS}
+  )
 
-        )
-    endif(CMAKE_COMPILER_IS_CLANGCXX)
+  target_include_directories(spectests-cov
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
 
-    target_include_directories(spectests-cov
-        SYSTEM
-        PRIVATE
-            ${CPPSPEC_INCLUDE_DIRS}
-    )
+  target_link_libraries(spectests-cov
+    ${CPPSPEC_LIBRARIES}
+    ${Boost_LIBRARIES}
+    internal::projectlib-cov
+  )
 
-    target_include_directories(spectests-cov
-        PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR}/include
-    )
-
-    target_link_libraries(spectests-cov
-        ${CPPSPEC_LIBRARIES}
-        ${Boost_LIBRARIES}
-        internal::projectlib-cov
-    )
-
-    if(USE_STATIC_BOOST)
-      set(Boost_USE_STATIC_LIBS ON)
-    else(USE_STATIC_BOOST)
-        target_compile_definitions(spectests-cov
-            PRIVATE
-                BOOST_ALL_DYN_LINK
-        )
-    endif(USE_STATIC_BOOST)
-
+  if(USE_STATIC_BOOST)
+    set(Boost_USE_STATIC_LIBS ON)
+  else(USE_STATIC_BOOST)
     target_compile_definitions(spectests-cov
-        PRIVATE
-            ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
+      PRIVATE
+        BOOST_ALL_DYN_LINK
     )
+  endif(USE_STATIC_BOOST)
 
-    setup_target_for_coverage_cobertura(coverage_specs
-      spectests-cov
-      ${COVERAGE_REPORT_DIR}/specifications
-      "-m;-ojunit;--report-dir;'${TESTS_REPORT_DIR}/'"
-     )
+  target_compile_definitions(spectests-cov
+    PRIVATE
+      ${Boost_LIB_DIAGNOSTIC_DEFINITIONS}
+  )
+
+  setup_target_for_coverage_cobertura(coverage_specs
+    spectests-cov
+    ${COVERAGE_REPORT_DIR}/specifications
+    "-m;-ojunit;--report-dir;'${TESTS_REPORT_DIR}/'"
+  )
 endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-

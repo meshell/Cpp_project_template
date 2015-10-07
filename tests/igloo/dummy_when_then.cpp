@@ -20,7 +20,7 @@ When (New_default_dummy_is_created)
 
 When (A_english_dummy_is_created)
 {
-    void SetUp()
+    void SetUp () override
     {
         dummy.reset(new Dummy{"Hello", "World"});
     }

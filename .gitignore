@@ -22,7 +22,11 @@
 
 doc/
 reports/
+build/
+externals/include/
+externals/lib/
 
 #generated file
 include/project_version.h
 project-export.cmake
+

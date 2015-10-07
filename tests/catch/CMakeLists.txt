@@ -15,9 +15,9 @@ set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
-    ${REPORT_DIR}
-    ${COVERAGE_REPORT_DIR}
-    ${TESTS_REPORT_DIR}
+  ${REPORT_DIR}
+  ${COVERAGE_REPORT_DIR}
+  ${TESTS_REPORT_DIR}
 )
 
 # Check for clang compiler
@@ -32,36 +32,35 @@ endif()
 find_package(Catch REQUIRED)
 
 if(NOT TARGET internal::projectlib)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
 endif()
 
 
 function(register_catchtest TEST_FILE)
-    get_filename_component(TEST_NAME ${TEST_FILE} NAME)
-    message(STATUS "Adding Catch test " ${TEST_NAME})
-    add_executable(${TEST_NAME}
-            ${TEST_FILE}.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+  get_filename_component(TEST_NAME ${TEST_FILE} NAME)
+  message(STATUS "Adding Catch test " ${TEST_NAME})
+  add_executable(${TEST_NAME}
+    ${TEST_FILE}.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+  )
+  if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(${TEST_NAME}
+      PRIVATE
+        -Wno-exit-time-destructors
     )
-    if(CMAKE_COMPILER_IS_CLANGCXX)
-        target_compile_options(${TEST_NAME}
-            PRIVATE
-                -Wno-exit-time-destructors
+  endif(CMAKE_COMPILER_IS_CLANGCXX)
 
-        )
-    endif(CMAKE_COMPILER_IS_CLANGCXX)
-	
-    target_include_directories(${TEST_NAME}
-        SYSTEM
-        PRIVATE
-            ${CATCH_INCLUDE_DIRS}
-    )
+  target_include_directories(${TEST_NAME}
+    SYSTEM
+    PRIVATE
+      ${CATCH_INCLUDE_DIRS}
+  )
 
-    target_link_libraries(${TEST_NAME}
-        internal::projectlib ${ARGN}
-    )
-    catch_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
-    set(CATCHTEST_SOURCES ${CATCHTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
+  target_link_libraries(${TEST_NAME}
+    internal::projectlib ${ARGN}
+  )
+  catch_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
+  set(CATCHTEST_SOURCES ${CATCHTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
 
 # The following tests are all the same tests but with different syntax, i.e 
@@ -76,46 +75,45 @@ register_catchtest(dummy_scenario_catch)
 ############################################################
 
 add_executable(catchtests
-    ${CATCHTEST_SOURCES}
-    main.cpp
+  ${CATCHTEST_SOURCES}
+  main.cpp
 )
 
 add_executable(tests::catch ALIAS catchtests)
 
 if(CMAKE_COMPILER_IS_CLANGCXX)
-    target_compile_options(catchtests
-        PRIVATE
-            -Wno-exit-time-destructors
-
-    )
+  target_compile_options(catchtests
+    PRIVATE
+      -Wno-exit-time-destructors
+  )
 endif(CMAKE_COMPILER_IS_CLANGCXX)
 
 target_include_directories(catchtests
-    SYSTEM
-    PRIVATE
-        ${CATCH_INCLUDE_DIRS}
+  SYSTEM
+  PRIVATE
+    ${CATCH_INCLUDE_DIRS}
 )
 
 target_link_libraries(catchtests
-    internal::projectlib
+  internal::projectlib
 )
 
 # run allways catch tests target when make all
 add_custom_target(run_catchtests
-    ALL
-        catchtests -s --order rand
+  ALL
+    catchtests -s --order rand
 )
 
 add_dependencies(run_catchtests
-    tests::catch
+  tests::catch
 )
 
 add_custom_target(run_catchtests_junit
-    catchtests -r junit;-o ${TESTS_REPORT_DIR}/catch-tests.xml
+  catchtests -r junit;-o ${TESTS_REPORT_DIR}/catch-tests.xml
 )
 
 add_dependencies(run_catchtests_junit
-    tests::catch
+  tests::catch
 )
 
 ####################################################################
@@ -126,29 +124,27 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
     include(CodeCoverage)
 
     add_executable(catchtests-cov
-        EXCLUDE_FROM_ALL
-            ${CATCHTEST_SOURCES}
-            main.cpp
+      EXCLUDE_FROM_ALL
+        ${CATCHTEST_SOURCES}
+        main.cpp
     )
 
     if(CMAKE_COMPILER_IS_CLANGCXX)
-        target_compile_options(catchtests-cov
-            PRIVATE
-                -Wno-exit-time-destructors
-
-        )
+      target_compile_options(catchtests-cov
+        PRIVATE
+          -Wno-exit-time-destructors
+      )
     endif(CMAKE_COMPILER_IS_CLANGCXX)
 
     target_include_directories(catchtests-cov
-        SYSTEM
-        PRIVATE
-            ${CATCH_INCLUDE_DIRS}
+      SYSTEM
+      PRIVATE
+        ${CATCH_INCLUDE_DIRS}
     )
 
     target_link_libraries(catchtests-cov
-        internal::projectlib-cov
+      internal::projectlib-cov
     )
-
 
   setup_target_for_coverage_cobertura(coverage_catch
     catchtests-cov

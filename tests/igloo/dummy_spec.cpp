@@ -20,12 +20,12 @@ Context (A_newly_created_default_dummy)
 
 Context (A_english_dummy)
 {
-    void SetUp()
+    void SetUp () override
     {
         dummy.reset(new Dummy{"Hello", "World"});
     }
 
-    Spec(should_not_be_speechless)
+    Spec (should_not_be_speechless)
     {
         Assert::That(dummy->speechless(), Is().Not().EqualTo(true));
     }

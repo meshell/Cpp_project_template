@@ -28,7 +28,7 @@ set(CPACK_COMPONENT_DOC_DISPLAY_NAME "Documentation")
 set(CPACK_COMPONENT_DOC_DESCRIPTION "The documentation")
 
 set(CPACK_COMPONENT_GROUP_PROGRAM_DESCRIPTION
-	"The main application"
+  "The main application"
 )
 
 set(CPACK_COMPONENT_LIBRARY_GROUP "Development")
@@ -38,7 +38,7 @@ set(CPACK_COMPONENT_HEADERS_GROUP "Development")
 set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "C++ Headers")
 
 set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION
-	"All of the stuff you'll never need to develop software"
+  "All of the stuff you'll never need to develop software"
 )
 
 ### nsis generator (Windows)
@@ -57,17 +57,16 @@ set(CPACK_NSIS_HELP_LINK "https://github.com/meshell/${PROJECT_NAME}")
 set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/meshell/${PROJECT_NAME}")
   
 set(CPACK_NSIS_CREATE_ICONS "
-	SetOutPath \\\"$INSTDIR\\\\bin\\\"
-    CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\C++Template.lnk\\\" \\\"$INSTDIR\\\\doc\\\\html\\\\index.html\\\"
-    CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\License.lnk\\\" \\\"$INSTDIR\\\\doc\\\\LICENSE\\\"
-    CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\README.lnk\\\" \\\"$INSTDIR\\\\doc\\\\README.md\\\"
-  ")
+  SetOutPath \\\"$INSTDIR\\\\bin\\\"
+  CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\C++Template.lnk\\\" \\\"$INSTDIR\\\\doc\\\\html\\\\index.html\\\"
+  CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\License.lnk\\\" \\\"$INSTDIR\\\\doc\\\\LICENSE\\\"
+  CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\README.lnk\\\" \\\"$INSTDIR\\\\doc\\\\README.md\\\"
+")
 set(CPACK_NSIS_DELETE_ICONS "
-	Delete \\\"$SMPROGRAMS\\\\$MUI_TEMP\\\\C++Template.lnk\\\"
-    Delete \\\"$SMPROGRAMS\\\\$MUI_TEMP\\\\License.lnk\\\"
-    Delete \\\"$SMPROGRAMS\\\\$MUI_TEMP\\\\README.lnk\\\"
-  ")
-  
+  Delete \\\"$SMPROGRAMS\\\\$MUI_TEMP\\\\C++Template.lnk\\\"
+  Delete \\\"$SMPROGRAMS\\\\$MUI_TEMP\\\\License.lnk\\\"
+  Delete \\\"$SMPROGRAMS\\\\$MUI_TEMP\\\\README.lnk\\\"
+")
 set(CPACK_NSIS_MENU_LINKS "doc/html/index.html" "Documentation")
 
 # DEB package config
@@ -81,23 +80,23 @@ set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/meshell/${PROJECT_NAME}")
 find_program(DPKG_PROGRAM dpkg)
 if (DPKG_PROGRAM)
 # Determine current architecture
-	macro(dpkg_arch VAR_NAME)
-		execute_process(
-			COMMAND ${DPKG_PROGRAM} --print-architecture
-			OUTPUT_VARIABLE ${VAR_NAME}
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-		)
-	endmacro(dpkg_arch)
+  macro(dpkg_arch VAR_NAME)
+  execute_process(
+    COMMAND ${DPKG_PROGRAM} --print-architecture
+    OUTPUT_VARIABLE ${VAR_NAME}
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+  endmacro(dpkg_arch)
 
-	set(CPACK_SET_DESTDIR true)
-	set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
-				
-	dpkg_arch(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
-	if (CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
-		set(CPACK_PACKAGE_FILE_NAME ${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
-	else (CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
-		set(CPACK_PACKAGE_FILE_NAME ${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CMAKE_SYSTEM_NAME})
-	endif (CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+  set(CPACK_SET_DESTDIR true)
+  set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+        
+  dpkg_arch(CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+  if (CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE})
+  else (CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CMAKE_SYSTEM_NAME})
+  endif (CPACK_DEBIAN_PACKAGE_ARCHITECTURE)
 endif(DPKG_PROGRAM)
 
 include(CPack)

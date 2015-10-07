@@ -4,17 +4,16 @@
 #include <cucumber-cpp/defs.hpp>
 #include "dummy.h"
 
-using cucumber::ScenarioScope;
-
 namespace
 {
+
+using cucumber::ScenarioScope;
 
 struct DummyCtx
 {
     std::vector<CppTemplate::Dummy> dummies{};
     std::string say_hello_result{};
 };
-
 
 
 GIVEN("^a dummy initialised with \"([^\"]*)\" and \"([^\"]*)\"$")
