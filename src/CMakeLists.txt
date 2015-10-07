@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 # TODO add your source files here
 set(PROJECTLIB_SOURCE_FILES
-  dummy.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dummy.cpp
 )
 
 # TODO add your header files here
@@ -180,7 +180,7 @@ endif(WIN32)
 #
 
 add_executable(${PROJECT_NAME}
-    main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 add_executable(${PROJECT_NAME}::exe ALIAS ${PROJECT_NAME})
 

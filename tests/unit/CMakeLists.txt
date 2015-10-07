@@ -1,6 +1,12 @@
 # required minimum version of cmake
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
+# TODO add your header files here
+set(UNITTEST_HEADER_FILES
+)
+
+source_group("Header Files" FILES ${UNITTEST_HEADER_FILES})
+
 # set the path to the additional cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/modules)
 
@@ -44,14 +50,23 @@ function(register_test TEST_FILE)
     SYSTEM
     PRIVATE
       ${GTEST_INCLUDE_DIRS}
-      ${GMOCK_INCLUDE_DIRS}
   )
   target_link_libraries(${TEST_NAME}
     ${GTEST_BOTH_LIBRARIES}
-    ${GMOCK_BOTH_LIBRARIES}
     internal::projectlib ${ARGN}
   )
 
+  if(GMOCK_FOUND)
+    target_include_directories(${TEST_NAME}
+      SYSTEM
+      PRIVATE
+        ${GMOCK_INCLUDE_DIRS}
+    )
+    target_link_libraries(${TEST_NAME}
+      ${GMOCK_BOTH_LIBRARIES}
+    )
+  endif(GMOCK_FOUND)
+  
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(${TEST_NAME}
       PRIVATE
@@ -71,6 +86,7 @@ function(register_test TEST_FILE)
 endfunction()
 
 register_test(src/dummy_test)
+register_test(src/gmock_test)
 
 ############################################################
 # Create a single test executable including all testclass. #
@@ -79,6 +95,7 @@ register_test(src/dummy_test)
 
 add_executable(unittests 
   ${UNITTEST_SOURCES}
+  ${UNITTEST_HEADER_FILES}
 )
 add_executable(tests::unit ALIAS unittests)
 
@@ -86,15 +103,23 @@ target_include_directories(unittests
   SYSTEM
   PRIVATE
     ${GTEST_INCLUDE_DIRS}
-    ${GMOCK_INCLUDE_DIRS}
 )
 
 target_link_libraries(unittests
   ${GTEST_BOTH_LIBRARIES}
-  ${GMOCK_BOTH_LIBRARIES}
   internal::projectlib
 )
-
+if(GMOCK_FOUND)
+  target_include_directories(unittests
+    SYSTEM
+    PRIVATE
+      ${GMOCK_INCLUDE_DIRS}
+  )
+  target_link_libraries(unittests
+    ${GMOCK_BOTH_LIBRARIES}
+  )
+endif(GMOCK_FOUND)
+  
 if(CMAKE_COMPILER_IS_CLANGCXX)
   target_compile_options(unittests
     PRIVATE
@@ -136,20 +161,30 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
   add_executable(unittests-cov
     EXCLUDE_FROM_ALL
       ${UNITTEST_SOURCES}
+      ${UNITTEST_HEADER_FILES}
   )
 
   target_include_directories(unittests-cov
     SYSTEM
     PRIVATE
       ${GTEST_INCLUDE_DIRS}
-      ${GMOCK_INCLUDE_DIRS}
   )
 
   target_link_libraries(unittests-cov
     ${GTEST_BOTH_LIBRARIES}
-    ${GMOCK_BOTH_LIBRARIES}
     internal::projectlib-cov
   )
+
+  if(GMOCK_FOUND)
+    target_include_directories(unittests-cov
+      SYSTEM
+      PRIVATE
+        ${GMOCK_INCLUDE_DIRS}
+    )
+    target_link_libraries(unittests-cov
+      ${GMOCK_BOTH_LIBRARIES}
+    )
+  endif(GMOCK_FOUND)
 
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(unittests-cov
