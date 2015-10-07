@@ -125,9 +125,16 @@ set(BOOST_MIN_VERSION 1.58)
 set(Boost_Version ${BOOST_MIN_VERSION}.0)
 set(Boost_MD5 b8839650e61e9c1c0a89f371dd475546)
 
-# cucumber-cpp and CppSpec needs filesystem, date_time, chrono, thread, system, regex and program_options
- # TODO: add your boost libraries here if you need one
-set(Boost_Components filesystem date_time chrono thread system regex program_options)
+# cucumber-cpp needs date_time, thread, system and regex
+set(Boost_Components thread system regex date_time)
+
+# TODO: add your boost libraries here if you need one
+set(Boost_Components ${Boost_Components} program_options)
+
+if(NOT DISABLE_CPPSPEC)
+  # cppspec needs additionally filesystem and chrono
+  set(Boost_Components ${Boost_Components} filesystem chrono)
+endif(NOT DISABLE_CPPSPEC)
 
 find_package(Boost COMPONENTS ${Boost_Components})
 
@@ -141,6 +148,7 @@ if(NOT Boost_FOUND)
 
   string(TOLOWER ${CMAKE_BUILD_TYPE} BOOST_VARIANT)
   set(BOOST_THREADING multi)
+  set(BOOST_LINK "shared,static")
   set(BOOST_LAYOUT tagged)
 
   set(BOOST_TOOLSET)
@@ -174,6 +182,7 @@ if(NOT Boost_FOUND)
     set(BOOST_CXX_FLAGS "cxxflags='-std=c++11 -Wno-c99-extensions'")
   elseif(MSVC)
     set(BOOST_TOOLSET "msvc")
+    set(BOOST_LINK "static")
     set(BOOST_LAYOUT versioned)
     if(CMAKE_CL_64)
       set(BOOST_TOOLSET_ADDRESSMODEL "address-model=64")
@@ -193,7 +202,7 @@ if(NOT Boost_FOUND)
       -j8
       --build-type=complete
       variant=${BOOST_VARIANT}
-      link=shared,static
+      link=${BOOST_LINK}
       threading=${BOOST_THREADING}
       --layout=${BOOST_LAYOUT}
       ${BOOST_CXX_FLAGS}
