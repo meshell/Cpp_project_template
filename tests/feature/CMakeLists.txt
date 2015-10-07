@@ -157,7 +157,7 @@ if(STEP_SOURCES)
   endif(GMOCK_FOUND)
 
   if(NOT MSVC)
-    find_library(PTREAD_LIB pthread)
+    find_library(PTREAD_LIB pthread REQUIRED)
     target_link_libraries(features
       ${PTREAD_LIB}
     )

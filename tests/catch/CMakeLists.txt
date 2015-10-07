@@ -76,6 +76,13 @@ function(register_catchtest TEST_FILE)
     target_link_libraries(${TEST_NAME}
       ${GMOCK_LIBRARIES}
     )
+    
+    if(NOT MSVC)
+      find_library(PTREAD_LIB pthread REQUIRED)
+      target_link_libraries(${TEST_NAME}
+        ${PTREAD_LIB}
+      )
+    endif(NOT MSVC)
   endif(GMOCK_FOUND)
 
   target_link_libraries(${TEST_NAME}
@@ -133,6 +140,13 @@ if(GMOCK_FOUND)
   target_link_libraries(catchtests
     ${GMOCK_LIBRARIES}
   )
+  
+  if(NOT MSVC)
+    find_library(PTREAD_LIB pthread REQUIRED)
+    target_link_libraries(catchtests
+      ${PTREAD_LIB}
+    )
+  endif(NOT MSVC)
 endif(GMOCK_FOUND)
 
 # run allways catch tests target when make all
@@ -193,6 +207,7 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
     )
     target_link_libraries(catchtests-cov
       ${GMOCK_LIBRARIES}
+      ${PTREAD_LIB}
     )
   endif(GMOCK_FOUND)
 
