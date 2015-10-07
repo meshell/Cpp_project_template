@@ -32,7 +32,7 @@ before_install:
   - sudo apt-get -qq update 
 
 install:
-  - sudo apt-get -y -qq install libboost-date-time-dev libboost-thread-dev libboost-chrono-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev
+  - sudo apt-get -y -qq install libboost-date-time1.48-dev libboost-thread1.48-dev libboost-chrono1.48-dev libboost-regex1.48-dev libboost-system1.48-dev libboost-filesystem1.48-dev libboost-program-options1.48-dev
   - if test ${CC} = gcc ; then sudo apt-get -y -qq install g++-${GCC_VERSION} ; fi
   - if test ${CC} = gcc ; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 40 --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} --slave /usr/bin/gcov gcov /usr/bin/gcov-${GCC_VERSION} ; fi
   - if test ${CC} = gcc ; then sudo update-alternatives --set gcc /usr/bin/gcc-${GCC_VERSION} ; fi
