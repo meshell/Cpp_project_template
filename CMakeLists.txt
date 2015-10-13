@@ -46,10 +46,6 @@ if(CMAKE_CXX_COMPILER MATCHES ".*clang")
   set(CMAKE_COMPILER_IS_CLANGCXX 1)
 endif()
 
-#
-# Generic Compiler Flags
-#
-
 if(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif(UNIX)

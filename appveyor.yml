@@ -15,7 +15,8 @@ version: 1.2.0.{build}
 pull_requests:
   do_not_increment_build_number: true
 
-os: Visual Studio 2015
+os:
+- Visual Studio 2015
 
 # build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
 platform: 
@@ -24,7 +25,7 @@ platform:
 
  # build configuration, i.e. Debug, Release, etc.
 configuration:
-  - Debug
+#  - Debug
   - Release 
 
 # scripts that run after cloning repository
@@ -68,10 +69,10 @@ test_script:
         cmake --build build --target tests/unit/run_unittests_xunit --config $($env:CONFIGURATION)
         $wc = New-Object 'System.Net.WebClient'
         $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\unittests.xml))
-        cmake --build build --target tests/igloo/run_iglootests_xunit --config $($env:CONFIGURATION)
-        $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
-        cmake --build build --target tests/catch/run_catchtests_junit --config $($env:CONFIGURATION)
-        $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))
+#        cmake --build build --target tests/igloo/run_iglootests_xunit --config $($env:CONFIGURATION)
+#        $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\igloo-tests.xml))
+#        cmake --build build --target tests/catch/run_catchtests_junit --config $($env:CONFIGURATION)
+#        $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\reports\tests\catch-tests.xml))
 
 deploy_script:
 

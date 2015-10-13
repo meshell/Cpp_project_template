@@ -1,4 +1,4 @@
-# - Enable Code Coverage
+# - Enable Code Coverage for the Igloo test framework
 #
 # 2012-01-31, Lars Bilke
 # 2013-07-11, Michel Estermann (modified)
@@ -48,27 +48,27 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/tests/coverage.ignore)
   endforeach(LINE)
 endif()
 
-
 # Param _targetname     The name of new the custom make target
 # Param _testrunner     The name of the target which runs the tests
 # Param _outputname     cobertura output is generated as _outputname.xml
 # Optional fourth parameter is passed as arguments to _testrunner
-# Optional fifth parameter is passed as arguments to gcovr
+# Optional fifth parameter is the outputfile the output is redirected to
+# Optional sixth parameter is passed as arguments to gcovr
 #   Pass them in list form, e.g.: "-j;2" for -j 2
-function(SETUP_TARGET_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname)
+function(SETUP_TARGET_FOR_IGLOO_COVERAGE_COBERTURA _targetname _testrunner _outputname)
   target_link_libraries(${_testrunner} gcov)
+
   target_compile_options(${_testrunner}
       PUBLIC
       -fprofile-arcs
       -ftest-coverage
   )
-
   add_custom_target(${_targetname}
   # Run tests
-      ${_testrunner} ${ARGV3}
+      ${_testrunner} ${ARGV3} > ${ARGV4}
 
   # Running gcovr
-      COMMAND ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV4}
+      COMMAND ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       COMMENT "Running gcovr to produce Cobertura code coverage report."
   )
@@ -78,5 +78,5 @@ function(SETUP_TARGET_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname
       COMMAND ;
       COMMENT "Cobertura code coverage report saved in ${_outputname}.xml."
   )
-endfunction() # SETUP_TARGET_FOR_COVERAGE_COBERTURA
+endfunction() # SETUP_TARGET_FOR_IGLOO_COVERAGE_COBERTURA
 

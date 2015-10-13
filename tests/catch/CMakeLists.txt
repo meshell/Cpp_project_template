@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 # TODO add your test specific header files here
 set(CATCH_HEADER_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/googlemock_catch_listener.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/googlemock_catch_listener.h
 )
 
 source_group("Header Files" FILES ${CATCH_HEADER_FILES})
@@ -22,9 +22,9 @@ set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
-  ${REPORT_DIR}
-  ${COVERAGE_REPORT_DIR}
-  ${TESTS_REPORT_DIR}
+    ${REPORT_DIR}
+    ${COVERAGE_REPORT_DIR}
+    ${TESTS_REPORT_DIR}
 )
 
 # Check for clang compiler
@@ -44,54 +44,53 @@ if(NOT TARGET internal::projectlib)
   include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
 endif()
 
-
 function(register_catchtest TEST_FILE)
   get_filename_component(TEST_NAME ${TEST_FILE} NAME)
   message(STATUS "Adding Catch test " ${TEST_NAME})
   add_executable(${TEST_NAME}
-    ${TEST_FILE}.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+      ${TEST_FILE}.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
   )
-  
+
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(${TEST_NAME}
-      PRIVATE
+        PRIVATE
         -Wno-exit-time-destructors
     )
   endif(CMAKE_COMPILER_IS_CLANGCXX)
 
   target_include_directories(${TEST_NAME}
-    SYSTEM
-    PRIVATE
+      SYSTEM
+      PRIVATE
       ${CATCH_INCLUDE_DIRS}
-      ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
 
   if(GMOCK_FOUND)
     target_include_directories(${TEST_NAME}
-      SYSTEM
-      PRIVATE
+        SYSTEM
+        PRIVATE
         ${GMOCK_INCLUDE_DIRS}
     )
     target_link_libraries(${TEST_NAME}
-      ${GMOCK_LIBRARIES}
+        ${GMOCK_LIBRARIES}
     )
-    
-    if(NOT MSVC)
-      find_library(PTREAD_LIB pthread REQUIRED)
+
+    if(UNIX)
+      find_package(Threads) # GTest needs this and it's a static library
       target_link_libraries(${TEST_NAME}
-        ${PTREAD_LIB}
+          ${CMAKE_THREAD_LIBS_INIT}
       )
-    endif(NOT MSVC)
+    endif(UNIX)
   endif(GMOCK_FOUND)
 
   target_link_libraries(${TEST_NAME}
-    internal::projectlib ${ARGN}
+      internal::projectlib ${ARGN}
   )
   catch_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
   set(CATCHTEST_SOURCES ${CATCHTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
 
+# TODO add here all your tests (source file name without extension)
 # The following tests are all the same tests but with different syntax, i.e 
 # - Classic Test
 # - BDD Style Test
@@ -101,119 +100,118 @@ register_catchtest(src/mock_test_catch)
 
 set(CATCHTEST_SOURCES ${CATCHTEST_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
-############################################################
-# Create a single test executable including all testclass. #
-# Without coverage measurement                             #
-############################################################
+######################################
+# Create a single test executable.   #
+# Without coverage measurement       #
+######################################
 
 add_executable(catchtests
-  ${CATCHTEST_SOURCES}
-  ${CATCH_HEADER_FILES}
+    ${CATCHTEST_SOURCES}
+    ${CATCH_HEADER_FILES}
 )
 
 add_executable(tests::catch ALIAS catchtests)
 
 if(CMAKE_COMPILER_IS_CLANGCXX)
   target_compile_options(catchtests
-    PRIVATE
+      PRIVATE
       -Wno-exit-time-destructors
   )
 endif(CMAKE_COMPILER_IS_CLANGCXX)
 
 target_include_directories(catchtests
-  SYSTEM
-  PRIVATE
+    SYSTEM
+    PRIVATE
     ${CATCH_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(catchtests
-  internal::projectlib
+    internal::projectlib
 )
 
 if(GMOCK_FOUND)
   target_include_directories(catchtests
-    SYSTEM
-    PRIVATE
+      SYSTEM
+      PRIVATE
       ${GMOCK_INCLUDE_DIRS}
   )
   target_link_libraries(catchtests
-    ${GMOCK_LIBRARIES}
+      ${GMOCK_LIBRARIES}
   )
-  
-  if(NOT MSVC)
-    find_library(PTREAD_LIB pthread REQUIRED)
+
+  if(UNIX)
+    find_package(Threads) # GTest needs this and it's a static library
     target_link_libraries(catchtests
-      ${PTREAD_LIB}
+        ${CMAKE_THREAD_LIBS_INIT}
     )
-  endif(NOT MSVC)
+  endif(UNIX)
 endif(GMOCK_FOUND)
 
-# run allways catch tests target when make all
+# Target: run catch tests 
 add_custom_target(run_catchtests
-  ALL
+    ALL # run the test always for target all
     catchtests -s --order rand
 )
 
 add_dependencies(run_catchtests
-  tests::catch
+    tests::catch
 )
 
+# Target: run catch tests with junit output
 add_custom_target(run_catchtests_junit
-  catchtests -r junit;-o ${TESTS_REPORT_DIR}/catch-tests.xml
+    catchtests -r junit;-o ${TESTS_REPORT_DIR}/catch-tests.xml
 )
 
 add_dependencies(run_catchtests_junit
-  tests::catch
+    tests::catch
 )
 
-####################################################################
-# Create and run a single test executable including all testclass. #
-# With coverage measurement                                        #
-####################################################################
+######################################
+# Create a single test executable.   #
+# With coverage measurement          #
+######################################
 if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    include(CodeCoverage)
+  include(CodeCoverage)
 
-    add_executable(catchtests-cov
+  add_executable(catchtests-cov
       EXCLUDE_FROM_ALL
-        ${CATCHTEST_SOURCES}
-        ${CATCH_HEADER_FILES}
-        
-    )
+      ${CATCHTEST_SOURCES}
+      ${CATCH_HEADER_FILES}
 
-    if(CMAKE_COMPILER_IS_CLANGCXX)
-      target_compile_options(catchtests-cov
+  )
+
+  if(CMAKE_COMPILER_IS_CLANGCXX)
+    target_compile_options(catchtests-cov
         PRIVATE
-          -Wno-exit-time-destructors
-      )
-    endif(CMAKE_COMPILER_IS_CLANGCXX)
+        -Wno-exit-time-destructors
+    )
+  endif(CMAKE_COMPILER_IS_CLANGCXX)
 
-    target_include_directories(catchtests-cov
+  target_include_directories(catchtests-cov
       SYSTEM
       PRIVATE
-        ${CATCH_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-    )
+      ${CATCH_INCLUDE_DIRS}
+  )
 
-    target_link_libraries(catchtests-cov
+  target_link_libraries(catchtests-cov
       internal::projectlib-cov
-    )
-  
+  )
+
   if(GMOCK_FOUND)
     target_include_directories(catchtests-cov
-      SYSTEM
-      PRIVATE
+        SYSTEM
+        PRIVATE
         ${GMOCK_INCLUDE_DIRS}
     )
     target_link_libraries(catchtests-cov
-      ${GMOCK_LIBRARIES}
-      ${PTREAD_LIB}
+        ${GMOCK_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
     )
   endif(GMOCK_FOUND)
 
   setup_target_for_coverage_cobertura(coverage_catch
-    catchtests-cov
-    ${COVERAGE_REPORT_DIR}/catchtests
-    "-r junit;-o '${TESTS_REPORT_DIR}/catch-tests.xml'"
+      catchtests-cov
+      ${COVERAGE_REPORT_DIR}/catchtests
+      "-r junit;-o '${TESTS_REPORT_DIR}/catch-tests.xml'"
   )
 endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)

@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 # TODO add your source files here
 set(PROJECTLIB_SOURCE_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/dummy.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dummy.cpp
 )
 
 # TODO add your header files here
 set(PROJECTLIB_HEADER_FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/../include/dummy.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/dummy.h
 )
 
 source_group("Header Files" FILES ${PROJECTLIB_HEADER_FILES})
@@ -37,8 +37,8 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../externals/lib)
 # configure a header file to pass the version number to the source code
 
 configure_file (
-  "${CMAKE_CURRENT_SOURCE_DIR}/../project_version.h.in"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../include/project_version.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../project_version.h.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../include/project_version.h"
 )
 
 #
@@ -47,24 +47,24 @@ configure_file (
 
 add_library(projectlib STATIC
 #  EXCLUDE_FROM_ALL
-  ${PROJECTLIB_SOURCE_FILES}
-  ${PROJECTLIB_HEADER_FILES}
+    ${PROJECTLIB_SOURCE_FILES}
+    ${PROJECTLIB_HEADER_FILES}
 )
 
 add_library(internal::projectlib ALIAS projectlib)
 
 target_include_directories(projectlib
-  PUBLIC
+    PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(projectlib
-    PUBLIC
+      PUBLIC
       -pedantic
       -Wall
       -Wextra
-    PRIVATE
+      PRIVATE
       -Werror
       -Wcast-align
       -Wcast-qual
@@ -90,11 +90,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
 elseif(CMAKE_COMPILER_IS_CLANGCXX)
   target_compile_options(projectlib
-    PUBLIC
+      PUBLIC
       -Weverything
       -Wno-c++98-compat
       -Wno-padded
-    PRIVATE
+      PRIVATE
       -Werror
   )
 endif(CMAKE_COMPILER_IS_GNUCXX)
@@ -102,77 +102,77 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 # Define some common C++11 features
 # TODO uncomment the C++11/14 features you use
 target_compile_features(projectlib
-  PUBLIC
-  #   cxx_aggregate_default_initializers
-  #   cxx_alias_templates
-  #   cxx_alignas
-  #   cxx_alignof
-  #   cxx_attributes
-  #   cxx_attribute_deprecated
+    PUBLIC
+#   cxx_aggregate_default_initializers
+#   cxx_alias_templates
+#   cxx_alignas
+#   cxx_alignof
+#   cxx_attributes
+#   cxx_attribute_deprecated
     cxx_auto_type
-  #   cxx_binary_literals
-  #   cxx_constexpr
-  #   cxx_contextual_conversions
-  #   cxx_decltype_incomplete_return_types
-  #   cxx_decltype
-  #   cxx_decltype_auto
-  #   cxx_default_function_template_args
+#   cxx_binary_literals
+#   cxx_constexpr
+#   cxx_contextual_conversions
+#   cxx_decltype_incomplete_return_types
+#   cxx_decltype
+#   cxx_decltype_auto
+#   cxx_default_function_template_args
     cxx_defaulted_functions
     cxx_defaulted_move_initializers
     cxx_delegating_constructors
     cxx_deleted_functions
-  #   cxx_digit_separators
-  #   cxx_enum_forward_declarations
-  #   cxx_explicit_conversions
-  #   cxx_extended_friend_declarations
-  #   cxx_extern_templates
+#   cxx_digit_separators
+#   cxx_enum_forward_declarations
+#   cxx_explicit_conversions
+#   cxx_extended_friend_declarations
+#   cxx_extern_templates
     cxx_final
-  #   cxx_func_identifier
-  #   cxx_generalized_initializers
-  #   cxx_generic_lambdas
-  #   cxx_inheriting_constructors
-  #   cxx_inline_namespaces
+#   cxx_func_identifier
+#   cxx_generalized_initializers
+#   cxx_generic_lambdas
+#   cxx_inheriting_constructors
+#   cxx_inline_namespaces
     cxx_lambdas
-  #   cxx_lambda_init_captures
-  #   cxx_local_type_template_args
-  #   cxx_long_long_type
-  #   cxx_noexcept
-  #   cxx_nonstatic_member_init
+#   cxx_lambda_init_captures
+#   cxx_local_type_template_args
+#   cxx_long_long_type
+#   cxx_noexcept
+#   cxx_nonstatic_member_init
     cxx_nullptr
     cxx_override
     cxx_range_for
-  #   cxx_raw_string_literals
-  #   cxx_reference_qualified_functions
-  #   cxx_relaxed_constexpr
-  #   cxx_return_type_deduction
-  #   cxx_right_angle_brackets
+#   cxx_raw_string_literals
+#   cxx_reference_qualified_functions
+#   cxx_relaxed_constexpr
+#   cxx_return_type_deduction
+#   cxx_right_angle_brackets
     cxx_rvalue_references
-  #   cxx_sizeof_member
+#   cxx_sizeof_member
     cxx_static_assert
     cxx_strong_enums
-  #   cxx_thread_local
-  #   cxx_trailing_return_types
-  #   cxx_unicode_literals
-  #   cxx_uniform_initialization
-  #   cxx_unrestricted_unions
-  #   cxx_user_literals
-  #   cxx_variable_templates
-  #   cxx_variadic_macros
-  #   cxx_variadic_templates
-  #   cxx_template_template_parameters
+#   cxx_thread_local
+#   cxx_trailing_return_types
+#   cxx_unicode_literals
+#   cxx_uniform_initialization
+#   cxx_unrestricted_unions
+#   cxx_user_literals
+#   cxx_variable_templates
+#   cxx_variadic_macros
+#   cxx_variadic_templates
+#   cxx_template_template_parameters
 )
 
 if(WIN32)
   if(MSVC)
     target_compile_options(projectlib
-      PUBLIC
+        PUBLIC
         /EHsc
     )
   endif(MSVC)
-    target_compile_definitions(projectlib
+  target_compile_definitions(projectlib
       PUBLIC
-        _WIN32_WINNT=0x0502
-    )
+      _WIN32_WINNT=0x0502
+  )
 endif(WIN32)
 
 #
@@ -188,7 +188,7 @@ if(USE_STATIC_BOOST)
   set(Boost_USE_STATIC_LIBS ON)
 else(USE_STATIC_BOOST)
   target_compile_definitions(${PROJECT_NAME}
-    PRIVATE
+      PRIVATE
       BOOST_ALL_DYN_LINK
   )
 endif(USE_STATIC_BOOST)
@@ -199,35 +199,35 @@ endif(USE_STATIC_BOOST)
 find_package(Boost COMPONENTS program_options REQUIRED)
 
 target_include_directories(${PROJECT_NAME}
-  SYSTEM
-  PUBLIC
+    SYSTEM
+    PUBLIC
     ${Boost_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
-  ${Boost_LIBRARIES}
-  internal::projectlib
+    ${Boost_LIBRARIES}
+    internal::projectlib
 )
 
 #Install targets
 
 
 install(TARGETS ${PROJECT_NAME}
-  RUNTIME DESTINATION bin
-  COMPONENT main
+    RUNTIME DESTINATION bin
+    COMPONENT main
 )
 
 #Install targets
 install(TARGETS projectlib
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib/static
-  COMPONENT library
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/static
+    COMPONENT library
 )
 
 install(FILES ${PROJECTLIB_HEADER_FILES}
-  DESTINATION include/${PROJECT_NAME}
-  COMPONENT headers
+    DESTINATION include/${PROJECT_NAME}
+    COMPONENT headers
 )
 
 #
@@ -236,30 +236,30 @@ install(FILES ${PROJECTLIB_HEADER_FILES}
 
 if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
   add_library(projectlib-cov
-  EXCLUDE_FROM_ALL
-  ${PROJECTLIB_SOURCE_FILES}
-  ${PROJECTLIB_HEADER_FILES}
+      EXCLUDE_FROM_ALL
+      ${PROJECTLIB_SOURCE_FILES}
+      ${PROJECTLIB_HEADER_FILES}
   )
   add_library(internal::projectlib-cov ALIAS projectlib-cov)
 
   target_compile_options(projectlib-cov
-    PUBLIC
+      PUBLIC
       -fprofile-arcs
       -ftest-coverage
       -pedantic
       -Wall
       -Wextra
-    PRIVATE
+      PRIVATE
       -Werror
   )
 
   target_include_directories(projectlib-cov
-    PUBLIC
+      PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/../include
   )
 
   target_compile_features(projectlib-cov
-    PUBLIC
+      PUBLIC
       cxx_auto_type
       cxx_constexpr
       cxx_defaulted_functions

@@ -21,9 +21,9 @@ set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
-  ${REPORT_DIR}
-  ${COVERAGE_REPORT_DIR}
-  ${TESTS_REPORT_DIR}
+    ${REPORT_DIR}
+    ${COVERAGE_REPORT_DIR}
+    ${TESTS_REPORT_DIR}
 )
 
 # Check for clang compiler
@@ -47,29 +47,29 @@ function(register_test TEST_FILE)
   message(STATUS "Adding " ${TEST_NAME})
   add_executable(${TEST_NAME} ${TEST_FILE}.cpp)
   target_include_directories(${TEST_NAME}
-    SYSTEM
-    PRIVATE
+      SYSTEM
+      PRIVATE
       ${GTEST_INCLUDE_DIRS}
   )
   target_link_libraries(${TEST_NAME}
-    ${GTEST_BOTH_LIBRARIES}
-    internal::projectlib ${ARGN}
+      ${GTEST_BOTH_LIBRARIES}
+      internal::projectlib ${ARGN}
   )
 
   if(GMOCK_FOUND)
     target_include_directories(${TEST_NAME}
-      SYSTEM
-      PRIVATE
+        SYSTEM
+        PRIVATE
         ${GMOCK_INCLUDE_DIRS}
     )
     target_link_libraries(${TEST_NAME}
-      ${GMOCK_BOTH_LIBRARIES}
+        ${GMOCK_BOTH_LIBRARIES}
     )
   endif(GMOCK_FOUND)
-  
+
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(${TEST_NAME}
-      PRIVATE
+        PRIVATE
         -Wno-global-constructors
     )
   endif(CMAKE_COMPILER_IS_CLANGCXX)
@@ -77,7 +77,7 @@ function(register_test TEST_FILE)
   if(UNIX)
     find_package(Threads) # GTest needs this and it's a static library
     target_link_libraries(${TEST_NAME}
-      ${CMAKE_THREAD_LIBS_INIT}
+        ${CMAKE_THREAD_LIBS_INIT}
     )
   endif(UNIX)
 
@@ -85,44 +85,45 @@ function(register_test TEST_FILE)
   set(UNITTEST_SOURCES ${UNITTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
 
+# TODO add here all your tests (source file name without extension)
 register_test(src/dummy_test)
 register_test(src/gmock_test)
 
-############################################################
-# Create a single test executable including all testclass. #
-# Without coverage measurement                             #
-############################################################
+######################################
+# Create a single test executable.   #
+# Without coverage measurement       #
+######################################
 
-add_executable(unittests 
-  ${UNITTEST_SOURCES}
-  ${UNITTEST_HEADER_FILES}
+add_executable(unittests
+    ${UNITTEST_SOURCES}
+    ${UNITTEST_HEADER_FILES}
 )
 add_executable(tests::unit ALIAS unittests)
 
 target_include_directories(unittests
-  SYSTEM
-  PRIVATE
+    SYSTEM
+    PRIVATE
     ${GTEST_INCLUDE_DIRS}
 )
 
 target_link_libraries(unittests
-  ${GTEST_BOTH_LIBRARIES}
-  internal::projectlib
+    ${GTEST_BOTH_LIBRARIES}
+    internal::projectlib
 )
 if(GMOCK_FOUND)
   target_include_directories(unittests
-    SYSTEM
-    PRIVATE
+      SYSTEM
+      PRIVATE
       ${GMOCK_INCLUDE_DIRS}
   )
   target_link_libraries(unittests
-    ${GMOCK_BOTH_LIBRARIES}
+      ${GMOCK_BOTH_LIBRARIES}
   )
 endif(GMOCK_FOUND)
-  
+
 if(CMAKE_COMPILER_IS_CLANGCXX)
   target_compile_options(unittests
-    PRIVATE
+      PRIVATE
       -Wno-global-constructors
   )
 endif(CMAKE_COMPILER_IS_CLANGCXX)
@@ -130,65 +131,66 @@ endif(CMAKE_COMPILER_IS_CLANGCXX)
 if(UNIX)
   find_package(Threads) # GTest needs this and it's a static library
   target_link_libraries(unittests
-    ${CMAKE_THREAD_LIBS_INIT}
+      ${CMAKE_THREAD_LIBS_INIT}
   )
 endif(UNIX)
 
-# run allways unit tests target when make all
+# Target: run gtest unit tests
 add_custom_target(run_unittests
-  ALL
+    ALL # run the test always for target all
     unittests --gtest_shuffle
 )
 
 add_dependencies(run_unittests
-  tests::unit
+    tests::unit
 )
 
+# Target: run gtest unit tests with xunit output
 add_custom_target(run_unittests_xunit
-  unittests --gtest_output=xml:${TESTS_REPORT_DIR}/unittests.xml
+    unittests --gtest_output=xml:${TESTS_REPORT_DIR}/unittests.xml
 )
 
 add_dependencies(run_unittests_xunit
-  tests::unit
+    tests::unit
 )
 
-####################################################################
-# Create and run a single test executable including all testclass. #
-# With coverage measurement                                        #
-####################################################################
+######################################
+# Create a single test executable.   #
+# With coverage measurement          #
+######################################
 if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
   include(CodeCoverage)
   add_executable(unittests-cov
-    EXCLUDE_FROM_ALL
+      EXCLUDE_FROM_ALL
       ${UNITTEST_SOURCES}
       ${UNITTEST_HEADER_FILES}
   )
 
   target_include_directories(unittests-cov
-    SYSTEM
-    PRIVATE
+      SYSTEM
+      PRIVATE
       ${GTEST_INCLUDE_DIRS}
   )
 
   target_link_libraries(unittests-cov
-    ${GTEST_BOTH_LIBRARIES}
-    internal::projectlib-cov
+      ${GTEST_BOTH_LIBRARIES}
+      internal::projectlib-cov
   )
 
   if(GMOCK_FOUND)
     target_include_directories(unittests-cov
-      SYSTEM
-      PRIVATE
+        SYSTEM
+        PRIVATE
         ${GMOCK_INCLUDE_DIRS}
     )
     target_link_libraries(unittests-cov
-      ${GMOCK_BOTH_LIBRARIES}
+        ${GMOCK_BOTH_LIBRARIES}
     )
   endif(GMOCK_FOUND)
 
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(unittests-cov
-      PRIVATE
+        PRIVATE
         -Wno-global-constructors
     )
   endif(CMAKE_COMPILER_IS_CLANGCXX)
@@ -196,12 +198,12 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
   if(UNIX)
     find_package(Threads) # GTest needs this and it's a static library
     target_link_libraries(unittests-cov
-      ${CMAKE_THREAD_LIBS_INIT}
+        ${CMAKE_THREAD_LIBS_INIT}
     )
   endif(UNIX)
   setup_target_for_coverage_cobertura(coverage_unittests
-    unittests-cov
-    ${COVERAGE_REPORT_DIR}/unittests
-    "--gtest_output='xml:${TESTS_REPORT_DIR}/unittests.xml'"
+      unittests-cov
+      ${COVERAGE_REPORT_DIR}/unittests
+      "--gtest_output='xml:${TESTS_REPORT_DIR}/unittests.xml'"
   )
 endif(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)

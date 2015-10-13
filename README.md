@@ -15,16 +15,16 @@ An example project which can be used as starting point for C++ projects using cm
 * A Dummy BDD Style test using [Igloo] (http://igloo-testing.org/) testing framework
 * A Dummy BDD Style test using [Catch] (https://github.com/philsquared/Catch) testing framework
 * [SonarQube](http://www.sonarqube.org/) project file
-* Makefile to build, run tests and meassure metrics under linux
+* CMake targets to build, run tests and measure metrics.
 
 
 # Dependencies
 ---------------
 Building the Project requires 
 * a recent Version of [CMake](http://www.cmake.org/) (3.2.x). See CMake documentation for more information about building using CMake.
-* a recent C++ compiler supporting C++11 (tested on gcc 4.8, 4.9, clang 3.5, 3.6 and Visual Studio 2013 & 2015)
+* a recent C++ compiler supporting C++11 (tested on gcc 4.8, 4.9, clang 3.5, 3.6, Visual Studio 2013 & 2015 and MinGW 4.9)
 
-The external dependencies can be downloaded and build using CMake's ExternalProject (make target external_dependencies).
+The external dependencies can be downloaded and built by building the external_dependencies target.
 
 # How to build
 --------------
@@ -42,6 +42,51 @@ You can use cmake to configure and build, you can also run the build.bat script 
 Usage:
 * build.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
 * create_windows_installer.bat [VS2013|VS2015] [--cmake_path <path_to_cmake>] [--config [Debug|Release]]
+
+# Known Issues
+--------------
+__CMake with MinGW__
+With CMake version 3.2 you get the following error when running for MinGW
+```
+CMake Error at ... (target_compile_features):
+  target_compile_features no known features for CXX compiler
+```
+
+Updating CMake to version 3.3 will fix this error.
+
+__Boost and MinGW__
+
+There is bug in boost and building with MinGW will fail first. In order to build boost with MinGW a script executed when building boost modifies the generated project-config.jam (in the boost build folder) by replacing all occurrence of mingw with gcc, i.e. the script replaces 
+```
+if ! mingw in [ feature.values <toolset> ]
+{
+    using mingw ; 
+}
+
+project : default-build <toolset>mingw ;
+``` 
+
+with
+
+```
+if ! gcc in [ feature.values <toolset> ]
+{
+    using gcc ; 
+}
+
+project : default-build <toolset>gcc ;
+``` 
+__Compile Error duplicate section__
+When you build with MinGW you may have compile errors similar to the following:
+```
+C:/Work/Cpp_project_template/externals/lib/libboost_regex-mt-d.a(regex.o): duplicate section `.rdata$_ZTVN5boost16exception_detail10clone_implINS0_19error_info_injectorISt11logic_errorEEEE[__ZTVN5boost16exception_detail10clone_implINS0_19error_info_injectorISt11logic_errorEEEE]' has different size
+C:/Work/Cpp_project_template/externals/lib/libboost_regex-mt-d.a(regex.o): duplicate section `.rdata$_ZTVN5boost16exception_detail10clone_implINS0_19error_info_injectorISt13runtime_errorEEEE[__ZTVN5boost16exception_detail10clone_implINS0_19error_info_injectorISt13runtime_errorEEEE]' has different size
+C:/Work/Cpp_project_template/externals/lib/libboost_regex-mt-d.a(regex.o): duplicate section `.rdata$_ZTSN5boost16exception_detail10clone_implINS0_19error_info_injectorISt11logic_errorEEEE[__ZTSN5boost16exception_detail10clone_implINS0_19error_info_injectorISt11logic_errorEEEE]' has different size
+C:/Work/Cpp_project_template/externals/lib/libboost_regex-mt-d.a(regex.o): duplicate section `.rdata$_ZTSN5boost16exception_detail19error_info_injectorISt11logic_errorEE[__ZTSN5boost16exception_detail19error_info_injectorISt11logic_errorEE]' has different size
+C:/Work/Cpp_project_template/externals/lib/libboost_regex-mt-d.a(regex.o): duplicate section `.rdata$_ZTSN5boost16exception_detail10clone_implINS0_19error_info_injectorISt13runtime_errorEEEE[__ZTSN5boost16exception_detail10clone_implINS0_19error_info_injectorISt13runtime_errorEEEE]' has different size
+C:/Work/Cpp_project_template/externals/lib/libboost_regex-mt-d.a(regex.o): duplicate section `.rdata$_ZTSN5boost16exception_detail19error_info_injectorISt13runtime_errorEE[__ZTSN5boost16exception_detail19error_info_injectorISt13runtime_errorEE]' has different size
+```
+I don't know a solution to this problem, it seems to be a compiler bug see [stackoverflow thread](http://stackoverflow.com/questions/14181351/i-got-duplicate-section-errors-when-compiling-boost-regex-with-size-optimizati)
 
 # Running Unit tests / specification
 ------------------------
