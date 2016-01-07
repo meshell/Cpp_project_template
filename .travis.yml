@@ -1,21 +1,189 @@
 language: cpp
-compiler:
-  - gcc
-  - clang
-
-env:
-  global:
-    - GCC_VERSION=4.8
-
-  matrix:
-    - CONFIG=Debug COVERAGE=0
-    - CONFIG=Debug COVERAGE=1 DOC=1
-    - CONFIG=Release COVERAGE=0
 
 matrix:
-  exclude:
-    - compiler: gcc
-      env: CONFIG=Debug COVERAGE=0
+  include:
+
+    # Linux Clang Builds
+    - os: linux
+      compiler: clang
+      addons: &clang35
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.5
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - clang-3.5
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER='clang++-3.5' BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: *clang35
+      env: COMPILER='clang++-3.5' BUILD_TYPE='Debug' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: &clang36
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.6
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - clang-3.6
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER='clang++-3.6' BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: *clang36
+      env: COMPILER='clang++-3.6' BUILD_TYPE='Debug' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: &clang37
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - clang-3.7
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER='clang++-3.7' BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: *clang37
+      env: COMPILER='clang++-3.7' BUILD_TYPE='Debug' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: &clang38
+        apt:
+          sources:
+            - llvm-toolchain-precise
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - clang-3.8
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER='clang++-3.8' BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: *clang38
+      env: COMPILER='clang++-3.8' BUILD_TYPE='Debug' COVERAGE=0
+
+    # Linux GCC Builds
+    - os: linux
+      compiler: gcc
+      addons: &gcc48
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - g++-4.8
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER='g++-4.8' BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - g++-4.8
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+            - doxygen
+            - graphviz
+      env: COMPILER='g++-4.8' BUILD_TYPE='Debug' COVERAGE=1 DOC=1
+
+    - os: linux
+      compiler: gcc
+      addons: &gcc49
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - g++-4.9
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER='g++-4.9' BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: gcc
+      addons: *gcc49
+      env: COMPILER='g++-4.9' BUILD_TYPE='Debug' COVERAGE=0
+
+    - os: linux
+      compiler: gcc
+      addons: &gcc5
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - g++-5
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER='g++-5' BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: gcc
+      addons: *gcc5
+      env: COMPILER='g++-5' BUILD_TYPE='Debug' COVERAGE=0
 
 notifications:
   email:
@@ -25,35 +193,27 @@ notifications:
     on_failure: always
 
 
-before_install:
-  - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  - sudo apt-get -qq update
-  - if [ "$CXX" == "g++" ]; then sudo apt-get -y -qq install g++-${GCC_VERSION} gcc-${GCC_VERSION} ; fi
-  - if [ "$CXX" == "g++" ]; then sudo ln -s -v -f $(which g++-${GCC_VERSION}) /usr/bin/g++; fi
-  - if [ "$CXX" == "g++" ]; then sudo ln -s -v -f $(which gcc-${GCC_VERSION}) /usr/bin/gcc; fi
-
 install:
   - wget --no-check-certificate https://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.tar.gz
   - tar -zxvf cmake-3.2.3-Linux-x86_64.tar.gz
   - sudo cp -fR cmake-3.2.3-Linux-x86_64/* /usr
   - rm -rf cmake-3.2.3-Linux-x86_64
   - rm cmake-3.2.3-Linux-x86_64.tar.gz
-  - sudo apt-get -y -qq install libboost-date-time1.48-dev libboost-thread1.48-dev libboost-chrono1.48-dev libboost-regex1.48-dev libboost-system1.48-dev libboost-filesystem1.48-dev libboost-program-options1.48-dev
 
   - gem install cucumber
-  - if [ "${COVERAGE}" == '1' ] ; then sudo pip install cpp-coveralls; fi
-  - if [ "${DOC}" == '1' ] ; then sudo apt-get -y -qq install doxygen graphviz; fi
+  - if [ "${COVERAGE}" == '1' ] ; then pip install cpp-coveralls; fi
 
 before_script:
-  - mkdir build && (cd build && ../cmake -DCMAKE_BUILD_TYPE=$CONFIG ..)
-  - ./cmake --build build --target external_dependencies --config $CONFIG
+  - export CXX=${COMPILER}
+  - mkdir build && (cd build && cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..)
+  - cmake --build build --target external_dependencies --config ${BUILD_TYPE}
 
 script:
-  - ./cmake --build build --target all --config $CONFIG
-  - ./cmake --build build --target run_feature_test --config $CONFIG
-  - ./cmake --build build --target Cpp_project_template --config $CONFIG
-  - if [ "${COVERAGE}" == '1' ] ; then ./cmake --build build --target coverage --config $CONFIG ; fi
-  - if [ "${DOC}" == '1' ] ; then ./cmake --build build --target doc ; fi
+  - cmake --build build --target all --config ${BUILD_TYPE}
+  - cmake --build build --target run_feature_test --config ${BUILD_TYPE}
+  - cmake --build build --target Cpp_project_template --config ${BUILD_TYPE}
+  - if [ "${COVERAGE}" == '1' ] ; then cmake --build build --target coverage --config ${BUILD_TYPE} ; fi
+  - if [ "${DOC}" == '1' ] ; then cmake --build build --target doc ; fi
 
 after_success:
   - if [ "${COVERAGE}" = '1' ] ; then coveralls -E.*/externals/.* -E/usr/include/.* -E.*/tests/.* -E.*/CMakeFiles/.* ; fi
