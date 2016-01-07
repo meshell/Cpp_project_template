@@ -41,7 +41,7 @@ install:
   - sudo apt-get -y -qq install libboost-date-time1.48-dev libboost-thread1.48-dev libboost-chrono1.48-dev libboost-regex1.48-dev libboost-system1.48-dev libboost-filesystem1.48-dev libboost-program-options1.48-dev
 
   - gem install cucumber
-  - if [ "${COVERAGE}" == '1' ] ; then sudo pip install cpp-coveralls --use-mirrors; fi
+  - if [ "${COVERAGE}" == '1' ] ; then sudo pip install cpp-coveralls; fi
   - if [ "${DOC}" == '1' ] ; then sudo apt-get -y -qq install doxygen graphviz; fi
 
 before_script:
