@@ -139,7 +139,7 @@ matrix:
             - libboost-program-options1.55-dev
             - doxygen
             - graphviz
-      env: COMPILER='g++-4.8' BUILD_TYPE='Debug' COVERAGE=1 DOC=1
+      env: COMPILER='g++-4.8' BUILD_TYPE='Debug' COVERAGE=1 GCOV_VER='gcov-4.8' DOC=1
 
     - os: linux
       compiler: gcc
@@ -218,4 +218,4 @@ script:
   - if [ "${DOC}" == '1' ] ; then cmake --build build --target doc ; fi
 
 after_success:
-  - if [ "${COVERAGE}" = '1' ] ; then coveralls -E.*/externals/.* -E/usr/include/.* -E.*/tests/.* -E.*/CMakeFiles/.* ; fi
+  - if [ "${COVERAGE}" = '1' ] ; then coveralls -E.*/externals/.* -E/usr/include/.* -E.*/tests/.* -E.*/CMakeFiles/.* --gcov ${GCOV_VER} ; fi

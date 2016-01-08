@@ -1,7 +1,7 @@
 [![Build Status Travis](https://travis-ci.org/meshell/Cpp_project_template.png)](https://travis-ci.org/meshell/Cpp_project_template)
 [![Build status AppVeyor](https://ci.appveyor.com/api/projects/status/u0axo813um798dc7?svg=true)](https://ci.appveyor.com/project/meshell/cpp-project-template)
 [![Build Status Drone.io](https://drone.io/github.com/meshell/Cpp_project_template/status.png)](https://drone.io/github.com/meshell/Cpp_project_template/latest)
-[![Coverage Status](https://coveralls.io/repos/meshell/Cpp_project_template/badge.svg)](https://coveralls.io/r/meshell/Cpp_project_template)
+[![Coverage Status](https://coveralls.io/repos/meshell/Cpp_project_template/badge.svg?service=github)](https://coveralls.io/r/meshell/Cpp_project_template)
 
 Cpp_project_template
 ======================
@@ -20,7 +20,7 @@ An example project which can be used as starting point for C++ projects using cm
 
 # Dependencies
 ---------------
-Building the Project requires 
+Building the Project requires
 * a recent Version of [CMake](http://www.cmake.org/) (3.2.x). See CMake documentation for more information about building using CMake.
 * a recent C++ compiler supporting C++11 (tested on gcc 4.8, 4.9, clang 3.5, 3.6, Visual Studio 2013 & 2015 and MinGW 4.9)
 
@@ -56,26 +56,26 @@ Updating CMake to version 3.3 will fix this error.
 
 __Boost and MinGW__
 
-There is bug in boost and building with MinGW will fail first. In order to build boost with MinGW a script executed when building boost modifies the generated project-config.jam (in the boost build folder) by replacing all occurrence of mingw with gcc, i.e. the script replaces 
+There is bug in boost and building with MinGW will fail first. In order to build boost with MinGW a script executed when building boost modifies the generated project-config.jam (in the boost build folder) by replacing all occurrence of mingw with gcc, i.e. the script replaces
 ```
 if ! mingw in [ feature.values <toolset> ]
 {
-    using mingw ; 
+    using mingw ;
 }
 
 project : default-build <toolset>mingw ;
-``` 
+```
 
 with
 
 ```
 if ! gcc in [ feature.values <toolset> ]
 {
-    using gcc ; 
+    using gcc ;
 }
 
 project : default-build <toolset>gcc ;
-``` 
+```
 __Compile Error duplicate section__
 When you build with MinGW you may have compile errors similar to the following:
 ```
@@ -90,14 +90,14 @@ I don't know a solution to this problem, it seems to be a compiler bug see [stac
 
 # Running Unit tests / specification
 ------------------------
-A cmake targets exists for each test framework to run the tests. And additionally the CTest target contains all tests from all unittests frameworks included. 
+A cmake targets exists for each test framework to run the tests. And additionally the CTest target contains all tests from all unittests frameworks included.
 
 # Running Feature tests
 ------------------------
-A cmake target exists to run the feature tests (run_feature_test). 
+A cmake target exists to run the feature tests (run_feature_test).
 For more details on how to run cucumber feature tests see the Cucumber-cpp documentation.
 
 # Sonar Metrics
 ----------------
-In order to generate the code metrics and use sonar for publishing the metrics, [sonar-runner](http://docs.codehaus.org/display/SONAR/Installing+and+Configuring+Sonar+Runner), [cppcheck] (http://cppcheck.sourceforge.net/), [valgrind] (http://valgrind.org/) and [Rough Auditing Tool for Security (RATS)] (http://code.google.com/p/rough-auditing-tool-for-security/) are needed. 
+In order to generate the code metrics and use sonar for publishing the metrics, [sonar-runner](http://docs.codehaus.org/display/SONAR/Installing+and+Configuring+Sonar+Runner), [cppcheck] (http://cppcheck.sourceforge.net/), [valgrind] (http://valgrind.org/) and [Rough Auditing Tool for Security (RATS)] (http://code.google.com/p/rough-auditing-tool-for-security/) are needed.
 On the sonar server the [C++ Community Plugin](http://docs.codehaus.org/pages/viewpage.action?pageId=185073817) should be installed.
