@@ -1,5 +1,7 @@
 language: cpp
 
+sudo: false
+
 matrix:
   include:
 
@@ -192,19 +194,19 @@ notifications:
     on_success: change
     on_failure: always
 
-
 install:
-  - wget --no-check-certificate https://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.tar.gz
-  - tar -zxvf cmake-3.2.3-Linux-x86_64.tar.gz
-  - sudo cp -fR cmake-3.2.3-Linux-x86_64/* /usr
-  - rm -rf cmake-3.2.3-Linux-x86_64
-  - rm cmake-3.2.3-Linux-x86_64.tar.gz
-
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR} && mkdir cmake
+  - |
+    CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
+    travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+    export PATH=${DEPS_DIR}/cmake/bin:${PATH}
   - gem install cucumber
-  - if [ "${COVERAGE}" == '1' ] ; then pip install cpp-coveralls; fi
+  - if [ "${COVERAGE}" == '1' ] ; then export PATH=$HOME/.local/bin:$PATH && pip install cpp-coveralls --user `whoami` ; fi
 
 before_script:
   - export CXX=${COMPILER}
+  - cd ${TRAVIS_BUILD_DIR}
   - mkdir build && (cd build && cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..)
   - cmake --build build --target external_dependencies --config ${BUILD_TYPE}
 
