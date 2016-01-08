@@ -102,7 +102,6 @@ target_compile_definitions(spectests
 
 # Target: run cppspec tests
 add_custom_target(run_spectests
-    ALL # run the test always for target all
     spectests -m
 )
 
