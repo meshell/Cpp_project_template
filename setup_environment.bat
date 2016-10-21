@@ -80,17 +80,6 @@ IF NOT EXIST %VISUAL_STUDIO_ENV% GOTO visual_studio_missing
 @ECHO CALL %VISUAL_STUDIO_ENV%
 CALL %VISUAL_STUDIO_ENV%
 
-PUSHD externals
-@ECHO.
-@ECHO ======================================================================================
-@ECHO -- Clean up externals
-
-IF EXIST include DEL /S/Q include
-IF EXIST lib DEL /S/Q lib
-
-@ECHO.
-POPD
-
 GOTO end
 
 :cmake_path_error

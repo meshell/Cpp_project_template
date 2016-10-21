@@ -16,15 +16,32 @@ set(CMAKE_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/include)
 set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/lib)
 
 # set report and documentation output paths
-set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
-set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
-set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+if(NOT REPORT_DIR)
+  set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
+endif(NOT REPORT_DIR)
+if(NOT COVERAGE_REPORT_DIR)
+  set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
+endif(NOT COVERAGE_REPORT_DIR)
+if(NOT TESTS_REPORT_DIR)
+  set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+endif(NOT TESTS_REPORT_DIR)
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
     ${REPORT_DIR}
     ${COVERAGE_REPORT_DIR}
     ${TESTS_REPORT_DIR}
+)
+
+if(NOT RUNTIME_OUTPUT_DIRECTORY)
+  set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../bin)
+endif()
+
+set(TEST_RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}/tests)
+
+file(MAKE_DIRECTORY
+    ${RUNTIME_OUTPUT_DIRECTORY}
+    ${TEST_RUNTIME_OUTPUT_DIRECTORY}
 )
 
 # Check for clang compiler
@@ -66,13 +83,9 @@ function(register_catchtest TEST_FILE)
   )
 
   if(GMOCK_FOUND)
-    target_include_directories(${TEST_NAME}
-        SYSTEM
-        PRIVATE
-        ${GMOCK_INCLUDE_DIRS}
-    )
     target_link_libraries(${TEST_NAME}
-        ${GMOCK_LIBRARIES}
+        GMock::GMock
+        GMock::Main
     )
 
     if(UNIX)
@@ -91,7 +104,7 @@ function(register_catchtest TEST_FILE)
 endfunction()
 
 # TODO add here all your tests (source file name without extension)
-# The following tests are all the same tests but with different syntax, i.e 
+# The following tests are all the same tests but with different syntax, i.e
 # - Classic Test
 # - BDD Style Test
 register_catchtest(src/dummy_test_catch)
@@ -111,6 +124,11 @@ add_executable(catchtests
 )
 
 add_executable(tests::catch ALIAS catchtests)
+
+set_target_properties(catchtests
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
+)
 
 if(CMAKE_COMPILER_IS_CLANGCXX)
   target_compile_options(catchtests
@@ -147,7 +165,8 @@ if(GMOCK_FOUND)
   endif(UNIX)
 endif(GMOCK_FOUND)
 
-# Target: run catch tests 
+
+# Target: run catch tests
 add_custom_target(run_catchtests
     ALL # run the test always for target all
     catchtests -s --order rand
@@ -177,7 +196,11 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
       EXCLUDE_FROM_ALL
       ${CATCHTEST_SOURCES}
       ${CATCH_HEADER_FILES}
+  )
 
+  set_target_properties(catchtests-cov
+      PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
   )
 
   if(CMAKE_COMPILER_IS_CLANGCXX)

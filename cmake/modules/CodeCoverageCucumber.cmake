@@ -7,7 +7,7 @@
 # 1. Copy this file into your cmake modules path
 # 2. Add the following line to your CMakeLists.txt:
 #      INCLUDE(CodeCoverage)
-# 
+#
 # 3. Use the function SETUP_TARGET_FOR_COVERAGE to create a custom make target
 #    which runs your test executable and produces a lcov code coverage report.
 #
@@ -48,6 +48,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/tests/coverage.ignore)
   endforeach(LINE)
 endif()
 
+
 # Param _targetname     The name of new the custom make target
 # Param _testrunner     The name of the target which runs the tests
 # Param _outputname     cobertura output is generated as _outputname.xml
@@ -63,25 +64,32 @@ function(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrun
       -ftest-coverage
   )
 
-  add_custom_target(${_targetname}_cucumber
-      # Run tests
-      ${_testrunner}  ${ARGV4} &
+  find_program(CUCUMBER_RUBY cucumber)
+  if(NOT CUCUMBER_RUBY)
+    message(FATAL_ERROR "cucumber not found! Aborting...")
+  endif(NOT CUCUMBER_RUBY)
 
-      COMMAND cucumber -P --tags ~@wip --no-color -f pretty -s -f junit -o ${TESTS_REPORT_DIR} features
+  add_custom_target(_start_wireserver
+    ${_testrunner}  ${ARGV4} &
+  )
+
+  add_custom_target(${_targetname}
+      # Run tests
+      ${CUCUMBER_RUBY} -P --tags ~@wip --no-color -f pretty -s -f junit -o ${TESTS_REPORT_DIR} features
       WORKING_DIRECTORY ${_workdir}
       COMMENT "Running cucumber to produce coverage informations."
   )
 
-  add_custom_target(${_targetname}
+  add_custom_command(TARGET ${_targetname}
+      POST_BUILD
   # Running gcovr
-      ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
+      COMMAND ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       COMMENT "Running gcovr to produce Cobertura code coverage report."
   )
 
-  add_dependencies(
-      ${_targetname}
-      ${_targetname}_cucumber
+  add_dependencies(${_targetname}
+      _start_wireserver
   )
 
   # Show info where to find the report
@@ -91,4 +99,3 @@ function(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrun
   )
 
   endfunction() # SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA
-

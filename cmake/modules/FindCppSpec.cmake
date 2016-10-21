@@ -58,7 +58,35 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(CPPSPEC DEFAULT_MSG CPPSPEC_LIBRARY CPPSPEC_INCLUDE_DIR)
 
 
-IF(CPPSPEC_FOUND)
+if(CPPSPEC_FOUND)
   SET(CPPSPEC_INCLUDE_DIRS ${CPPSPEC_INCLUDE_DIR})
   _cppspec_append_debugs(CPPSPEC_LIBRARIES CPPSPEC_LIBRARY)
-ENDIF()
+
+  if(NOT TARGET CppSpec::CppSpec)
+      add_library(CppSpec::CppSpec UNKNOWN IMPORTED)
+      if(CPPSPEC_INCLUDE_DIRS)
+          set_target_properties(CppSpec::CppSpec PROPERTIES
+              INTERFACE_INCLUDE_DIRECTORIES "${CPPSPEC_INCLUDE_DIRS}")
+      endif()
+      if(EXISTS "${CPPSPEC_LIBRARY}")
+          set_target_properties(CppSpec::CppSpec PROPERTIES
+              IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
+              IMPORTED_LOCATION "${CPPSPEC_LIBRARY}")
+      endif()
+      if(EXISTS "${CPPSPEC_LIBRARY_DEBUG}")
+          set_property(TARGET CppSpec::CppSpec APPEND PROPERTY
+              IMPORTED_CONFIGURATIONS DEBUG)
+          set_target_properties(CppSpec::CppSpec PROPERTIES
+              IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "CXX"
+              IMPORTED_LOCATION_DEBUG "${CPPSPEC_LIBRARY_DEBUG}")
+      endif()
+      if(EXISTS "${CPPSPEC_LIBRARY_RELEASE}")
+          set_property(TARGET CppSpec::CppSpec APPEND PROPERTY
+              IMPORTED_CONFIGURATIONS RELEASE)
+          set_target_properties(CppSpec::CppSpec PROPERTIES
+              IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+              IMPORTED_LOCATION_RELEASE "${CPPSPEC_LIBRARY_RELEASE}")
+      endif()
+  endif()
+
+endif()

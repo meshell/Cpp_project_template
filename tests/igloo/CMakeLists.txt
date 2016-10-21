@@ -16,9 +16,15 @@ set(CMAKE_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/include)
 set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/lib)
 
 # set report and documentation output paths
-set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
-set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
-set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+if(NOT REPORT_DIR)
+  set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
+endif(NOT REPORT_DIR)
+if(NOT COVERAGE_REPORT_DIR)
+  set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
+endif(NOT COVERAGE_REPORT_DIR)
+if(NOT TESTS_REPORT_DIR)
+  set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+endif(NOT TESTS_REPORT_DIR)
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
@@ -26,6 +32,18 @@ file(MAKE_DIRECTORY
     ${COVERAGE_REPORT_DIR}
     ${TESTS_REPORT_DIR}
 )
+
+if(NOT RUNTIME_OUTPUT_DIRECTORY)
+  set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../bin)
+endif()
+
+set(TEST_RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}/tests)
+
+file(MAKE_DIRECTORY
+    ${RUNTIME_OUTPUT_DIRECTORY}
+    ${TEST_RUNTIME_OUTPUT_DIRECTORY}
+)
+
 
 # Check for clang compiler
 if(CMAKE_CXX_COMPILER MATCHES ".*clang")
@@ -76,7 +94,7 @@ function(register_iglootest TEST_FILE)
 endfunction()
 
 # TODO add here all your tests (source file name without extension)
-# The following tests are all the same tests but with different syntax, i.e 
+# The following tests are all the same tests but with different syntax, i.e
 # - Specification/Context
 # - Describe It
 # - When Then
@@ -97,6 +115,11 @@ add_executable(iglootests
 )
 
 add_executable(tests::igloo ALIAS iglootests)
+
+set_target_properties(iglootests
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
+)
 
 target_include_directories(iglootests
     SYSTEM
@@ -154,6 +177,12 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
       ${IGLOOTEST_HEADER_FILES}
 
   )
+
+  set_target_properties(iglootests-cov
+      PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
+  )
+
   target_include_directories(iglootests-cov
       SYSTEM
       PRIVATE

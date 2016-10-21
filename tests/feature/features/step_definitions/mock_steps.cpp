@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <cucumber-cpp/defs.hpp>
+#include <cucumber-cpp/autodetect.hpp>
+
+#include <memory>
 
 namespace
 {
-	
+
 using cucumber::ScenarioScope;
 
 class IFoo
@@ -22,12 +24,12 @@ public:
 
 struct MockCtx
 {
-	std::unique_ptr<Mock_Foo> mock;
+    std::shared_ptr<Mock_Foo> mock;
 };
 
 GIVEN("^a mock class with method foo$") {
 	ScenarioScope<MockCtx> context{};
-	context->mock.reset(new Mock_Foo());
+    context->mock = std::make_shared<Mock_Foo>();
 }
 
 GIVEN("^the tests expects that foo is called once$") {
@@ -46,5 +48,3 @@ THEN("^the test should pass$") {
 }
 
 }
-
-

@@ -24,10 +24,26 @@ endif (WIN32)
 
 # Cmake cache variables
 option(BUILD_EXTERNALS "Build also external libraries" TRUE)
-option(DISABLE_CPPSPEC "Do not use CppSpec" ${WIN32})
+option(DISABLE_CPPSPEC "Do not use CppSpec" TRUE)
 option(DISABLE_IGLOO "Do not use Igloo testing framework" FALSE)
 option(DISABLE_CATCH "Do not use CATCH testing framework" FALSE)
 
+
+set(EXT_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/externals)
+set(EXT_INSTALL_INCLUDE_DIR ${EXT_INSTALL_DIR}/include)
+set(EXT_INSTALL_LIB_DIR ${EXT_INSTALL_DIR}/lib)
+
+set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
+file(MAKE_DIRECTORY
+    ${EXT_INSTALL_DIR}
+    ${EXT_INSTALL_INCLUDE_DIR}
+    ${EXT_INSTALL_LIB_DIR}
+    ${RUNTIME_OUTPUT_DIRECTORY}
+    )
+
+set(CMAKE_INCLUDE_PATH ${EXT_INSTALL_INCLUDE_DIR})
+set(CMAKE_LIBRARY_PATH ${EXT_INSTALL_LIB_DIR})
 
 # set default built type to Debug
 if(NOT CMAKE_BUILD_TYPE)
@@ -48,14 +64,11 @@ endif()
 
 if(UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Xlinker '--no-as-needed'")
 endif(UNIX)
 
 # set the path to the additional cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
-
-# set path to externals
-set(CMAKE_INCLUDE_PATH ${PROJECT_SOURCE_DIR}/externals/include)
-set(CMAKE_LIBRARY_PATH ${PROJECT_SOURCE_DIR}/externals/lib)
 
 # external libraries
 if(BUILD_EXTERNALS)
@@ -133,7 +146,7 @@ install(FILES README.md LICENSE
   DESTINATION doc
   COMPONENT doc
 )
-  
+
 # Add some custom target
 if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
   add_custom_target(coverage)

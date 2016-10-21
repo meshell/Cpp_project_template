@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 #include <gtest/gtest.h>
-#include <cucumber-cpp/defs.hpp>
+#include <cucumber-cpp/autodetect.hpp>
 #include "dummy.h"
 
 namespace

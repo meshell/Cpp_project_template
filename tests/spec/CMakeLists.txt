@@ -11,15 +11,32 @@ set(CMAKE_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/include)
 set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../externals/lib)
 
 # set report and documentation output paths
-set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
-set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
-set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+if(NOT REPORT_DIR)
+  set(REPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../reports CACHE PATH "Reports directory")
+endif(NOT REPORT_DIR)
+if(NOT COVERAGE_REPORT_DIR)
+  set(COVERAGE_REPORT_DIR ${REPORT_DIR}/coverage CACHE PATH "Coverage reports output directory" )
+endif(NOT COVERAGE_REPORT_DIR)
+if(NOT TESTS_REPORT_DIR)
+  set(TESTS_REPORT_DIR ${REPORT_DIR}/tests CACHE PATH "Testresult output directory" )
+endif(NOT TESTS_REPORT_DIR)
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
     ${REPORT_DIR}
     ${COVERAGE_REPORT_DIR}
     ${TESTS_REPORT_DIR}
+)
+
+if(NOT RUNTIME_OUTPUT_DIRECTORY)
+  set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../bin)
+endif()
+
+set(TEST_RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_OUTPUT_DIRECTORY}/tests)
+
+file(MAKE_DIRECTORY
+    ${RUNTIME_OUTPUT_DIRECTORY}
+    ${TEST_RUNTIME_OUTPUT_DIRECTORY}
 )
 
 # Check for clang compiler
@@ -57,10 +74,9 @@ add_executable(spectests
 )
 add_executable(tests::spec ALIAS spectests)
 
-target_include_directories(spectests
-    SYSTEM
-    PRIVATE
-    ${CPPSPEC_INCLUDE_DIRS}
+set_target_properties(spectests
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
 )
 
 target_include_directories(spectests
@@ -90,7 +106,7 @@ set(CORE_BOOST_LIBS regex program_options filesystem date_time chrono thread sys
 find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
 
 target_link_libraries(spectests
-    ${CPPSPEC_LIBRARIES}
+    CppSpec::CppSpec
     ${Boost_LIBRARIES}
     internal::projectlib
 )
@@ -132,6 +148,11 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
       ${CPPSPECTEST_HEADERS}
   )
 
+  set_target_properties(spectests-cov
+      PROPERTIES
+      RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
+  )
+
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(spectests-cov
         PRIVATE
@@ -141,18 +162,12 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
   endif(CMAKE_COMPILER_IS_CLANGCXX)
 
   target_include_directories(spectests-cov
-      SYSTEM
-      PRIVATE
-      ${CPPSPEC_INCLUDE_DIRS}
-  )
-
-  target_include_directories(spectests-cov
       PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/include
   )
 
   target_link_libraries(spectests-cov
-      ${CPPSPEC_LIBRARIES}
+      CppSpec::CppSpec
       ${Boost_LIBRARIES}
       internal::projectlib-cov
   )

@@ -41,6 +41,19 @@ configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/../include/project_version.h"
 )
 
+if(NOT RUNTIME_OUTPUT_DIRECTORY)
+  set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../bin)
+endif()
+
+if(NOT LIBRARY_OUTPUT_DIRECTORY)
+  set(LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib)
+endif()
+
+file(MAKE_DIRECTORY
+    ${RUNTIME_OUTPUT_DIRECTORY}
+    ${LIBRARY_OUTPUT_DIRECTORY}
+)
+
 #
 # Build library for internal use only (unittests)
 # TODO uncomment the EXCLUDE_FROM_ALL if your library is only used internally
@@ -52,6 +65,13 @@ add_library(projectlib STATIC
 )
 
 add_library(internal::projectlib ALIAS projectlib)
+
+set_target_properties( projectlib
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_DIRECTORY}"
+    LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_DIRECTORY}"
+    RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"
+)
 
 target_include_directories(projectlib
     PUBLIC
@@ -183,6 +203,11 @@ add_executable(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
 add_executable(${PROJECT_NAME}::exe ALIAS ${PROJECT_NAME})
+
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_OUTPUT_DIRECTORY}"
+)
 
 if(USE_STATIC_BOOST)
   set(Boost_USE_STATIC_LIBS ON)
