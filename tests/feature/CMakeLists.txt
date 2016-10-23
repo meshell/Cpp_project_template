@@ -88,13 +88,13 @@ if(STEP_SOURCES)
 
   source_group("Feature Files" FILES ${FEATURE_FILES})
 
-  add_executable(cucumber-cpp_wire_server
+  add_executable(cucumber-cpp_wireserver
       ${STEP_SOURCES}
       ${FEATURE_FILES}
   )
-  add_executable(cucumber-cpp_wire_server_wireserver ALIAS cucumber-cpp_wire_server)
+  add_executable(feature::wireserver ALIAS cucumber-cpp_wireserver)
 
-  set_target_properties(cucumber-cpp_wire_server
+  set_target_properties(cucumber-cpp_wireserver
       PROPERTIES
       RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
   )
@@ -105,7 +105,7 @@ if(STEP_SOURCES)
   if(USE_STATIC_BOOST)
     set(Boost_USE_STATIC_LIBS ON)
   else(USE_STATIC_BOOST)
-    target_compile_definitions(cucumber-cpp_wire_server
+    target_compile_definitions(cucumber-cpp_wireserver
         PRIVATE
         BOOST_ALL_DYN_LINK
     )
@@ -115,29 +115,25 @@ if(STEP_SOURCES)
 
   find_package(Boost COMPONENTS  ${CORE_BOOST_LIBS} REQUIRED)
 
-  target_include_directories(cucumber-cpp_wire_server
+  target_include_directories(cucumber-cpp_wireserver
       SYSTEM
       PRIVATE
       ${Boost_INCLUDE_DIRS}
   )
 
-  target_link_libraries(cucumber-cpp_wire_server
+  target_link_libraries(cucumber-cpp_wireserver
       Cuke::Cucumber-cpp
       ${Boost_LIBRARIES}
       internal::projectlib
   )
 
   if(CMAKE_COMPILER_IS_CLANGCXX)
-    target_compile_options(cucumber-cpp_wire_server
+    target_compile_options(cucumber-cpp_wireserver
         PRIVATE
         -Wno-non-virtual-dtor
         -Wno-global-constructors
     )
   endif(CMAKE_COMPILER_IS_CLANGCXX)
-  #
-  # CppSpec driver
-  #
-  find_package(CppSpec)
 
   #
   # Google Test driver
@@ -145,18 +141,18 @@ if(STEP_SOURCES)
   find_package(GTest REQUIRED)
 
   if(GTEST_FOUND)
-    target_include_directories(cucumber-cpp_wire_server
+    target_include_directories(cucumber-cpp_wireserver
         SYSTEM
         PRIVATE
         ${GTEST_INCLUDE_DIRS}
     )
-    target_link_libraries(cucumber-cpp_wire_server
+    target_link_libraries(cucumber-cpp_wireserver
         ${GTEST_LIBRARIES}
     )
 
     if(UNIX)
       find_package(Threads) # GTest needs this and it's a static library
-      target_link_libraries(cucumber-cpp_wire_server
+      target_link_libraries(cucumber-cpp_wireserver
           ${CMAKE_THREAD_LIBS_INIT}
       )
     endif(UNIX)
@@ -168,14 +164,14 @@ if(STEP_SOURCES)
   find_package(GMock)
 
   if(GMOCK_FOUND)
-    target_link_libraries(cucumber-cpp_wire_server
+    target_link_libraries(cucumber-cpp_wireserver
         GMock::GMock
         GMock::Main
     )
   endif(GMOCK_FOUND)
 
   if(WIN32)
-    target_link_libraries(cucumber-cpp_wire_server
+    target_link_libraries(cucumber-cpp_wireserver
         ws2_32
     )
   endif(WIN32)
@@ -202,16 +198,20 @@ if(STEP_SOURCES)
     # Run all features except features tagged  @wip or @proposal
     if(WIN32)
         add_custom_target(start_wireserver
-          start /B cucumber-cpp_wire_server_wireserver
+          start /B $<TARGET_FILE:cucumber-cpp_wireserver>
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+          COMMENT "Start wireserver."
         )
     else(WIN32)
       add_custom_target(start_wireserver
-        cucumber-cpp_wire_server_wireserver &
+        feature::wireserver &
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Start wireserver."
       )
     endif(WIN32)
 
     add_dependencies(start_wireserver
-        cucumber-cpp_wire_server_wireserver
+        feature::wireserver
     )
 
     add_custom_target(run_feature_test
@@ -219,9 +219,11 @@ if(STEP_SOURCES)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Running cucumber."
     )
-    add_dependencies(run_feature_test
-        start_wireserver
-    )
+    if(UNIX)
+      add_dependencies(run_feature_test
+          start_wireserver
+      )
+    endif(UNIX)
 
     # Target: run wip features
     # Run cucumber with --wip argument and run only features tagged @wip
@@ -230,9 +232,12 @@ if(STEP_SOURCES)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Running cucumber (wip features)."
     )
-    add_dependencies(run_wip_features
-        start_wireserver
-    )
+
+    if(UNIX)
+      add_dependencies(run_wip_features
+          start_wireserver
+      )
+    endif(UNIX)
 
     # Target: document features
     # Run all features except features tagged @wip or @proposal and generate html output
@@ -241,9 +246,12 @@ if(STEP_SOURCES)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Running cucumber (features documentation)."
     )
-    add_dependencies(document_features
-        start_wireserver
-    )
+
+    if(UNIX)
+      add_dependencies(document_features
+          start_wireserver
+      )
+    endif(UNIX)
 
   else(CUCUMBER_RUBY)
     message(WARNING "Could not find Cucumber: Install cucumber first in order to run tests")
@@ -256,22 +264,22 @@ if(STEP_SOURCES)
   if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
     include(CodeCoverageCucumber)
 
-    add_executable(cucumber-cpp_wire_server-cov
+    add_executable(cucumber-cpp_wireserver-cov
         EXCLUDE_FROM_ALL
         ${STEP_SOURCES}
     )
 
-    set_target_properties(cucumber-cpp_wire_server-cov
+    set_target_properties(cucumber-cpp_wireserver-cov
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
     )
 
-  target_include_directories(cucumber-cpp_wire_server-cov
+  target_include_directories(cucumber-cpp_wireserver-cov
         SYSTEM
         PRIVATE
         ${Boost_INCLUDE_DIRS}
     )
-    target_link_libraries(cucumber-cpp_wire_server-cov
+    target_link_libraries(cucumber-cpp_wireserver-cov
         Cuke::Cucumber-cpp
         ${Boost_LIBRARIES}
         internal::projectlib-cov
@@ -279,7 +287,7 @@ if(STEP_SOURCES)
     )
 
     if(CMAKE_COMPILER_IS_CLANGCXX)
-      target_compile_options(cucumber-cpp_wire_server-cov
+      target_compile_options(cucumber-cpp_wireserver-cov
           PRIVATE
           -Wno-non-virtual-dtor
           -Wno-global-constructors
@@ -287,18 +295,18 @@ if(STEP_SOURCES)
     endif(CMAKE_COMPILER_IS_CLANGCXX)
 
     if(GTEST_FOUND)
-      target_include_directories(cucumber-cpp_wire_server-cov
+      target_include_directories(cucumber-cpp_wireserver-cov
           SYSTEM
           PRIVATE
           ${GTEST_INCLUDE_DIRS}
       )
-      target_link_libraries(cucumber-cpp_wire_server-cov
+      target_link_libraries(cucumber-cpp_wireserver-cov
           ${GTEST_LIBRARIES}
       )
     endif(GTEST_FOUND)
 
     if(GMOCK_FOUND)
-      target_link_libraries(cucumber-cpp_wire_server-cov
+      target_link_libraries(cucumber-cpp_wireserver-cov
           GMock::GMock
           GMock::Main
       )
@@ -306,7 +314,7 @@ if(STEP_SOURCES)
 
     setup_target_under_cucumber_for_coverage_cobertura(
         coverage_features
-        cucumber-cpp_wire_server-cov
+        cucumber-cpp_wireserver-cov
         ${COVERAGE_REPORT_DIR}/features
         ${CMAKE_CURRENT_SOURCE_DIR}
         ""
