@@ -8,8 +8,8 @@ version: 1.2.0.{build}
 #  - VisualStudio
   # blacklist
   #except:
- 
-# Do not build on tags (GitHub only) 
+
+# Do not build on tags (GitHub only)
 #skip_tags: true
 
 pull_requests:
@@ -19,22 +19,20 @@ os:
 - Visual Studio 2015
 
 # build platform, i.e. Win32 (instead of x86), x64, Any CPU. This setting is optional.
-platform: 
+platform:
   - Win32
   - x64
 
  # build configuration, i.e. Debug, Release, etc.
 configuration:
 #  - Debug
-  - Release 
+  - Release
 
 # scripts that run after cloning repository
 install:
   - cmd: cinst cmake -version 3.2.1 -y
   - cmd: cmake --version
   - cmd: cinst nsis --version 2.46.0.20150406
-  - cmd: cinst ruby
-  - cmd: cinst rubygems
   - cmd: gem install cucumber --no-document
 
 # scripts to run before build
@@ -56,8 +54,8 @@ after_build:
 build_script:
 
 # to disable automatic builds
-#build: off  
-  
+#build: off
+
 build:
   project: build\Cpp_project_template.sln # path to Visual Studio solution or project
   parallel: true                           # enable MSBuild parallel builds
