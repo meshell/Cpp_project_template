@@ -78,30 +78,6 @@ matrix:
       addons: *clang37
       env: COMPILER=clang++-3.7 BUILD_TYPE='Debug' COVERAGE=0
 
-    - os: linux
-      compiler: clang
-      addons: &clang38
-        apt:
-          sources:
-            - llvm-toolchain-precise
-            - ubuntu-toolchain-r-test
-            - boost-latest
-          packages:
-            - clang-3.8
-            - libboost-date-time1.55-dev
-            - libboost-thread1.55-dev
-            - libboost-chrono1.55-dev
-            - libboost-regex1.55-dev
-            - libboost-system1.55-dev
-            - libboost-filesystem1.55-dev
-            - libboost-program-options1.55-dev
-      env: COMPILER=clang++-3.8 BUILD_TYPE='Release' COVERAGE=0
-
-    - os: linux
-      compiler: clang
-      addons: *clang38
-      env: COMPILER=clang++-3.8 BUILD_TYPE='Debug' COVERAGE=0
-
     # Linux GCC Builds
     - os: linux
       compiler: gcc
@@ -186,6 +162,30 @@ matrix:
       compiler: gcc
       addons: *gcc5
       env: COMPILER=g++-5 BUILD_TYPE='Debug' COVERAGE=0
+  allow_failures:
+    - os: linux
+      compiler: clang
+      addons: &clang38
+        apt:
+          sources:
+            - llvm-toolchain-precise
+            - ubuntu-toolchain-r-test
+            - boost-latest
+          packages:
+            - clang-3.8
+            - libboost-date-time1.55-dev
+            - libboost-thread1.55-dev
+            - libboost-chrono1.55-dev
+            - libboost-regex1.55-dev
+            - libboost-system1.55-dev
+            - libboost-filesystem1.55-dev
+            - libboost-program-options1.55-dev
+      env: COMPILER=clang++-3.8 BUILD_TYPE='Release' COVERAGE=0
+
+    - os: linux
+      compiler: clang
+      addons: *clang38
+      env: COMPILER=clang++-3.8 BUILD_TYPE='Debug' COVERAGE=0    
 
 notifications:
   email:
