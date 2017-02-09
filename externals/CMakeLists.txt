@@ -219,15 +219,15 @@ endif(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
 # Boost
 ####################
 
-# cucumber-cpp needs date_time, thread, system, regex and program_options
-set(Boost_Components thread system regex date_time program_options)
+# cucumber-cpp needs date_time, thread, system, regex, filesystem and program_options
+set(Boost_Components thread system regex date_time filesystem program_options)
 
 # TODO: add your boost libraries here if you need one
 # set(Boost_Components ${Boost_Components} program_options)
 
 if(NOT DISABLE_CPPSPEC)
-  # cppspec needs additionally filesystem and chrono
-  set(Boost_Components ${Boost_Components} filesystem chrono)
+  # cppspec needs additionally chrono
+  set(Boost_Components ${Boost_Components} chrono)
 endif(NOT DISABLE_CPPSPEC)
 
 find_package(Boost COMPONENTS ${Boost_Components})
@@ -418,7 +418,6 @@ if(NOT CUKE_FOUND)
   ExternalProject_Add(cucumber-cpp
       INSTALL_DIR ${EXT_INSTALL_DIR}
       GIT_REPOSITORY https://github.com/meshell/cucumber-cpp
-      GIT_TAG GTest_download
 #      URL https://github.com/cucumber/cucumber-cpp/archive/v${CUKE_VERSION}.tar.gz
       LOG_DOWNLOAD ON
       LOG_CONFIGURE ON

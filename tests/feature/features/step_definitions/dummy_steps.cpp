@@ -24,16 +24,16 @@ GIVEN("^a dummy initialised with \"([^\"]*)\" and \"([^\"]*)\"$")
     context->dummies.emplace_back(CppTemplate::Dummy{hello_string, world_string});
 }
 
-GIVEN("^the following dummies:$")
+GIVEN("^the following dummies")
 {
     TABLE_PARAM(dummy_params);
     ScenarioScope<DummyCtx> context{};
-    const auto& dummies_table = dummy_params.hashes();
+    const auto& dummies = dummy_params.hashes();
 
-    for (const auto& table_row : dummies_table)
+    for (const auto& dummy : dummies)
     {
-        context->dummies.emplace_back(CppTemplate::Dummy{std::string{table_row.at("hello")},
-                                                         std::string{table_row.at("world")}});
+        context->dummies.emplace_back(CppTemplate::Dummy{std::string{dummy.at("hello")},
+                                                         std::string{dummy.at("world")}});
     }
 }
 

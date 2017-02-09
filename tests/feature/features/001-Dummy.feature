@@ -7,12 +7,12 @@ Feature: Hello World feature
 Scenario Outline: Single dummy says Hello World
   Given a dummy initialised with <hello> and <world>
   When I command the dummy to say hello
-  Then the dummy should say <hello world>
+  Then the dummy should say <hello_world>
 
 Examples:
-  | hello     | world          | hello world             |
+  | hello     | world          | hello_world             |
   | "Hello"   | "World"        | "Hello World"           |
-  | "Hallo"   | "Welt"        | "Hallo Welt"             |
+  | "Hallo"   | "Welt"         | "Hallo Welt"             |
   | "Bonjour" | "tout le monde"| "Bonjour tout le monde" |
   | "Hola"    | "mundo"        | "Hola mundo"            |
   | "Hello"   | "vilag"        | "Hello vilag"           |
@@ -28,10 +28,10 @@ Scenario Outline: Multiple dummies say Hello World
     | Hello   | vilag         |
 
   When I command the dummy <index> to say hello
-  Then the dummy should say <hello world>
+  Then the dummy should say <hello_world>
 
 Examples:
-  | index | hello world             |
+  | index | hello_world             |
   | 0     | "Hello World"           |
   | 1     | "Hallo Welt"            |
   | 2     | "Bonjour tout le monde" |
