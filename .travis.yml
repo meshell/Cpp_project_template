@@ -202,7 +202,7 @@ install:
     travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
     export PATH=${DEPS_DIR}/cmake/bin:${PATH}
   - gem install bundler
-  - if [ "${COVERAGE}" == '1' ] ; then export PATH=$HOME/.local/bin:$PATH && pip install cpp-coveralls --user `whoami` ; fi
+  - if [ "${COVERAGE}" == '1' ] ; then export PATH=$HOME/.local/bin:$PATH && pip install --user cpp-coveralls ; fi
 
 before_script:
   - export CXX=${COMPILER}
