@@ -2,7 +2,6 @@
 ------------- | -------------
 Travis  |[![Build Status Travis](https://travis-ci.org/meshell/Cpp_project_template.png)](https://travis-ci.org/meshell/Cpp_project_template)
 AppVeyor  | [![Build status AppVeyor](https://ci.appveyor.com/api/projects/status/u0axo813um798dc7?svg=true)](https://ci.appveyor.com/project/meshell/cpp-project-template)
-Drone.io | [![Build Status](https://drone.io/github.com/meshell/Cpp_project_template/status.png)](https://drone.io/github.com/meshell/Cpp_project_template/latest)
 Coverage | [![Coverage Status](https://coveralls.io/repos/meshell/Cpp_project_template/badge.svg?branch=master&service=github)](https://coveralls.io/github/meshell/Cpp_project_template?branch=master)
 
 Cpp_project_template
