@@ -185,7 +185,7 @@ matrix:
     - os: linux
       compiler: clang
       addons: *clang38
-      env: COMPILER=clang++-3.8 BUILD_TYPE='Debug' COVERAGE=0    
+      env: COMPILER=clang++-3.8 BUILD_TYPE='Debug' COVERAGE=0
 
 notifications:
   email:
@@ -201,8 +201,8 @@ install:
     CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
     travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
     export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-  - gem install bundler
-  - if [ "${COVERAGE}" == '1' ] ; then export PATH=$HOME/.local/bin:$PATH && pip install --user cpp-coveralls ; fi
+  - gem install bundler --no-document
+  - if [ "${COVERAGE}" == '1' ] ; then export PATH=$HOME/.local/bin:$PATH && pip install --user urllib3[secure] cpp-coveralls ; fi
 
 before_script:
   - export CXX=${COMPILER}

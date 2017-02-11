@@ -33,7 +33,7 @@ install:
   - cmd: cinst cmake -version 3.2.1 -y
   - cmd: cmake --version
   - cmd: cinst nsis --version 2.46.0.20150406
-  - cmd: gem install cucumber --no-document
+  - cmd: gem install bundler --no-document
 
 # scripts to run before build
 before_build:
