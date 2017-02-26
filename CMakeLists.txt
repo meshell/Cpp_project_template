@@ -10,16 +10,16 @@ cmake_policy(SET CMP0048 NEW)
 project(Cpp_project_template VERSION 1.2.0 LANGUAGES CXX C)
 
 # project name used in doxygen docu
-STRING(REGEX REPLACE "_" " " PROJECT_DOC_NAME ${PROJECT_NAME})
+string(REGEX REPLACE "_" " " PROJECT_DOC_NAME ${PROJECT_NAME})
 
 # project name used for installation
 set(APPLICATION_NAME ${PROJECT_DOC_NAME})
 
-if (WIN32)
+if(WIN32)
   # Set a install path in the project folder
   # Windows 7 can not install directly into the default folder (e.g. C:/Program Files (x86)/Cpp_Project_Template)
   set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install CACHE PATH "Install path prefix" FORCE)
-endif (WIN32)
+endif(WIN32)
 
 
 # Cmake cache variables
@@ -77,7 +77,7 @@ endif(BUILD_EXTERNALS)
 
 find_package(Boost)
 if(Boost_FOUND)
-    add_subdirectory(src)
+  add_subdirectory(src)
 endif(Boost_FOUND)
 
 # unit tests require gmock
@@ -123,29 +123,29 @@ endif(CPPSPEC_FOUND AND Boost_FOUND AND NOT DISABLE_CPPSPEC)
 set(DOC_DIR ${PROJECT_SOURCE_DIR}/doc CACHE PATH "Documentation directory")
 
 file(MAKE_DIRECTORY
-  ${DOC_DIR}
-)
+    ${DOC_DIR}
+    )
 
 # Doxygen documentation
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doxygen/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
   add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${DOC_DIR}
-    COMMENT "Generating API documentation with Doxygen." VERBATIM
-  )
+      ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+      WORKING_DIRECTORY ${DOC_DIR}
+      COMMENT "Generating API documentation with Doxygen." VERBATIM
+      )
 
   install(DIRECTORY ${DOC_DIR}/html
-    DESTINATION doc
-    COMPONENT doc
-  )
+      DESTINATION doc
+      COMPONENT doc
+      )
 endif(DOXYGEN_FOUND)
 
 install(FILES README.md LICENSE
-  DESTINATION doc
-  COMPONENT doc
-)
+    DESTINATION doc
+    COMPONENT doc
+    )
 
 # Add some custom target
 if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
@@ -161,7 +161,7 @@ if(TARGET coverage_features)
 endif(TARGET coverage_features)
 
 if(TARGET coverage_igloo)
-    add_dependencies(coverage coverage_igloo)
+  add_dependencies(coverage coverage_igloo)
 endif(TARGET coverage_igloo)
 
 if(TARGET coverage_catch)
@@ -178,45 +178,45 @@ set(REPORT_DIR ${PROJECT_SOURCE_DIR}/reports CACHE PATH "Reports directory")
 
 # create report and documentation output directories
 file(MAKE_DIRECTORY
-  ${REPORT_DIR}
-)
+    ${REPORT_DIR}
+    )
 
 find_program(CPPCHECK_EXE cppcheck)
 
 if(CPPCHECK_EXE)
   add_custom_target(run_cppcheck
-    ${CPPCHECK_EXE}  -iexternals --enable=style -f --std=c++11 -j2 --xml --suppress=*:externals/include/gtest/gtest.h --suppress=*:externals/include/gtest/internal/gtest-tuple.h --suppress=*:externals/include/gmock/gmock.h ./ 2> ${REPORT_DIR}/cppcheck.xml
-    COMMENT "Run cppcheck and output report to ${REPORT_DIR}/cppcheck.xml" VERBATIM
-  )
+      ${CPPCHECK_EXE} -iexternals --enable=style -f --std=c++11 -j2 --xml --suppress=*:externals/include/gtest/gtest.h --suppress=*:externals/include/gtest/internal/gtest-tuple.h --suppress=*:externals/include/gmock/gmock.h ./ 2> ${REPORT_DIR}/cppcheck.xml
+      COMMENT "Run cppcheck and output report to ${REPORT_DIR}/cppcheck.xml" VERBATIM
+      )
 endif(CPPCHECK_EXE)
 
 find_program(RATS_EXE rats)
 
 if(RATS_EXE)
   add_custom_target(run_rats
-    ${RATS_EXE}  --quiet --xml ./src > ${REPORT_DIR}/rats.xml
-    COMMENT "Run cppcheck and output report to ${REPORT_DIR}/rats.xml" VERBATIM
-  )
+      ${RATS_EXE} --quiet --xml ./src > ${REPORT_DIR}/rats.xml
+      COMMENT "Run cppcheck and output report to ${REPORT_DIR}/rats.xml" VERBATIM
+      )
 endif(RATS_EXE)
 
 add_custom_target(clean-reports
-  ${CMAKE_COMMAND} -E remove_directory ${REPORT_DIR}
-  COMMENT "Delete all reports." VERBATIM
-)
+    ${CMAKE_COMMAND} -E remove_directory ${REPORT_DIR}
+    COMMENT "Delete all reports." VERBATIM
+    )
 
 add_custom_target(remove_externals
-  ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/include
-  COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/lib
-  COMMENT "Remove externals (lib & include)." VERBATIM
-)
+    ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/include
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/externals/lib
+    COMMENT "Remove externals (lib & include)." VERBATIM
+    )
 
 find_program(SONAR_RUNNER_EXE sonar-runner)
 
 if(SONAR_RUNNER_EXE)
   add_custom_target(run_sonar-runner
-    ${SONAR_RUNNER_EXE}
-    COMMENT "Remove externals (lib & include)." VERBATIM
-  )
+      ${SONAR_RUNNER_EXE}
+      COMMENT "Remove externals (lib & include)." VERBATIM
+      )
   add_dependencies(run_sonar-runner clean-reports run_cppcheck run_rats coverage)
 endif(SONAR_RUNNER_EXE)
 

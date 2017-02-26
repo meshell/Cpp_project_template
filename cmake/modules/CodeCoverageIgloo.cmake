@@ -18,7 +18,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
       ${CMAKE_CXX_COMPILER} -dumpversion
       OUTPUT_VARIABLE
       GCC_VERSION
-  )
+      )
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 if(NOT CMAKE_COMPILER_IS_GNUCXX)
@@ -26,7 +26,7 @@ if(NOT CMAKE_COMPILER_IS_GNUCXX)
 endif(NOT CMAKE_COMPILER_IS_GNUCXX)
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-  message( WARNING "Code coverage results with an optimised (non-Debug) build may be misleading" )
+  message(WARNING "Code coverage results with an optimised (non-Debug) build may be misleading")
 endif(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 find_program(PYTHON_EXECUTABLE python)
@@ -55,28 +55,28 @@ endif()
 # Optional fifth parameter is the outputfile the output is redirected to
 # Optional sixth parameter is passed as arguments to gcovr
 #   Pass them in list form, e.g.: "-j;2" for -j 2
-function(SETUP_TARGET_FOR_IGLOO_COVERAGE_COBERTURA _targetname _testrunner _outputname)
+function(setup_target_for_igloo_coverage_cobertura _targetname _testrunner _outputname)
   target_link_libraries(${_testrunner} gcov)
 
   target_compile_options(${_testrunner}
       PUBLIC
       -fprofile-arcs
       -ftest-coverage
-  )
+      )
   add_custom_target(${_targetname}
-  # Run tests
+      # Run tests
       ${_testrunner} ${ARGV3} > ${ARGV4}
 
-  # Running gcovr
+      # Running gcovr
       COMMAND ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       COMMENT "Running gcovr to produce Cobertura code coverage report."
-  )
+      )
 
   # Show info where to find the report
   add_custom_command(TARGET ${_targetname} POST_BUILD
       COMMAND ;
       COMMENT "Cobertura code coverage report saved in ${_outputname}.xml."
-  )
+      )
 endfunction() # SETUP_TARGET_FOR_IGLOO_COVERAGE_COBERTURA
 

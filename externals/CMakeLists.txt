@@ -46,7 +46,6 @@ if(NOT EXT_INSTALL_DIR)
 endif()
 
 
-
 set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 if(MSVC)
   set(LIB_DIR ${CMAKE_BUILD_TYPE})
@@ -69,14 +68,14 @@ add_custom_command(TARGET external_dependencies
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} ..
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-)
+    )
 
 ####################
 # Igloo
 ####################
 find_package(Igloo)
 if(NOT DISABLE_IGLOO AND NOT IGLOO_FOUND)
-  ExternalProject_Add(igloo
+  externalproject_add(igloo
       INSTALL_DIR ${EXT_INSTALL_DIR}
       URL https://github.com/joakimkarlsson/igloo/archive/igloo.${IGLOO_VERSION}.tar.gz
       LOG_DOWNLOAD ON
@@ -86,9 +85,9 @@ if(NOT DISABLE_IGLOO AND NOT IGLOO_FOUND)
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND
-        ${CMAKE_COMMAND} -E make_directory ${EXT_INSTALL_INCLUDE_DIR}/igloo &&
-        ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/igloo ${EXT_INSTALL_INCLUDE_DIR}/igloo
-  )
+      ${CMAKE_COMMAND} -E make_directory ${EXT_INSTALL_INCLUDE_DIR}/igloo &&
+      ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/igloo ${EXT_INSTALL_INCLUDE_DIR}/igloo
+      )
 
   add_dependencies(external_dependencies igloo)
 endif(NOT DISABLE_IGLOO AND NOT IGLOO_FOUND)
@@ -98,7 +97,7 @@ endif(NOT DISABLE_IGLOO AND NOT IGLOO_FOUND)
 ####################
 find_package(Catch)
 if(NOT DISABLE_CATCH AND NOT CATCH_FOUND)
-  ExternalProject_Add(catch
+  externalproject_add(catch
       INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
       URL https://github.com/philsquared/Catch/archive/V${CATCH_VERSION}.tar.gz
       URL_MD5 d18fc213fb5cf662ce507b6fb549d5f6
@@ -109,9 +108,9 @@ if(NOT DISABLE_CATCH AND NOT CATCH_FOUND)
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND
-        ${CMAKE_COMMAND} -E make_directory ${EXT_INSTALL_INCLUDE_DIR}/catch &&
-        ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/single_include/catch.hpp ${EXT_INSTALL_INCLUDE_DIR}/catch/
-  )
+      ${CMAKE_COMMAND} -E make_directory ${EXT_INSTALL_INCLUDE_DIR}/catch &&
+      ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/single_include/catch.hpp ${EXT_INSTALL_INCLUDE_DIR}/catch/
+      )
 
   add_dependencies(external_dependencies catch)
 endif(NOT DISABLE_CATCH AND NOT CATCH_FOUND)
@@ -136,7 +135,7 @@ if(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
   if("${GMOCK_VERSION}" STREQUAL "1.6.0" OR "${GMOCK_VERSION}" STREQUAL "1.7.0")
     set(GMOCK_SRC_ROOT "${CMAKE_CURRENT_BINARY_DIR}/googlemock")
 
-    ExternalProject_Add(gtest
+    externalproject_add(gtest
         INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
         GIT_REPOSITORY "https://github.com/google/googletest.git"
         GIT_TAG "release-${GMOCK_VERSION}"
@@ -146,17 +145,17 @@ if(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
         LOG_BUILD ON
         UPDATE_COMMAND ""
         CMAKE_ARGS
-          -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-          -Dgtest_disable_pthreads=${MINGW}
-          ${GTEST_CMAKE_ARGS}
+        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -Dgtest_disable_pthreads=${MINGW}
+        ${GTEST_CMAKE_ARGS}
         INSTALL_COMMAND
-          ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include ${EXT_INSTALL_INCLUDE_DIR} &&
-          ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR} &&
-          ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
-    )
+        ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include ${EXT_INSTALL_INCLUDE_DIR} &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gtest${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR} &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gtest_main${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
+        )
 
-    ExternalProject_Add(googlemock
+    externalproject_add(googlemock
         INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
         GIT_REPOSITORY "https://github.com/google/googlemock.git"
         GIT_TAG "release-${GMOCK_VERSION}"
@@ -166,16 +165,16 @@ if(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
         LOG_BUILD ON
         UPDATE_COMMAND ""
         CMAKE_ARGS
-          -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-          -Dgtest_disable_pthreads=${MINGW}
-          ${GTEST_CMAKE_ARGS}
+        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -Dgtest_disable_pthreads=${MINGW}
+        ${GTEST_CMAKE_ARGS}
         DEPENDS gtest
         INSTALL_COMMAND
-          ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include ${EXT_INSTALL_INCLUDE_DIR} &&
-          ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gmock${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR} &&
-          ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gmock_main${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
-    )
+        ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include ${EXT_INSTALL_INCLUDE_DIR} &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gmock${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR} &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/${LIB_DIR}/${LIBRARY_PREFIX}gmock_main${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
+        )
 
     # override GMOCK_LIBRARY_DIRS such that only the ones from external are used
     set(GMOCK_ROOT ${EXT_INSTALL_DIR})
@@ -187,7 +186,7 @@ if(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
     set(GTEST_LIBRARY_DIRS ${EXT_INSTALL_LIB_DIR})
     add_dependencies(external_dependencies gtest)
   else() #1.8.0
-    ExternalProject_Add(googlemock
+    externalproject_add(googlemock
         INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}
         GIT_REPOSITORY "https://github.com/google/googletest.git"
         GIT_TAG "release-${GMOCK_VER}"
@@ -197,16 +196,16 @@ if(NOT GMOCK_FOUND OR NOT GTEST_FOUND)
         LOG_BUILD ON
         UPDATE_COMMAND ""
         CMAKE_ARGS
-          -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-          -Dgtest_disable_pthreads=${MINGW}
-          -DBUILD_GTEST=ON
-          ${GTEST_CMAKE_ARGS}
+        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -Dgtest_disable_pthreads=${MINGW}
+        -DBUILD_GTEST=ON
+        ${GTEST_CMAKE_ARGS}
         INSTALL_COMMAND
-          ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/googlemock/include ${EXT_INSTALL_INCLUDE_DIR} &&
-          ${CMAKE_COMMAND} -E copy <BINARY_DIR>/googlemock/${LIB_DIR}/${LIBRARY_PREFIX}gmock${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR} &&
-          ${CMAKE_COMMAND} -E copy <BINARY_DIR>/googlemock/${LIB_DIR}/${LIBRARY_PREFIX}gmock_main${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
-    )
+        ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/googlemock/include ${EXT_INSTALL_INCLUDE_DIR} &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/googlemock/${LIB_DIR}/${LIBRARY_PREFIX}gmock${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR} &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/googlemock/${LIB_DIR}/${LIBRARY_PREFIX}gmock_main${LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
+        )
 
     # override GMOCK_LIBRARY_DIRS such that only the ones from external are used
     set(GMOCK_ROOT ${EXT_INSTALL_DIR})
@@ -234,7 +233,7 @@ find_package(Boost COMPONENTS ${Boost_Components})
 
 if(NOT Boost_FOUND)
 
-  string( REPLACE "." "_" Boost_Version_Underscore ${BOOST_VERSION} )
+  string(REPLACE "." "_" Boost_Version_Underscore ${BOOST_VERSION})
 
   foreach(library ${Boost_Components})
     set(BOOST_LIBRARIES ${BOOST_LIBRARIES} --with-${library})
@@ -283,7 +282,7 @@ if(NOT Boost_FOUND)
     set(BOOST_TOOLSET_ADDRESSMODEL "address-model=64")
   endif(CMAKE_CL_64)
 
-  ExternalProject_Add(boost
+  externalproject_add(boost
       URL http://downloads.sourceforge.net/project/boost/boost/${BOOST_VERSION}/boost_${Boost_Version_Underscore}.tar.bz2
       LOG_DOWNLOAD ON
       LOG_CONFIGURE ON
@@ -291,41 +290,41 @@ if(NOT Boost_FOUND)
       INSTALL_DIR ${EXT_INSTALL_DIR}
       UPDATE_COMMAND ""
       CONFIGURE_COMMAND
-        <SOURCE_DIR>/bootstrap${SCRIPT_SUFFIX} --with-toolset=${BOOST_TOOLSET} --prefix=<INSTALL_DIR>
+      <SOURCE_DIR>/bootstrap${SCRIPT_SUFFIX} --with-toolset=${BOOST_TOOLSET} --prefix=<INSTALL_DIR>
       BUILD_COMMAND
-        <SOURCE_DIR>/b2${EXE_SUFFIX} install --prefix=<INSTALL_DIR>
-        ${BOOST_LIBRARIES}
-        -j8
-        --build-type=complete
-        variant=${BOOST_VARIANT}
-        link=${BOOST_LINK}
-        threading=${BOOST_THREADING}
-        --layout=${BOOST_LAYOUT}
-        ${BOOST_CXX_FLAGS}
-        ${BOOST_TOOLSET_BUILD}
-        ${BOOST_TOOLSET_ADDRESSMODEL}
+      <SOURCE_DIR>/b2${EXE_SUFFIX} install --prefix=<INSTALL_DIR>
+      ${BOOST_LIBRARIES}
+      -j8
+      --build-type=complete
+      variant=${BOOST_VARIANT}
+      link=${BOOST_LINK}
+      threading=${BOOST_THREADING}
+      --layout=${BOOST_LAYOUT}
+      ${BOOST_CXX_FLAGS}
+      ${BOOST_TOOLSET_BUILD}
+      ${BOOST_TOOLSET_ADDRESSMODEL}
       BUILD_IN_SOURCE 1
       INSTALL_COMMAND ""
-  )
+      )
 
   if(MSVC)
-    string( REPLACE "_0" "" Boost_Version_Shorten ${Boost_Version_Underscore} )
-    ExternalProject_Add_Step(boost MoveHeaders
+    string(REPLACE "_0" "" Boost_Version_Shorten ${Boost_Version_Underscore})
+    externalproject_add_step(boost MoveHeaders
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}/boost ${EXT_INSTALL_INCLUDE_DIR}/boost
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_SOURCE_DIR}/include/boost-${Boost_Version_Shorten}
         COMMENT "Move boost headers..."
         DEPENDEES install
-    )
+        )
   endif(MSVC)
 
   if(MINGW)
-    ExternalProject_Add_Step(boost FixBoostProjectConfig
+    externalproject_add_step(boost FixBoostProjectConfig
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/fix_boost_project-config_for_mingw.bat <BINARY_DIR>
         COMMAND ${CMAKE_COMMAND} -E chdir <BINARY_DIR> fix_boost_project-config_for_mingw.bat project-config.jam
         COMMENT "Fix boost project-config.jam file for MinGW..."
         DEPENDEES configure
         DEPENDERS build
-    )
+        )
   endif(MINGW)
 
   if(WIN32)
@@ -335,7 +334,7 @@ if(NOT Boost_FOUND)
 
 
   # set boost cmake variables such that only the ones from external are used
-  ExternalProject_Get_Property(boost INSTALL_DIR)
+  externalproject_get_property(boost INSTALL_DIR)
   set(BOOST_ROOT ${INSTALL_DIR})
   set(Boost_NO_SYSTEM_PATHS ON)
 
@@ -353,11 +352,11 @@ if(Boost_FOUND)
   set(CUKE_EXTERNAL_PROJ_DEPENDS)
   set(CUKE_DEPENDENCIES_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
   set(CUKE_DEPENDENCIES_LIBS_DIRS ${Boost_LIBRARY_DIRS})
-  set(CUKE_DEPENDENCIES ${Boost_LIBRARIES} )
+  set(CUKE_DEPENDENCIES ${Boost_LIBRARIES})
   set(CPPSPEC_EXTERNAL_PROJ_DEPENDS)
   set(CPPSPEC_DEPENDENCIES_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
   set(CPPSPEC_DEPENDENCIES_LIBS_DIRS ${Boost_LIBRARY_DIRS})
-  set(CPPSPEC_DEPENDENCIES ${Boost_LIBRARIES} )
+  set(CPPSPEC_DEPENDENCIES ${Boost_LIBRARIES})
 else(Boost_FOUND)
   set(CUKE_EXTERNAL_PROJ_DEPENDS boost)
   set(CPPSPEC_EXTERNAL_PROJ_DEPENDS boost)
@@ -368,7 +367,7 @@ find_package(GTest)
 if(GTEST_FOUND)
   set(CPPSPEC_DEPENDENCIES_INCLUDE_DIRS ${GTEST_INCLUDE_DIRS})
   set(CPPSPEC_DEPENDENCIES_LIBS_DIRS ${GTEST_LIBRARY_DIRS})
-  set(CPPSPEC_DEPENDENCIES ${GTEST_LIBRARIES} )
+  set(CPPSPEC_DEPENDENCIES ${GTEST_LIBRARIES})
   set(CUKE_DEPENDENCIES_INCLUDE_DIRS ${CUKE_DEPENDENCIES_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
   set(CUKE_DEPENDENCIES_LIBS_DIRS ${CUKE_DEPENDENCIES_LIBS_DIRS} ${GTEST_LIBRARY_DIRS})
   set(CUKE_DEPENDENCIES ${CUKE_DEPENDENCIES} ${GTEST_LIBRARIES})
@@ -383,28 +382,28 @@ if(NOT DISABLE_CPPSPEC)
     ####################
     # CppSpec
     ####################
-    ExternalProject_Add(cppspec
+    externalproject_add(cppspec
         INSTALL_DIR ${EXT_INSTALL_DIR}
         GIT_REPOSITORY https://github.com/meshell/cppspec.git
         GIT_TAG cmake_fix
-    # URL https://github.com/tpuronen/cppspec/archive/release-0.5.tar.gz
-    # URL_MD5 88e462b4416aa64463a9cd7fda105708
+        # URL https://github.com/tpuronen/cppspec/archive/release-0.5.tar.gz
+        # URL_MD5 88e462b4416aa64463a9cd7fda105708
         LOG_DOWNLOAD ON
         LOG_CONFIGURE ON
         LOG_BUILD ON
         DEPENDS ${CPPSPEC_EXTERNAL_PROJ_DEPENDS}
         CMAKE_ARGS
-          -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-          -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-          -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+        -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
         BUILD_COMMAND
-          cmake --build <BINARY_DIR> --target CppSpec --config ${CMAKE_BUILD_TYPE}
+        cmake --build <BINARY_DIR> --target CppSpec --config ${CMAKE_BUILD_TYPE}
         UPDATE_COMMAND ""
         INSTALL_COMMAND
-          ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/CppSpec &&
-          ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include/CppSpec &&
-          ${CMAKE_COMMAND} -E copy <BINARY_DIR>/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CppSpec${CMAKE_SHARED_LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}/
-    )
+        ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/include/CppSpec &&
+        ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include <INSTALL_DIR>/include/CppSpec &&
+        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CppSpec${CMAKE_SHARED_LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}/
+        )
     add_dependencies(external_dependencies cppspec)
   endif(NOT CPPSPEC_FOUND)
 endif(NOT DISABLE_CPPSPEC)
@@ -415,33 +414,33 @@ endif(NOT DISABLE_CPPSPEC)
 find_package(Cuke)
 
 if(NOT CUKE_FOUND)
-  ExternalProject_Add(cucumber-cpp
+  externalproject_add(cucumber-cpp
       INSTALL_DIR ${EXT_INSTALL_DIR}
       GIT_REPOSITORY https://github.com/meshell/cucumber-cpp
-#      URL https://github.com/cucumber/cucumber-cpp/archive/v${CUKE_VERSION}.tar.gz
+      #      URL https://github.com/cucumber/cucumber-cpp/archive/v${CUKE_VERSION}.tar.gz
       LOG_DOWNLOAD ON
       LOG_CONFIGURE ON
       LOG_BUILD ON
       DEPENDS ${CUKE_EXTERNAL_PROJ_DEPENDS}
       CMAKE_ARGS
-        -DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}
-        -DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-        -DCUKE_USE_STATIC_BOOST=${USE_STATIC_BOOST}
-        -DCUKE_DISABLE_BOOST_TEST=ON
-        -DCUKE_DISABLE_GTEST=OFF
-        -DCUKE_ENABLE_EXAMPLES=OFF
-        -DBUILD_SHARED_LIBS=ON
-        -DCUKE_DISABLE_UNIT_TESTS=ON
-        -DCUKE_DISABLE_E2E_TESTS=ON
+      -DCMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}
+      -DCMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH}
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+      -DCUKE_USE_STATIC_BOOST=${USE_STATIC_BOOST}
+      -DCUKE_DISABLE_BOOST_TEST=ON
+      -DCUKE_DISABLE_GTEST=OFF
+      -DCUKE_ENABLE_EXAMPLES=OFF
+      -DBUILD_SHARED_LIBS=ON
+      -DCUKE_DISABLE_UNIT_TESTS=ON
+      -DCUKE_DISABLE_E2E_TESTS=ON
       BUILD_COMMAND
-        cmake --build <BINARY_DIR> --target cucumber-cpp --config ${CMAKE_BUILD_TYPE}
+      cmake --build <BINARY_DIR> --target cucumber-cpp --config ${CMAKE_BUILD_TYPE}
       UPDATE_COMMAND ""
       INSTALL_COMMAND
-        ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include ${EXT_INSTALL_INCLUDE_DIR} &&
-        ${CMAKE_COMMAND} -E copy <BINARY_DIR>/src/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}cucumber-cpp${CMAKE_STATIC_LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
-  )
+      ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include ${EXT_INSTALL_INCLUDE_DIR} &&
+      ${CMAKE_COMMAND} -E copy <BINARY_DIR>/src/${LIB_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}cucumber-cpp${CMAKE_STATIC_LIBRARY_SUFFIX} ${EXT_INSTALL_LIB_DIR}
+      )
   add_dependencies(external_dependencies cucumber-cpp)
 endif(NOT CUKE_FOUND)

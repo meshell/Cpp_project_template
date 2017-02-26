@@ -8,34 +8,34 @@
 #
 
 function(_cppspec_append_debugs _endvar _library)
-    if(${_library} AND ${_library}_DEBUG)
-        set(_output optimized ${${_library}} debug ${${_library}_DEBUG})
-    else()
-        set(_output ${${_library}})
-    endif()
-    set(${_endvar} ${_output} PARENT_SCOPE)
+  if(${_library} AND ${_library}_DEBUG)
+    set(_output optimized ${${_library}} debug ${${_library}_DEBUG})
+  else()
+    set(_output ${${_library}})
+  endif()
+  set(${_endvar} ${_output} PARENT_SCOPE)
 endfunction()
 
 
 find_path(CPPSPEC_INCLUDE_DIR CppSpec/CppSpec.h
     HINTS
-        ${CPPSPEC_ROOT}
-)
+    ${CPPSPEC_ROOT}
+    )
 
 mark_as_advanced(CPPSPEC_INCLUDE_DIR)
 
 
 function(_cppspec_find_library _name)
-    find_library(${_name}
-        NAMES ${ARGN}
-        HINTS
-            ENV CPPSPEC_ROOT
-            ${CPPSPEC_ROOT}
-    )
-    mark_as_advanced(${_name})
+  find_library(${_name}
+      NAMES ${ARGN}
+      HINTS
+      ENV CPPSPEC_ROOT
+      ${CPPSPEC_ROOT}
+      )
+  mark_as_advanced(${_name})
 endfunction()
 
-function(CPPSPEC_ADD_TESTS executable extra_args)
+function(cppspec_add_tests executable extra_args)
   if(NOT ARGN)
     message(FATAL_ERROR "Missing ARGN: Read the documentation for CPPSPEC_ADD_TESTS")
   endif()
@@ -59,34 +59,34 @@ find_package_handle_standard_args(CPPSPEC DEFAULT_MSG CPPSPEC_LIBRARY CPPSPEC_IN
 
 
 if(CPPSPEC_FOUND)
-  SET(CPPSPEC_INCLUDE_DIRS ${CPPSPEC_INCLUDE_DIR})
+  set(CPPSPEC_INCLUDE_DIRS ${CPPSPEC_INCLUDE_DIR})
   _cppspec_append_debugs(CPPSPEC_LIBRARIES CPPSPEC_LIBRARY)
 
   if(NOT TARGET CppSpec::CppSpec)
-      add_library(CppSpec::CppSpec UNKNOWN IMPORTED)
-      if(CPPSPEC_INCLUDE_DIRS)
-          set_target_properties(CppSpec::CppSpec PROPERTIES
-              INTERFACE_INCLUDE_DIRECTORIES "${CPPSPEC_INCLUDE_DIRS}")
-      endif()
-      if(EXISTS "${CPPSPEC_LIBRARY}")
-          set_target_properties(CppSpec::CppSpec PROPERTIES
-              IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
-              IMPORTED_LOCATION "${CPPSPEC_LIBRARY}")
-      endif()
-      if(EXISTS "${CPPSPEC_LIBRARY_DEBUG}")
-          set_property(TARGET CppSpec::CppSpec APPEND PROPERTY
-              IMPORTED_CONFIGURATIONS DEBUG)
-          set_target_properties(CppSpec::CppSpec PROPERTIES
-              IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "CXX"
-              IMPORTED_LOCATION_DEBUG "${CPPSPEC_LIBRARY_DEBUG}")
-      endif()
-      if(EXISTS "${CPPSPEC_LIBRARY_RELEASE}")
-          set_property(TARGET CppSpec::CppSpec APPEND PROPERTY
-              IMPORTED_CONFIGURATIONS RELEASE)
-          set_target_properties(CppSpec::CppSpec PROPERTIES
-              IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
-              IMPORTED_LOCATION_RELEASE "${CPPSPEC_LIBRARY_RELEASE}")
-      endif()
+    add_library(CppSpec::CppSpec UNKNOWN IMPORTED)
+    if(CPPSPEC_INCLUDE_DIRS)
+      set_target_properties(CppSpec::CppSpec PROPERTIES
+          INTERFACE_INCLUDE_DIRECTORIES "${CPPSPEC_INCLUDE_DIRS}")
+    endif()
+    if(EXISTS "${CPPSPEC_LIBRARY}")
+      set_target_properties(CppSpec::CppSpec PROPERTIES
+          IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
+          IMPORTED_LOCATION "${CPPSPEC_LIBRARY}")
+    endif()
+    if(EXISTS "${CPPSPEC_LIBRARY_DEBUG}")
+      set_property(TARGET CppSpec::CppSpec APPEND PROPERTY
+          IMPORTED_CONFIGURATIONS DEBUG)
+      set_target_properties(CppSpec::CppSpec PROPERTIES
+          IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "CXX"
+          IMPORTED_LOCATION_DEBUG "${CPPSPEC_LIBRARY_DEBUG}")
+    endif()
+    if(EXISTS "${CPPSPEC_LIBRARY_RELEASE}")
+      set_property(TARGET CppSpec::CppSpec APPEND PROPERTY
+          IMPORTED_CONFIGURATIONS RELEASE)
+      set_target_properties(CppSpec::CppSpec PROPERTIES
+          IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "CXX"
+          IMPORTED_LOCATION_RELEASE "${CPPSPEC_LIBRARY_RELEASE}")
+    endif()
   endif()
 
 endif()

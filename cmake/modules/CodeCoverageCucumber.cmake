@@ -18,7 +18,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
       ${CMAKE_CXX_COMPILER} -dumpversion
       OUTPUT_VARIABLE
       GCC_VERSION
-  )
+      )
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 if(NOT CMAKE_COMPILER_IS_GNUCXX)
@@ -26,7 +26,7 @@ if(NOT CMAKE_COMPILER_IS_GNUCXX)
 endif(NOT CMAKE_COMPILER_IS_GNUCXX)
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-  message( WARNING "Code coverage results with an optimised (non-Debug) build may be misleading" )
+  message(WARNING "Code coverage results with an optimised (non-Debug) build may be misleading")
 endif(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 find_program(PYTHON_EXECUTABLE python)
@@ -56,13 +56,13 @@ endif()
 # Optional fifth parameter is passed as arguments to _testrunner
 #   Pass them in list form, e.g.: "-j;2" for -j 2
 # Optional sixth parameter is passed as arguments to gcovr
-function(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrunner _outputname _workdir)
+function(setup_target_under_cucumber_for_coverage_cobertura _targetname _testrunner _outputname _workdir)
   target_link_libraries(${_testrunner} gcov)
   target_compile_options(${_testrunner}
       PUBLIC
       -fprofile-arcs
       -ftest-coverage
-  )
+      )
 
   find_program(CUCUMBER_RUBY cucumber)
   if(NOT CUCUMBER_RUBY)
@@ -70,32 +70,32 @@ function(SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA _targetname _testrun
   endif(NOT CUCUMBER_RUBY)
 
   add_custom_target(_start_wireserver
-    ${_testrunner}  ${ARGV4} &
-  )
+      ${_testrunner} ${ARGV4} &
+      )
 
   add_custom_target(${_targetname}
       # Run tests
       ${CUCUMBER_RUBY} -P --tags ~@wip --no-color -f pretty -s -f junit -o ${TESTS_REPORT_DIR} features
       WORKING_DIRECTORY ${_workdir}
       COMMENT "Running cucumber to produce coverage informations."
-  )
+      )
 
   add_custom_command(TARGET ${_targetname}
       POST_BUILD
-  # Running gcovr
+      # Running gcovr
       COMMAND ${GCOVR_EXE} -x -r ${CMAKE_SOURCE_DIR} -o ${_outputname}.xml ${COVERAGE_EXCLUDE} ${ARGV5}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
       COMMENT "Running gcovr to produce Cobertura code coverage report."
-  )
+      )
 
   add_dependencies(${_targetname}
       _start_wireserver
-  )
+      )
 
   # Show info where to find the report
   add_custom_command(TARGET ${_targetname} POST_BUILD
       COMMAND ;
       COMMENT "Cobertura code coverage report saved in ${_outputname}.xml."
-  )
+      )
 
-  endfunction() # SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA
+endfunction() # SETUP_TARGET_UNDER_CUCUMBER_FOR_COVERAGE_COBERTURA
