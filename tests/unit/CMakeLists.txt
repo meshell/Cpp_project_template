@@ -1,5 +1,5 @@
 # required minimum version of cmake
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 # TODO add your header files here
 set(UNITTEST_HEADER_FILES
@@ -52,8 +52,7 @@ endif()
 # Create test executables for every testclass (no coverage measurement) #
 #########################################################################
 
-find_package(GMock)
-find_package(GTest REQUIRED)
+find_package(GMock REQUIRED)
 
 if(NOT TARGET internal::projectlib)
   include(${CMAKE_CURRENT_SOURCE_DIR}/../../project-export.cmake)
@@ -63,22 +62,11 @@ function(register_test TEST_FILE)
   get_filename_component(TEST_NAME ${TEST_FILE} NAME)
   message(STATUS "Adding " ${TEST_NAME})
   add_executable(${TEST_NAME} ${TEST_FILE}.cpp)
-  target_include_directories(${TEST_NAME}
-      SYSTEM
-      PRIVATE
-      ${GTEST_INCLUDE_DIRS}
-      )
   target_link_libraries(${TEST_NAME}
-      ${GTEST_BOTH_LIBRARIES}
       internal::projectlib ${ARGN}
+      GMock::GMock
+      GMock::Main
       )
-
-  if(GMOCK_FOUND)
-    target_link_libraries(${TEST_NAME}
-        GMock::GMock
-        GMock::Main
-        )
-  endif(GMOCK_FOUND)
 
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(${TEST_NAME}
@@ -86,7 +74,6 @@ function(register_test TEST_FILE)
         -Wno-global-constructors
         )
   endif(CMAKE_COMPILER_IS_CLANGCXX)
-
   gtest_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
   set(UNITTEST_SOURCES ${UNITTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
@@ -111,22 +98,13 @@ set_target_properties(unittests
     RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
     )
 
-target_include_directories(unittests
-    SYSTEM
-    PRIVATE
-    ${GTEST_INCLUDE_DIRS}
+target_link_libraries(unittests
+    internal::projectlib
+    GMock::GMock
+    GMock::Main
     )
 
-target_link_libraries(unittests
-    ${GTEST_BOTH_LIBRARIES}
-    internal::projectlib
-    )
-if(GMOCK_FOUND)
-  target_link_libraries(unittests
-      GMock::GMock
-      GMock::Main
-      )
-endif(GMOCK_FOUND)
+add_test(NAME gtest_unittests COMMAND unittests)
 
 if(CMAKE_COMPILER_IS_CLANGCXX)
   target_compile_options(unittests
@@ -171,23 +149,11 @@ if(UNIX AND CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES Debug)
       RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
       )
 
-  target_include_directories(unittests-cov
-      SYSTEM
-      PRIVATE
-      ${GTEST_INCLUDE_DIRS}
-      )
-
   target_link_libraries(unittests-cov
-      ${GTEST_BOTH_LIBRARIES}
       internal::projectlib-cov
+      GMock::GMock
+      GMock::Main
       )
-
-  if(GMOCK_FOUND)
-    target_link_libraries(unittests-cov
-        GMock::GMock
-        GMock::Main
-        )
-  endif(GMOCK_FOUND)
 
   if(CMAKE_COMPILER_IS_CLANGCXX)
     target_compile_options(unittests-cov

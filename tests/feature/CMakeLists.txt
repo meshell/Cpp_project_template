@@ -1,5 +1,5 @@
 # required minimum version of cmake
-cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 option(USE_STATIC_BOOST "Statically link Boost" ${WIN32})
 
@@ -141,13 +141,8 @@ if(STEP_SOURCES)
   find_package(GTest REQUIRED)
 
   if(GTEST_FOUND)
-    target_include_directories(cucumber-cpp_wireserver
-        SYSTEM
-        PRIVATE
-        ${GTEST_INCLUDE_DIRS}
-        )
     target_link_libraries(cucumber-cpp_wireserver
-        ${GTEST_LIBRARIES}
+        GTest::GTest
         )
 
     if(UNIX)
@@ -166,7 +161,6 @@ if(STEP_SOURCES)
   if(GMOCK_FOUND)
     target_link_libraries(cucumber-cpp_wireserver
         GMock::GMock
-        GMock::Main
         )
   endif(GMOCK_FOUND)
 
@@ -301,20 +295,14 @@ if(STEP_SOURCES)
     endif(CMAKE_COMPILER_IS_CLANGCXX)
 
     if(GTEST_FOUND)
-      target_include_directories(cucumber-cpp_wireserver-cov
-          SYSTEM
-          PRIVATE
-          ${GTEST_INCLUDE_DIRS}
-          )
       target_link_libraries(cucumber-cpp_wireserver-cov
-          ${GTEST_LIBRARIES}
+          GTest::GTest
           )
     endif(GTEST_FOUND)
 
     if(GMOCK_FOUND)
       target_link_libraries(cucumber-cpp_wireserver-cov
           GMock::GMock
-          GMock::Main
           )
     endif(GMOCK_FOUND)
 
