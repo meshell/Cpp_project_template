@@ -99,7 +99,9 @@ function(register_catchtest TEST_FILE)
   target_link_libraries(${TEST_NAME}
       internal::projectlib ${ARGN}
       )
-  catch_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
+
+  # TODO uncomment if you would like each Test to show up in CTest as a test
+  # catch_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
   set(CATCHTEST_SOURCES ${CATCHTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
 
@@ -124,6 +126,8 @@ add_executable(catchtests
     )
 
 add_executable(tests::catch ALIAS catchtests)
+
+add_test(NAME catch_unittest COMMAND catchtests)
 
 set_target_properties(catchtests
     PROPERTIES

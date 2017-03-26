@@ -57,7 +57,9 @@ endif()
 function(register_test TEST_FILE)
   get_filename_component(TEST_NAME ${TEST_FILE} NAME)
   message(STATUS "Adding spec " ${TEST_NAME})
-  cppspec_add_tests(spectests "" ${TEST_FILE}.h)
+
+  # TODO uncomment if you would like each Test to show up in CTest as a test
+  # cppspec_add_tests(spectests "" ${TEST_FILE}.h)
   set(CPPSPECTEST_SOURCES ${CPPSPECTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
   set(CPPSPECTEST_HEADERS ${CPPSPECTEST_HEADERS} ${TEST_FILE}.h PARENT_SCOPE)
 endfunction()
@@ -73,6 +75,8 @@ add_executable(spectests
     ${CPPSPECTEST_HEADERS}
     )
 add_executable(tests::spec ALIAS spectests)
+
+add_test(NAME specs COMMAND spectests)
 
 set_target_properties(spectests
     PROPERTIES

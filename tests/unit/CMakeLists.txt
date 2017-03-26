@@ -74,7 +74,8 @@ function(register_test TEST_FILE)
         -Wno-global-constructors
         )
   endif(CMAKE_COMPILER_IS_CLANGCXX)
-  gtest_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
+  # TODO uncomment if you would like each Test to show up in CTest as a test
+  # gtest_add_tests(${TEST_NAME} "" AUTO)
   set(UNITTEST_SOURCES ${UNITTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
 

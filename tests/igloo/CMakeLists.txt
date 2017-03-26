@@ -89,7 +89,8 @@ function(register_iglootest TEST_FILE)
         )
   endif(CMAKE_COMPILER_IS_GNUCXX)
 
-  igloo_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
+  # TODO uncomment if you would like each Test to show up in CTest as a test
+  # igloo_add_tests(${TEST_NAME} "" ${TEST_FILE}.cpp)
   set(IGLOOTEST_SOURCES ${IGLOOTEST_SOURCES} ${TEST_FILE}.cpp PARENT_SCOPE)
 endfunction()
 
@@ -116,6 +117,7 @@ add_executable(iglootests
 
 add_executable(tests::igloo ALIAS iglootests)
 
+add_test(NAME igloo_unittests COMMAND iglootests)
 set_target_properties(iglootests
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${TEST_RUNTIME_OUTPUT_DIRECTORY}"
