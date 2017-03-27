@@ -30,7 +30,7 @@ configuration:
 
 # scripts that run after cloning repository
 install:
-  - cmd: cinst cmake 
+  - cmd: cinst cmake --version 3.5.2 
   - cmd: cmake --version
   - cmd: cinst nsis
   - cmd: gem install bundler --no-document
